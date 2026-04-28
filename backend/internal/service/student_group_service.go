@@ -133,7 +133,7 @@ func (s *studentGroupService) UpdateStudentGroup(ctx context.Context, id uint16,
 	// Get existing group
 	group, err := s.studentGroupRepo.FindByID(ctx, &id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get student group with ID %s: %w", id, err)
+		return nil, fmt.Errorf("failed to get student group with ID %d: %w", id, err)
 	}
 	// Track updated fields
 	updatedFields := make([]string, 0)
@@ -145,7 +145,7 @@ func (s *studentGroupService) UpdateStudentGroup(ctx context.Context, id uint16,
 			return nil, fmt.Errorf("failed to check name uniqueness: %w", err)
 		}
 		if exists {
-			return nil, fmt.Errorf("student group with name %s already exists: %w", dto.Name, apperrors.ErrStudentGroupAlreadyExists)
+			return nil, fmt.Errorf("student group with name %s already exists: %w", *dto.Name, apperrors.ErrStudentGroupAlreadyExists)
 		}
 		group.Name = *dto.Name
 		updatedFields = append(updatedFields, "name")

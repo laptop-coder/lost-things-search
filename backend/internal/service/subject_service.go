@@ -126,7 +126,7 @@ func (s *subjectService) UpdateSubject(ctx context.Context, id uint16, dto Updat
 			return nil, fmt.Errorf("failed to check name uniqueness: %w", err)
 		}
 		if exists {
-			return nil, fmt.Errorf("subject with name '%s' already exists: %w", dto.Name, apperrors.ErrSubjectAlreadyExists)
+			return nil, fmt.Errorf("subject with name '%s' already exists: %w", *dto.Name, apperrors.ErrSubjectAlreadyExists)
 		}
 		subject.Name = *dto.Name
 	} else {
