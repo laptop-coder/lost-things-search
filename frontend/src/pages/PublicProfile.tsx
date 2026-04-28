@@ -178,7 +178,9 @@ const PublicProfile = () => {
                   <h2 class="text-2xl font-bold text-gray-800">
                     {user()!.lastName} {user()!.firstName} {user()?.middleName}
                   </h2>
-                  <p class="text-gray-500 mt-1">{user()!.email}</p>
+                  <Show when={hasPermission(PERMISSIONS.USER_READ_ALL)}>
+                    <p class="text-gray-500 mt-1">{user()!.email}</p>
+                  </Show>
                   <div class="flex flex-wrap gap-2 mt-3">
                     <div class="flex flex-wrap gap-1">
                       <For each={user()!.roles}>
