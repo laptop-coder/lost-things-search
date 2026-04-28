@@ -39,7 +39,6 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	r.Body = http.MaxBytesReader(w, r.Body, 10<<20) // 10 MB
-	// TODO: add cleaning of temporary data (ParseMultipartForm, r.MultipartForm, etc)
 	// TODO: check if r.MultipartForm == nil and r.PostForm == nil (in all handlers)
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		h.log.Error("failed to parse multipart/formdata form")

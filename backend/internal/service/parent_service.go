@@ -171,7 +171,6 @@ func (s *parentService) UnassignStudent(ctx context.Context, userID uuid.UUID, s
 	return s.db.Transaction(func(tx *gorm.DB) error {
 		// Check parent existence
 		var parent model.Parent
-		// TODO: move all code like here to repositories
 		if err := tx.WithContext(ctx).
 			Preload("Students").
 			Where("user_id = ?", userID).
