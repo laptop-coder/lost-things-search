@@ -1,17 +1,48 @@
-# LostThingsSearch service
-## Current roles:
-```
-1 - superadmin
-2 - admin
-3 - institution_administrator
-4 - staff
-5 - teacher
-6 - parent
-7 - student
+# LostThingsSearch
+
+Lost and found service for educational institutions.
+
+## User roles
+
+| ID | Role |
+| --- | --- |
+| 1 | Superadmin |
+| 2 | Admin |
+| 3 | Institution Administrator |
+| 4 | Staff |
+| 5 | Teacher |
+| 6 | Parent |
+| 7 | Student |
+
+**Superadmin** role is the system entrypoint. This account is created manually and there can be only one. `Superadmin` creates tokens for `admin` users registration, can assign/unassign `admin` role. In turn, **admins** manage the system (users, content). They can create tokens for all other users registration.
+
+## Tech Stack
+
+- **Backend:** Go, GORM, PostgreSQL, Valkey
+- **Frontend:** SolidJS, TailwindCSS
+- **Deploy:** Docker, Docker Compose, Nginx
+
+## Getting Started
+```bash
+# Clone the repository
+git clone https://github.com/laptop-coder/lts-service.git
+cd ./lts-service
+# Set up env variables
+cp .env.example .env
+vi .env
+# First run (migrate + deploy + enable CI/CD)
+make first-run
 ```
 
-## Installing `cron` schedule:
+## Available `make` commands
 
-```
-sh -c "( crontab -l; cat ./crontab.tasks )" | crontab -
-```
+| Command | Description |
+| --- | --- |
+| `migrate` | Run migrations |
+| `cron` | Add cron CI/CD schedule (automatically download updates at night) |
+| `deploy` | Start the app |
+| `first-run` | `migrate` + `deploy` + `cron` |
+| `logs` | See logs |
+| `down` | Stop the app |
+| `dev` | Run app in the development mode (with migrations) |
+
