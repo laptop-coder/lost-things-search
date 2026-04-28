@@ -203,6 +203,7 @@ func main() {
 		{ID: 90, Name: permissions.PositionStaffCreate},
 		{ID: 91, Name: permissions.PositionStaffUpdate},
 		{ID: 92, Name: permissions.PositionStaffDelete},
+		{ID: 101, Name: permissions.DocumentPrivacyUpload},
 	}
 	for _, permission := range permissions {
 		if err := db.FirstOrCreate(&permission, model.Permission{ID: permission.ID}).Error; err != nil {
@@ -214,7 +215,7 @@ func main() {
 
 	// Lists of permissions by roles
 	superadminPermissions := []string{
-		"user.read.own", "user.read.other", "user.read.all", "user.delete.any.admin", "role.admin.assign", "role.admin.add", "role.admin.unassign", "role.read.any", "role.read.own", "token.invite.admin.create", "token.invite.admin.delete",
+		"user.read.own", "user.read.other", "user.read.all", "user.delete.any.admin", "role.admin.assign", "role.admin.add", "role.admin.unassign", "role.read.any", "role.read.own", "token.invite.admin.create", "token.invite.admin.delete", "document.privacy.upload",
 	}
 
 	adminPermissions := []string{

@@ -30,9 +30,15 @@ type ImageStorageConfig struct {
 	AllowedMIMETypes []string
 }
 
+type FileStorageConfig struct {
+	UploadPath string
+	MaxSize    int64 // in bytes
+}
+
 type StorageConfig struct {
 	Avatar    ImageStorageConfig
 	PostPhoto ImageStorageConfig
+	Document  FileStorageConfig
 }
 
 func LoadSharedConfig() SharedConfig {
@@ -58,6 +64,10 @@ func LoadSharedConfig() SharedConfig {
 				UploadPath:       filepath.Join(env.GetStringRequired("PATH_TO_STORAGE"), "post_photos"),
 				MaxSize:          10 * 1024 * 1024, // 10 MB
 				AllowedMIMETypes: []string{"image/jpeg", "image/png", "image/webp", "image/gif"},
+			},
+			Document: FileStorageConfig{
+				UploadPath: filepath.Join(env.GetStringRequired("PATH_TO_STORAGE"), "documents"),
+				MaxSize:    10 * 1024 * 1024, // 10 MB
 			},
 		},
 	}

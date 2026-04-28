@@ -177,6 +177,9 @@ export const PERMISSIONS = {
   POSITION_STAFF_CREATE: "position.staff.create",
   POSITION_STAFF_UPDATE: "position.staff.update",
   POSITION_STAFF_DELETE: "position.staff.delete",
+
+  // Document
+  DOCUMENT_PRIVACY_UPLOAD: "document.privacy.upload",
 };
 
 export const ROLES = {

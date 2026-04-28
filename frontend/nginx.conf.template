@@ -13,5 +13,9 @@ server {
         try_files $$$uri $$$uri/ /index.html;
         add_header Cache-Control "private, no-cache";
     }
+
+    location /documents/ {
+        alias /usr/share/nginx/html/storage/storage/documents/;
+    }
 }
 
