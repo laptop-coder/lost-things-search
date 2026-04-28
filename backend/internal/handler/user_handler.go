@@ -113,7 +113,6 @@ func (h *UserHandler) UpdateOwnAvatar(w http.ResponseWriter, r *http.Request) {
 	// Restrictions
 	r.Body = http.MaxBytesReader(w, r.Body, 10<<20) // 10 MB
 	// Parse form
-	// TODO: add cleaning of temporary data (ParseMultipartForm, r.MultipartForm, etc)
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		h.log.Error("failed to parse multipart/formdata form")
 		helpers.BadRequestError(h.log, w)

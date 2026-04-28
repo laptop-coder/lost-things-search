@@ -113,12 +113,12 @@ func main() {
 		{ID: 7, Name: permissions.PostDeleteOwn},
 		{ID: 8, Name: permissions.PostPhotoDeleteAny},
 		{ID: 9, Name: permissions.PostPhotoDeleteOwn},
-		{ID: 93, Name: permissions.PostPhotoUpdateAny}, //TODO: numeration
+		{ID: 93, Name: permissions.PostPhotoUpdateAny},
 		{ID: 94, Name: permissions.PostPhotoUpdateOwn},
 		{ID: 10, Name: permissions.PostVerify},
 		{ID: 11, Name: permissions.PostMarkReturnedAny},
 		{ID: 12, Name: permissions.PostMarkReturnedOwn},
-		{ID: 97, Name: permissions.ConversationCreate}, //TODO: numeration
+		{ID: 97, Name: permissions.ConversationCreate},
 		{ID: 98, Name: permissions.ConversationReadOwn},
 		{ID: 99, Name: permissions.ConversationMessageSend},
 		{ID: 100, Name: permissions.ConversationMessageMarkAsRead},
@@ -126,7 +126,7 @@ func main() {
 		{ID: 14, Name: permissions.UserReadOther},
 		{ID: 15, Name: permissions.UserReadAll},
 		{ID: 16, Name: permissions.UserUpdateOwn},
-		{ID: 95, Name: permissions.UserDeleteAnyAdmin}, //TODO: numeration
+		{ID: 95, Name: permissions.UserDeleteAnyAdmin},
 		{ID: 96, Name: permissions.UserDeleteAnyUser},
 		{ID: 18, Name: permissions.UserDeleteOwn},
 		{ID: 19, Name: permissions.RoomCreate},

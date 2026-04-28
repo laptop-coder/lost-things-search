@@ -40,7 +40,6 @@ func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	r.Body = http.MaxBytesReader(w, r.Body, 15<<20) // 15 MB
-	// TODO: add cleaning of temporary data (ParseMultipartForm, r.MultipartForm, etc)
 	if err := r.ParseMultipartForm(15 << 20); err != nil {
 		h.log.Error("failed to parse multipart/formdata form")
 		helpers.BadRequestError(h.log, w)
@@ -297,7 +296,6 @@ func (h *PostHandler) UpdatePhoto(w http.ResponseWriter, r *http.Request) {
 	// Restrictions
 	r.Body = http.MaxBytesReader(w, r.Body, 15<<20) // 15 MB
 	// Parse form
-	// TODO: add cleaning of temporary data (ParseMultipartForm, r.MultipartForm, etc)
 	if err := r.ParseMultipartForm(15 << 20); err != nil {
 		h.log.Error("failed to parse multipart/formdata form")
 		helpers.BadRequestError(h.log, w)

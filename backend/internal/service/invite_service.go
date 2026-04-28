@@ -26,7 +26,7 @@ type InviteService interface {
 	GetRoles(ctx context.Context, tokenString string) ([]RoleResponseDTO, error)
 	GetEmail(ctx context.Context, tokenString string) (*string, error)
 	RevokeToken(ctx context.Context, tokenString string) error
-	ParseToken(tokenString string) (*InviteTokenClaims, error) // TODO: add context to parameters of all services
+	ParseToken(tokenString string) (*InviteTokenClaims, error)
 	MakeInviteRequest(ctx context.Context, email *string, roleIDs []uint16) error
 }
 
