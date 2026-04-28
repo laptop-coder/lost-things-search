@@ -126,7 +126,7 @@ func (s *staffPositionService) UpdatePosition(ctx context.Context, id uint16, dt
 			return nil, fmt.Errorf("failed to check name uniqueness: %w", err)
 		}
 		if exists {
-			return nil, fmt.Errorf("staff position with name '%s' already exists: %w", dto.Name, apperrors.ErrStaffPositionAlreadyExists)
+			return nil, fmt.Errorf("staff position with name '%s' already exists: %w", *dto.Name, apperrors.ErrStaffPositionAlreadyExists)
 		}
 		staffPosition.Name = *dto.Name
 	} else {
