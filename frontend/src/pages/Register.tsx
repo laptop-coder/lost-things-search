@@ -267,7 +267,9 @@ const Register = () => {
     <div class="min-h-screen py-8 px-4">
       <div class="max-w-2xl mx-auto">
         <div class="text-center mb-8">
-          <h1 class="text-3xl font-bold text-gray-800">Создание учётной записи</h1>
+          <h1 class="text-3xl font-bold text-gray-800">
+            Создание учётной записи
+          </h1>
           <p class="text-gray-500 mt-2">
             Роли:{" "}
             <span class="font-medium text-blue-600">
@@ -317,7 +319,7 @@ const Register = () => {
                   <img
                     src={avatarPreview()!}
                     alt="Preview"
-                    class="w-24 h-24 rounded-full object-cover border-4 border-blue-100"
+                    class="w-24 h-24 rounded-full object-cover border-4 border-gray-100"
                   />
                   <button
                     type="button"

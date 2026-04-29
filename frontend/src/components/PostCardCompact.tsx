@@ -75,7 +75,7 @@ const PostCardCompact = (props: Props) => {
             class="w-10 h-10 flex bg-gray-100 rounded-full hover:bg-gray-200 transition"
           >
             <img
-              class={`w-10 h-10 rounded-full object-cover border-2 border-blue-100 hover:brightness-95 transition flex-shrink-0 ${props.post.thingReturnedToOwner ? "grayscale" : ""}`}
+              class={`w-10 h-10 rounded-full object-cover border-2 border-gray-100 hover:brightness-95 transition flex-shrink-0 ${props.post.thingReturnedToOwner ? "grayscale" : ""}`}
               src={
                 props.post.author.hasAvatar
                   ? `/storage/storage/avatars/${props.post.author.id}.jpeg`

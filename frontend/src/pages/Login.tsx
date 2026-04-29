@@ -31,7 +31,9 @@ const Login = () => {
       navigate("/");
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : "Не удалось войти в учётную запись",
+        err instanceof Error
+          ? err.message
+          : "Не удалось войти в учётную запись",
       );
     } finally {
       setLoading(false);
@@ -42,7 +44,9 @@ const Login = () => {
     <div class="min-h-[80vh] flex items-center justify-center px-4">
       <div class="w-full max-w-md">
         <div class="text-center mb-8">
-          <h1 class="text-3xl font-bold text-gray-800">Вход в учётную запись</h1>
+          <h1 class="text-3xl font-bold text-gray-800">
+            Вход в учётную запись
+          </h1>
           <p class="text-gray-500 mt-2">Добро пожаловать!</p>
         </div>
 

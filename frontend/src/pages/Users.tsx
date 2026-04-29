@@ -518,7 +518,7 @@ const Users = () => {
                             class="w-8 h-8 bg-gray-100 rounded-full hover:bg-gray-200 transition aspect-square"
                           >
                             <img
-                              class="w-8 h-8 rounded-full object-cover border-2 border-blue-100 hover:brightness-95 transition"
+                              class="w-8 h-8 rounded-full object-cover border-2 border-gray-100 hover:brightness-95 transition"
                               src={
                                 user.hasAvatar
                                   ? `/storage/storage/avatars/${user.id}.jpeg`
