@@ -53,7 +53,11 @@ const ListOfConversations = () => {
               >
                 <div class="flex items-center gap-4 relative">
                   <img
-                    src={`/storage/storage/avatars/${conv.otherUser.hasAvatar ? conv.otherUser.id : "default"}.jpeg`}
+                    src={
+                      conv.otherUser.hasAvatar
+                        ? `/storage/storage/avatars/${conv.otherUser.id}.jpeg`
+                        : "/storage/assets/default_avatar.jpeg"
+                    }
                     alt={`Фото профиля пользователя ${conv.otherUser.firstName} ${conv.otherUser.lastName}`}
                     class="w-12 h-12 rounded-full object-cover"
                   />

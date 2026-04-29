@@ -112,7 +112,11 @@ export const PublicRoute: Component<Props> = (props) => {
                 >
                   <img
                     class="w-10 h-10 rounded-full object-cover border-2 border-blue-100 hover:brightness-95 transition"
-                    src={`/storage/storage/avatars/${auth.user()?.hasAvatar ? auth.user()?.id : "default"}.jpeg`}
+                    src={
+                      auth.user()?.hasAvatar
+                        ? `/storage/storage/avatars/${auth.user()?.id}.jpeg`
+                        : "/storage/assets/default_avatar.jpeg"
+                    }
                     alt="Фото профиля"
                   />
                 </A>
