@@ -81,6 +81,11 @@ const superadminTabs: Tab[] = [
     label: "Инвайт-токены",
     path: "/admin/invite_tokens",
   },
+  {
+    key: "documents",
+    label: "Документы",
+    path: "/admin/documents",
+  },
 ];
 
 const AdminLayout = (props: Props) => {

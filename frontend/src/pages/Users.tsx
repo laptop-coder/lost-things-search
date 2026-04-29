@@ -443,7 +443,6 @@ const Users = () => {
     }
   };
 
-  // TODO: mark required fields with "*"
   return (
     <div class="space-y-6 p-4">
       {/* "Copied!" notification */}

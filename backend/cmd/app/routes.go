@@ -164,7 +164,7 @@ func SetupRoutes(
 	mux.Handle("POST /api/v1/conversations/{conversationId}/messages", authMiddleware(false)(requirePermissions(log, false, permissions.ConversationMessageSend)(http.HandlerFunc(conversationHandler.SendMessage))))
 	mux.Handle("PATCH /api/v1/conversations/{conversationId}/messages/read", authMiddleware(false)(requirePermissions(log, false, permissions.ConversationMessageMarkAsRead)(http.HandlerFunc(conversationHandler.MarkAsRead))))
 	// Documents
-	mux.Handle("POST /api/v1/documents/privacy", authMiddleware(false)(requirePermissions(log, false, permissions.DocumentPrivacyUpload)(http.HandlerFunc(documentHandler.UploadPrivacy))))
+	mux.Handle("PUT /api/v1/documents/privacy", authMiddleware(false)(requirePermissions(log, false, permissions.DocumentPrivacyUpload)(http.HandlerFunc(documentHandler.UploadPrivacy))))
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {

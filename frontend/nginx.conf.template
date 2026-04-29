@@ -16,6 +16,7 @@ server {
 
     location /documents/ {
         alias /usr/share/nginx/html/storage/storage/documents/;
+        try_files $$$uri =404;
     }
 }
 

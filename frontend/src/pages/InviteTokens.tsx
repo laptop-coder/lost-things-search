@@ -160,7 +160,6 @@ const InviteTokens = () => {
 
   return (
     <div class="space-y-6 p-4">
-      {/*TODO: move to the component (duplicates code from pages/Users.tsx)*/}
       {/* "Copied!" notification */}
       <Show when={showTokenCopied()}>
         <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50">

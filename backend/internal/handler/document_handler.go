@@ -23,7 +23,7 @@ func NewDocumentHandler(documentServiceConfig service.DocumentServiceConfig, log
 }
 
 func (h *DocumentHandler) UploadPrivacy(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
+	if r.Method != http.MethodPut {
 		helpers.MethodNotAllowedError(h.log, w)
 		return
 	}
