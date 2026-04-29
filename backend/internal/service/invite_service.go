@@ -234,6 +234,15 @@ func (s *inviteService) MakeInviteRequest(ctx context.Context, email *string, ro
 	}
 	// Create invite link
 	link := fmt.Sprintf("%s/register?inviteToken=%s", s.config.FrontendURL, *token)
-	// Send link
-	return s.emailService.SendInviteLink(ctx, email, link)
+	// Send invite link
+	if err := s.emailService.SendInviteLink(ctx, email, link); err != nil {
+		return err
+	}
+	// Send guide in case of parent role
+	if slices.Contains(roleIDs, 6) {
+		if err := s.emailService.SendAddStudentToParentGuide(ctx, email); err != nil {
+			return err
+		}
+	}
+	return nil
 }

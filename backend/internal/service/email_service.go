@@ -22,6 +22,7 @@ var templatesFS embed.FS
 type EmailService interface {
 	Send(ctx context.Context, to []string, subject, body string) error
 	SendInviteLink(ctx context.Context, to *string, link string) error
+	SendAddStudentToParentGuide(ctx context.Context, to *string) error
 	SendNewMessageNotification(ctx context.Context, dto *NewMessageNotificationDTO) error
 }
 
@@ -120,6 +121,21 @@ func (s *emailService) SendInviteLink(ctx context.Context, to *string, link stri
 		return err
 	}
 	return s.Send(ctx, []string{*to}, "Добро пожаловать!", body.String())
+}
+
+func (s *emailService) SendAddStudentToParentGuide(ctx context.Context, to *string) error {
+	if to == nil {
+		return fmt.Errorf("email cannot be nil: %w", apperrors.ErrRequiredField)
+	} else if strings.TrimSpace(*to) == "" {
+		return fmt.Errorf("email cannot be empty or only whitespace: %w", apperrors.ErrRequiredField)
+	}
+	var body bytes.Buffer
+	if err := s.templates.ExecuteTemplate(&body, "add_student_to_parent_guide.html", map[string]string{
+		"FooterText": env.GetStringRequired("FOOTER_TEXT"), // TODO: move to the config
+	}); err != nil {
+		return err
+	}
+	return s.Send(ctx, []string{*to}, "Инструкция по привязке учётной записи ученика", body.String())
 }
 
 type NewMessageNotificationDTO struct {

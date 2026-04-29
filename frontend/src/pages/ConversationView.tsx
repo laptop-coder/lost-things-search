@@ -109,7 +109,11 @@ const ConversationView = () => {
             class="flex flex-1 transition gap-2 rounded-2xl"
           >
             <img
-              src={`/storage/storage/avatars/${otherUser()!.hasAvatar ? otherUser()!.id : "default"}.jpeg`}
+              src={
+                otherUser()!.hasAvatar
+                  ? `/storage/storage/avatars/${otherUser()!.id}.jpeg`
+                  : "/storage/assets/default_avatar.jpeg"
+              }
               alt={`Фото профиля пользователя ${otherUser()!.firstName} ${otherUser()!.lastName}`}
               class="w-10 h-10 rounded-full object-cover"
             />

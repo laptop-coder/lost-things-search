@@ -140,7 +140,11 @@ const PostCardDetailed = (props: Props) => {
           >
             <img
               class="w-10 h-10 rounded-full object-cover border-2 border-blue-100 hover:brightness-95 transition"
-              src={`/storage/storage/avatars/${props.post.author.hasAvatar ? props.post.author.id : "default"}.jpeg`}
+              src={
+                props.post.author.hasAvatar
+                  ? `/storage/storage/avatars/${props.post.author.id}.jpeg`
+                  : "/storage/assets/default_avatar.jpeg"
+              }
               alt="Фото профиля"
             />
           </A>

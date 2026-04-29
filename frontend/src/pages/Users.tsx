@@ -519,7 +519,11 @@ const Users = () => {
                           >
                             <img
                               class="w-8 h-8 rounded-full object-cover border-2 border-blue-100 hover:brightness-95 transition"
-                              src={`/storage/storage/avatars/${user.hasAvatar ? user.id : "default"}.jpeg`}
+                              src={
+                                user.hasAvatar
+                                  ? `/storage/storage/avatars/${user.id}.jpeg`
+                                  : "/storage/assets/default_avatar.jpeg"
+                              }
                               alt="Фото профиля"
                             />
                           </A>
@@ -647,7 +651,11 @@ const Users = () => {
             <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4">
               <div class="flex items-center gap-3">
                 <img
-                  src={`/storage/storage/avatars/${selectedUser()?.hasAvatar ? selectedUser()?.id : "default"}.jpeg`}
+                  src={
+                    selectedUser()?.hasAvatar
+                      ? `/storage/storage/avatars/${selectedUser()?.id}.jpeg`
+                      : "/storage/assets/default_avatar.jpeg"
+                  }
                   alt="Аватар"
                   class="w-10 h-10 rounded-full object-cover"
                 />

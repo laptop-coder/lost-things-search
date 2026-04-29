@@ -170,7 +170,11 @@ const PublicProfile = () => {
                 <div class="relative group w-32 h-32 rounded-full">
                   <img
                     class="w-32 h-32 rounded-full object-cover border-4 border-blue-100"
-                    src={`/storage/storage/avatars/${user()!.hasAvatar ? user()!.id : "default"}.jpeg`}
+                    src={
+                      user()!.hasAvatar
+                        ? `/storage/storage/avatars/${user()!.id}.jpeg`
+                        : "/storage/assets/default_avatar.jpeg"
+                    }
                     alt="Фото профиля"
                   />
                 </div>
@@ -221,7 +225,11 @@ const PublicProfile = () => {
                           <div class="flex flex-col md:flex-row items-center gap-3">
                             <img
                               class="w-12 h-12 rounded-full object-cover"
-                              src={`/storage/storage/avatars/${user.hasAvatar ? user.id : "default"}.jpeg`}
+                              src={
+                                user.hasAvatar
+                                  ? `/storage/storage/avatars/${user.id}.jpeg`
+                                  : "/storage/assets/default_avatar.jpeg"
+                              }
                               alt="Фото профиля"
                             />
                             <div>
@@ -361,7 +369,11 @@ const PublicProfile = () => {
                           <div class="flex items-center gap-3">
                             <img
                               class="w-12 h-12 rounded-full object-cover"
-                              src={`/storage/storage/avatars/${user.hasAvatar ? user.id : "default"}.jpeg`}
+                              src={
+                                user.hasAvatar
+                                  ? `/storage/storage/avatars/${user.id}.jpeg`
+                                  : "/storage/assets/default_avatar.jpeg"
+                              }
                               alt="Фото профиля"
                             />
                             <div>
