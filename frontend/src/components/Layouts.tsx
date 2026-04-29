@@ -58,6 +58,12 @@ export const PublicRoute: Component<Props> = (props) => {
           </A>
           <Show when={!auth.user() && location.pathname === "/"}>
             <A
+              href="/documents/privacy.pdf"
+              class="text-sm text-gray-500 hover:text-gray-700 transition"
+            >
+              Политика конфиденциальности
+            </A>
+            <A
               href="/about"
               class="text-sm text-gray-500 hover:text-gray-700 transition"
             >
@@ -143,6 +149,12 @@ export const PublicRoute: Component<Props> = (props) => {
               </div>
 
               <div class="flex gap-6">
+                <A
+                  href="/documents/privacy.pdf"
+                  class="text-sm text-gray-500 hover:text-gray-700 transition"
+                >
+                  Политика конфиденциальности
+                </A>
                 <A
                   href="/about"
                   class="text-sm text-gray-500 hover:text-gray-700 transition"
