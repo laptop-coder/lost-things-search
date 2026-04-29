@@ -61,7 +61,7 @@ const RequestStudentOrParentInvite = () => {
       <div class="w-full max-w-md">
         <div class="text-center mb-8">
           <h1 class="text-3xl font-bold text-gray-800">
-            Создание аккаунта
+            Создание учётной записи
             {role() === ROLES.STUDENT && " ученика"}
             {role() === ROLES.PARENT && " родителя"}
           </h1>
@@ -91,7 +91,7 @@ const RequestStudentOrParentInvite = () => {
               </button>
             </div>
             <p class="text-sm text-gray-500 mt-1">
-              Уже есть аккаунт?{" "}
+              Уже есть учётная запись?{" "}
               <a
                 href="/login"
                 class="text-blue-600 hover:text-blue-700 hover:underline"

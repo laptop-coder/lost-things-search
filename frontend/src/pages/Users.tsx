@@ -832,7 +832,7 @@ const Users = () => {
 
                   <div class="space-y-3 border-t border-gray-200 pt-4">
                     <h3 class="font-medium text-gray-800">
-                      Классное руководство/менторство
+                      Классное руководство/наставничество
                     </h3>
 
                     <Index each={teacherStudentGroupIds}>

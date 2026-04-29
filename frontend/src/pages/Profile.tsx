@@ -325,7 +325,7 @@ const Profile = () => {
       {hasPermission(PERMISSIONS.USER_READ_OWN) && (
         <div class="max-w-4xl mx-auto space-y-6 p-4">
           <h1 class="text-2xl font-bold text-center text-gray-800">
-            Мой профиль
+            Личный кабинет
           </h1>
 
           <Show when={!user()}>
@@ -563,7 +563,7 @@ const Profile = () => {
 
                   <div>
                     <h4 class="text-sm font-medium text-gray-500 mb-2">
-                      Классное руководство/менторство
+                      Классное руководство/наставничество
                     </h4>
                     <div class="flex flex-wrap gap-2">
                       <For each={teacherStudentGroups()}>
@@ -635,7 +635,7 @@ const Profile = () => {
                   </div>
                   <div class="space-y-3 border-t border-gray-200 pt-4">
                     <h3 class="font-medium text-gray-800">
-                      Классное руководство/менторство
+                      Классное руководство/наставничество
                     </h3>
 
                     <Index each={teacherStudentGroupIds}>

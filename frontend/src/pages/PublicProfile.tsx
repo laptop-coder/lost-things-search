@@ -307,7 +307,7 @@ const PublicProfile = () => {
 
                 <div>
                   <h4 class="text-sm font-medium text-gray-500 mb-2">
-                    Классное руководство/менторство
+                    Классное руководство/наставничество
                   </h4>
                   <div class="flex flex-wrap gap-2">
                     <For each={teacherStudentGroups()}>
