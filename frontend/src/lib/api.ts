@@ -2,10 +2,11 @@ import { ConversationListItem, Conversation, Message } from "./types";
 
 const getBackendURL = () => {
   const hostname = window.location.hostname;
+  const port = window.location.port;
   if (hostname === "localhost" || hostname === "127.0.0.1") {
     return import.meta.env.VITE_API_URL || "http://127.0.0.1:37190/api/v1";
   }
-  return `${window.location.protocol}//${hostname}/api/v1`;
+  return `${window.location.protocol}//${hostname}:${port}/api/v1`;
 };
 
 const API_BASE = getBackendURL();
