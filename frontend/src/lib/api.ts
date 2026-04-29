@@ -1,19 +1,12 @@
 import { ConversationListItem, Conversation, Message } from "./types";
 
-const isCurrentAddressIPWithPort = () => {
-  const currentHost = window.location.hostname;
-  const currentPort = window.location.port;
-  const isIP =
-    /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
-      currentHost,
-    );
-  return isIP && currentPort !== "";
+const getBackendURL = () => {
+  const hostname = window.location.hostname;
+  if (hostname === "localhost" || hostname === "127.0.0.1") {
+    return import.meta.env.VITE_API_URL || "http://127.0.0.1:37190/api/v1";
+  }
+  return `${window.location.protocol}//${hostname}/api/v1`;
 };
-
-const getBackendURL = () =>
-  isCurrentAddressIPWithPort()
-    ? import.meta.env.VITE_API_URL || "http://127.0.0.1:37190/api/v1"
-    : `${window.location.protocol}//${window.location.hostname}/api/v1`;
 
 const API_BASE = getBackendURL();
 
