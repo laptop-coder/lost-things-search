@@ -1,47 +1,63 @@
 name: Docker Images CI
 on:
   push:
-    branches: [ "main" ]
+    tags:
+      - 'v*'
 jobs:
   push-backend:
     runs-on: ubuntu-latest
     environment: docker-images-ci-actions-env
     steps:
       - uses: actions/checkout@v4
-      - name: Build Docker image
-        run: docker build ./backend -t "${{ vars.DOCKERHUB_USERNAME }}/lts-service-backend:latest"
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PAT }}
-      - name: Push to Docker Hub
-        run: docker push "${{ vars.DOCKERHUB_USERNAME }}/lts-service-backend:latest"
+      - name: Build and push backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: |
+            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-backend:latest
+            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-backend:${{ github.ref_name }}
   push-migrate:
     runs-on: ubuntu-latest
     environment: docker-images-ci-actions-env
     steps:
       - uses: actions/checkout@v4
-      - name: Build Docker image
-        run: docker build ./backend -f ./backend/Dockerfile.migrate -t "${{ vars.DOCKERHUB_USERNAME }}/lts-service-migrate:latest"
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PAT }}
-      - name: Push to Docker Hub
-        run: docker push "${{ vars.DOCKERHUB_USERNAME }}/lts-service-migrate:latest"
+      - name: Build and push migrate
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile.migrate
+          push: true
+          tags: |
+            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-migrate:latest
+            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-migrate:${{ github.ref_name }}
   push-frontend:
     runs-on: ubuntu-latest
     environment: docker-images-ci-actions-env
     steps:
       - uses: actions/checkout@v4
-      - name: Build Docker image
-        run: docker build ./frontend -t "${{ vars.DOCKERHUB_USERNAME }}/lts-service-frontend:latest"
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PAT }}
-      - name: Push to Docker Hub
-        run: docker push "${{ vars.DOCKERHUB_USERNAME }}/lts-service-frontend:latest"
+      - name: Build and push frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-frontend:latest
+            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-frontend:${{ github.ref_name }}
