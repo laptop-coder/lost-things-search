@@ -1,47 +1,113 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<body style="margin:0; padding:0; font-family: Arial, sans-serif; background-color: #f4f4f4;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 40px 0;">
-    <tr>
-      <td align="center">
-        <table width="500" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-          <!-- Header -->
-          <tr>
-            <td style="padding: 30px 30px 0 30px; text-align: center;">
-              <h1 style="color: #1f2937; margin: 10px 0 0 0;">LostThingsSearch</h1>
-              <p style="color: #6b7280; margin: 5px 0 0 0;">Сервис поиска потерянных вещей</p>
-            </td>
-          </tr>
-          <!-- Body -->
-          <tr>
-            <td style="padding: 30px;">
-              <p style="color: #4b5563; line-height: 1.5; margin: 0 0 20 0;">
-              Для того чтобы привязать учётную запись ученика, выполните следующие действия:
-              </p>
-              <ol style="color: #4b5563; line-height: 1.6; margin: 0 0 20px 20px; padding: 0;">
-                <li style="margin-bottom: 10px;">Войдите в учётную запись <strong>ученика</strong>, откройте профиль</li>
-                <li style="margin-bottom: 10px;">Из верхней карточки скопируйте <strong>ID ученика</strong> — он находится рядом с фотографией</li>
-                <li style="margin-bottom: 10px;">Войдите в учётную запись <strong>родителя</strong>, откройте профиль</li>
-                <li style="margin-bottom: 10px;">Нажмите <strong>"Редактировать"</strong>. Появится карточка "Мои дети"</li>
-                <li style="margin-bottom: 10px;">Нажмите <strong>"Добавить ученика"</strong> и в появившееся поле ввода вставьте <strong>скопированный ID</strong></li>
-                <li style="margin-bottom: 10px;">В верхней карточке (в которой находится фото профиля) нажмите <strong>"Сохранить"</strong>. Готово!</li>
-              </ol>
-              <p style="color: #9ca3af; font-size: 12px; margin: 30px 0 0 0; text-align: center;">
-                Если Вы не создавали учётную запись родителя, проигнорируйте это письмо.
-              </p>
-            </td>
-          </tr>
-          <!-- Footer -->
-          <tr>
-            <td style="padding: 20px 30px; background-color: #f9fafb; border-radius: 0 0 16px 16px; text-align: center;">
-              <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-              {{.FooterText}}
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+    "
+  >
+    <table
+      width="100%"
+      cellpadding="0"
+      cellspacing="0"
+      style="background-color: #f4f4f4; padding: 40px 0"
+    >
+      <tr>
+        <td align="center">
+          <table
+            width="500"
+            cellpadding="0"
+            cellspacing="0"
+            style="
+              background-color: #ffffff;
+              border-radius: 16px;
+              box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            "
+          >
+            <!-- Header -->
+            <tr>
+              <td style="padding: 30px 30px 0 30px; text-align: center">
+                <h1 style="color: #1f2937; margin: 10px 0 0 0">
+                  LostThingsSearch
+                </h1>
+                <p style="color: #6b7280; margin: 5px 0 0 0">
+                  Сервис поиска потерянных вещей
+                </p>
+              </td>
+            </tr>
+            <!-- Body -->
+            <tr>
+              <td style="padding: 30px">
+                <p style="color: #4b5563; line-height: 1.5; margin: 0 0 20 0">
+                  Для того чтобы привязать учётную запись ученика, выполните
+                  следующие действия:
+                </p>
+                <ol
+                  style="
+                    color: #4b5563;
+                    line-height: 1.6;
+                    margin: 0 0 20px 20px;
+                    padding: 0;
+                  "
+                >
+                  <li style="margin-bottom: 10px">
+                    Войдите в учётную запись <strong>ученика</strong>, откройте
+                    профиль
+                  </li>
+                  <li style="margin-bottom: 10px">
+                    Из верхней карточки скопируйте <strong>ID ученика</strong> —
+                    он находится рядом с фотографией
+                  </li>
+                  <li style="margin-bottom: 10px">
+                    Войдите в учётную запись <strong>родителя</strong>, откройте
+                    профиль
+                  </li>
+                  <li style="margin-bottom: 10px">
+                    Нажмите <strong>"Редактировать"</strong>. Появится карточка
+                    "Мои дети"
+                  </li>
+                  <li style="margin-bottom: 10px">
+                    Нажмите <strong>"Добавить ученика"</strong> и в появившееся
+                    поле ввода вставьте <strong>скопированный ID</strong>
+                  </li>
+                  <li style="margin-bottom: 10px">
+                    В верхней карточке (в которой находится фото профиля)
+                    нажмите <strong>"Сохранить"</strong>. Готово!
+                  </li>
+                </ol>
+                <p
+                  style="
+                    color: #9ca3af;
+                    font-size: 12px;
+                    margin: 30px 0 0 0;
+                    text-align: center;
+                  "
+                >
+                  Если Вы не создавали учётную запись родителя, проигнорируйте
+                  это письмо.
+                </p>
+              </td>
+            </tr>
+            <!-- Footer -->
+            <tr>
+              <td
+                style="
+                  padding: 20px 30px;
+                  background-color: #f9fafb;
+                  border-radius: 0 0 16px 16px;
+                  text-align: center;
+                "
+              >
+                <p style="color: #9ca3af; font-size: 12px; margin: 0">
+                  {{.FooterText}}
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
 </html>
