@@ -119,6 +119,7 @@ func main() {
 	inviteHandler := handler.NewInviteHandler(inviteService, serviceConfigs.Invite, log)
 	institutionAdministratorPositionHandler := handler.NewInstitutionAdministratorPositionHandler(institutionAdministratorPositionService, log)
 	staffPositionHandler := handler.NewStaffPositionHandler(staffPositionService, log)
+	documentHandler := handler.NewDocumentHandler(serviceConfigs.Document, log)
 
 	mux := http.NewServeMux()
 	authMiddleware := func(allowUnauthorized bool) func(http.Handler) http.Handler {
@@ -148,6 +149,7 @@ func main() {
 		inviteHandler,
 		staffPositionHandler,
 		institutionAdministratorPositionHandler,
+		documentHandler,
 	)
 
 	// Middleware

@@ -10,7 +10,7 @@ import { createStore } from "solid-js/store";
 import { useAuth } from "../lib/auth";
 import { api } from "../lib/api";
 import { ROLES_TO_DISPLAY } from "../lib/permissions";
-import { useNavigate, useSearchParams } from "@solidjs/router";
+import { A, useNavigate, useSearchParams } from "@solidjs/router";
 import type {
   Role,
   Room,
@@ -617,6 +617,26 @@ const Register = () => {
                 {error()}
               </div>
             )}
+
+            <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition">
+              <input
+                type="checkbox"
+                required
+                class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 mt-1 aspect-square"
+              />
+              <span class="text-sm text-gray-600">
+                Я даю согласие на обработку персональных данных и принимаю
+                условия{" "}
+                <A
+                  href="/documents/privacy.pdf"
+                  target="_blank"
+                  class="text-blue-600 hover:underline"
+                >
+                  политики конфиденциальности
+                </A>
+                <span class="text-red-500">*</span>
+              </span>
+            </label>
 
             <div class="flex gap-3 pt-2">
               <button

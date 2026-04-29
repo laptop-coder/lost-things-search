@@ -159,3 +159,8 @@ const (
 	PositionStaffUpdate = "position.staff.update"
 	PositionStaffDelete = "position.staff.delete"
 )
+
+// Document
+const (
+	DocumentPrivacyUpload = "document.privacy.upload"
+)

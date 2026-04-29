@@ -30,6 +30,7 @@ func SetupRoutes(
 	inviteHandler *handler.InviteHandler,
 	staffPositionHandler *handler.StaffPositionHandler,
 	institutionAdministratorPositionHandler *handler.InstitutionAdministratorPositionHandler,
+	documentHandler *handler.DocumentHandler,
 ) {
 	// Public routes (no auth required)
 	// TODO: split this routes into categories (i.e. mix with secure routes)
@@ -162,6 +163,8 @@ func SetupRoutes(
 	mux.Handle("GET /api/v1/conversations/unread_count", authMiddleware(false)(requirePermissions(log, false, permissions.ConversationReadOwn)(http.HandlerFunc(conversationHandler.GetTotalUnreadCount))))
 	mux.Handle("POST /api/v1/conversations/{conversationId}/messages", authMiddleware(false)(requirePermissions(log, false, permissions.ConversationMessageSend)(http.HandlerFunc(conversationHandler.SendMessage))))
 	mux.Handle("PATCH /api/v1/conversations/{conversationId}/messages/read", authMiddleware(false)(requirePermissions(log, false, permissions.ConversationMessageMarkAsRead)(http.HandlerFunc(conversationHandler.MarkAsRead))))
+	// Documents
+	mux.Handle("PUT /api/v1/documents/privacy", authMiddleware(false)(requirePermissions(log, false, permissions.DocumentPrivacyUpload)(http.HandlerFunc(documentHandler.UploadPrivacy))))
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {

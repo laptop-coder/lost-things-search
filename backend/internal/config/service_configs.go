@@ -6,20 +6,22 @@ import (
 )
 
 type ServiceConfigs struct {
-	User   service.UserServiceConfig
-	Post   service.PostServiceConfig
-	Auth   service.AuthServiceConfig
-	Invite service.InviteServiceConfig
-	Email  service.EmailServiceConfig
+	User     service.UserServiceConfig
+	Post     service.PostServiceConfig
+	Auth     service.AuthServiceConfig
+	Invite   service.InviteServiceConfig
+	Email    service.EmailServiceConfig
+	Document service.DocumentServiceConfig
 }
 
 func NewServiceConfigs(sharedConfig SharedConfig, appConfig AppConfig) ServiceConfigs {
 	return ServiceConfigs{
-		User:   newUserServiceConfig(sharedConfig),
-		Post:   newPostServiceConfig(sharedConfig),
-		Auth:   newAuthServiceConfig(sharedConfig),
-		Invite: newInviteServiceConfig(sharedConfig, appConfig),
-		Email:  newEmailServiceConfig(appConfig),
+		User:     newUserServiceConfig(sharedConfig),
+		Post:     newPostServiceConfig(sharedConfig),
+		Auth:     newAuthServiceConfig(sharedConfig),
+		Invite:   newInviteServiceConfig(sharedConfig, appConfig),
+		Email:    newEmailServiceConfig(appConfig),
+		Document: newDocumentServiceConfig(sharedConfig),
 	}
 }
 
@@ -68,5 +70,12 @@ func newEmailServiceConfig(appConfig AppConfig) service.EmailServiceConfig {
 		From:        env.GetStringRequired("EMAIL_USERNAME"),
 		FrontendURL: appConfig.FrontendURL,
 		AppMode:     appConfig.AppMode,
+	}
+}
+
+func newDocumentServiceConfig(sharedConfig SharedConfig) service.DocumentServiceConfig {
+	return service.DocumentServiceConfig{
+		FileMaxSize:    sharedConfig.Storage.Document.MaxSize,
+		FileUploadPath: sharedConfig.Storage.Document.UploadPath,
 	}
 }

@@ -47,3 +47,8 @@ type EmailServiceConfig struct {
 	FrontendURL string
 	AppMode     env.AppMode
 }
+
+type DocumentServiceConfig struct {
+	FileMaxSize    int64
+	FileUploadPath string
+}
