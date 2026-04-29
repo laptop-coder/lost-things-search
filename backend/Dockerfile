@@ -13,7 +13,10 @@ FROM debian:12.11-slim
 COPY --from=builder /app/bin/main /usr/local/bin/app
 ARG UID=1000
 ARG GID=1000
-RUN addgroup --gid $GID appuser && \
+RUN apt-get update && \
+    apt-get install -y wget && \
+    rm -rf /var/lib/apt/lists/* && \
+    addgroup --gid $GID appuser && \
     adduser --uid $UID --gid $GID appuser && \
     chown appuser /usr/local/bin/app && \
     chmod u+x /usr/local/bin/app
