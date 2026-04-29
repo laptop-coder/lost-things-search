@@ -98,7 +98,6 @@ services:
     image: laptopcoder/lts-service-frontend:latest
     container_name: lts-frontend
     restart: always
-    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - /etc/localtime:/etc/localtime
       - ./data/storage:/usr/share/nginx/html/storage/storage
