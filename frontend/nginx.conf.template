@@ -8,6 +8,7 @@ server {
     server_name lts_frontend;
 
     location /api/ {
+        client_max_body_size 20M;
         proxy_pass http://backend:${BACKEND_PORT};
         proxy_set_header Host $$$host;
         proxy_set_header X-Real-IP $$$remote_addr;
