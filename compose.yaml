@@ -7,7 +7,7 @@ services:
     ports:
       - "${VALKEY_PORT:-6379}:6379"
     volumes:
-      - ./data/valkey:/data
+      - valkey:/data
     command:
       - "valkey-server"
       - "--bind"
@@ -41,7 +41,7 @@ services:
     ports:
       - "${POSTGRES_PORT:-54321}:5432"
     volumes:
-      - ./data/pg:/var/lib/postgresql/data/pgdata
+      - pg:/var/lib/postgresql/data/pgdata
     networks:
       - lts_network
     healthcheck:
@@ -57,7 +57,7 @@ services:
     user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./data/storage:/backend/data/storage
+      - storage:/backend/data/storage
     environment:
       - PATH_TO_STORAGE=/backend/data/storage
       - POSTGRES_HOST=postgres
@@ -100,7 +100,7 @@ services:
     restart: always
     volumes:
       - /etc/localtime:/etc/localtime
-      - ./data/storage:/usr/share/nginx/html/storage/storage
+      - storage:/usr/share/nginx/html/storage/storage
     env_file:
       - .env
     networks:
@@ -114,3 +114,9 @@ services:
 networks:
   lts_network:
     driver: bridge
+
+
+volumes:
+  valkey:
+  pg:
+  storage:

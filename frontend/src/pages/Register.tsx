@@ -267,7 +267,9 @@ const Register = () => {
     <div class="min-h-screen py-8 px-4">
       <div class="max-w-2xl mx-auto">
         <div class="text-center mb-8">
-          <h1 class="text-3xl font-bold text-gray-800">Регистрация</h1>
+          <h1 class="text-3xl font-bold text-gray-800">
+            Создание учётной записи
+          </h1>
           <p class="text-gray-500 mt-2">
             Роли:{" "}
             <span class="font-medium text-blue-600">
@@ -317,7 +319,7 @@ const Register = () => {
                   <img
                     src={avatarPreview()!}
                     alt="Preview"
-                    class="w-24 h-24 rounded-full object-cover border-4 border-blue-100"
+                    class="w-24 h-24 rounded-full object-cover border-4 border-gray-100"
                   />
                   <button
                     type="button"
@@ -505,7 +507,7 @@ const Register = () => {
                 </div>
                 <div class="space-y-3 border-t border-gray-200 pt-4">
                   <h3 class="font-medium text-gray-800">
-                    Классное руководство/менторство
+                    Классное руководство/наставничество
                   </h3>
 
                   <Index each={teacherStudentGroupIds}>
@@ -644,7 +646,7 @@ const Register = () => {
                 disabled={loading()}
                 class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
-                {loading() ? "Регистрация..." : "Зарегистрироваться"}
+                {loading() ? "Создание..." : "Создать"}
               </button>
             </div>
           </form>

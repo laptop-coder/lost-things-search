@@ -325,7 +325,7 @@ const Profile = () => {
       {hasPermission(PERMISSIONS.USER_READ_OWN) && (
         <div class="max-w-4xl mx-auto space-y-6 p-4">
           <h1 class="text-2xl font-bold text-center text-gray-800">
-            Мой профиль
+            Личный кабинет
           </h1>
 
           <Show when={!user()}>
@@ -346,7 +346,7 @@ const Profile = () => {
               <div class="flex flex-col md:flex-row gap-6 items-center md:items-start">
                 <div class="relative group w-32 h-32 rounded-full">
                   <img
-                    class="w-32 h-32 rounded-full object-cover border-4 border-blue-100"
+                    class="w-32 h-32 rounded-full object-cover border-4 border-gray-100"
                     src={
                       user()!.hasAvatar
                         ? `/storage/storage/avatars/${user()!.id}.jpeg`
@@ -479,7 +479,7 @@ const Profile = () => {
                         >
                           <div class="flex flex-col md:flex-row items-center gap-3">
                             <img
-                              class="w-12 h-12 rounded-full object-cover"
+                              class="w-12 h-12 rounded-full object-cover border-2 border-gray-100"
                               src={
                                 user.hasAvatar
                                   ? `/storage/storage/avatars/${user.id}.jpeg`
@@ -563,7 +563,7 @@ const Profile = () => {
 
                   <div>
                     <h4 class="text-sm font-medium text-gray-500 mb-2">
-                      Классное руководство/менторство
+                      Классное руководство/наставничество
                     </h4>
                     <div class="flex flex-wrap gap-2">
                       <For each={teacherStudentGroups()}>
@@ -635,7 +635,7 @@ const Profile = () => {
                   </div>
                   <div class="space-y-3 border-t border-gray-200 pt-4">
                     <h3 class="font-medium text-gray-800">
-                      Классное руководство/менторство
+                      Классное руководство/наставничество
                     </h3>
 
                     <Index each={teacherStudentGroupIds}>
@@ -778,7 +778,7 @@ const Profile = () => {
                         <div class="border rounded-xl p-4 hover:shadow-md transition">
                           <div class="flex items-center gap-3">
                             <img
-                              class="w-12 h-12 rounded-full object-cover"
+                              class="w-12 h-12 rounded-full object-cover border-2 border-gray-100"
                               src={
                                 user.hasAvatar
                                   ? `/storage/storage/avatars/${user.id}.jpeg`

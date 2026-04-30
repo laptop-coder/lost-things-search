@@ -518,7 +518,7 @@ const Users = () => {
                             class="w-8 h-8 bg-gray-100 rounded-full hover:bg-gray-200 transition aspect-square"
                           >
                             <img
-                              class="w-8 h-8 rounded-full object-cover border-2 border-blue-100 hover:brightness-95 transition"
+                              class="w-8 h-8 rounded-full object-cover border-2 border-gray-100 hover:brightness-95 transition"
                               src={
                                 user.hasAvatar
                                   ? `/storage/storage/avatars/${user.id}.jpeg`
@@ -832,7 +832,7 @@ const Users = () => {
 
                   <div class="space-y-3 border-t border-gray-200 pt-4">
                     <h3 class="font-medium text-gray-800">
-                      Классное руководство/менторство
+                      Классное руководство/наставничество
                     </h3>
 
                     <Index each={teacherStudentGroupIds}>

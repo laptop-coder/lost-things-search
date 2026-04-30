@@ -169,7 +169,7 @@ const PublicProfile = () => {
               <div class="flex flex-col md:flex-row gap-6 items-center md:items-start">
                 <div class="relative group w-32 h-32 rounded-full">
                   <img
-                    class="w-32 h-32 rounded-full object-cover border-4 border-blue-100"
+                    class="w-32 h-32 rounded-full object-cover border-4 border-gray-100"
                     src={
                       user()!.hasAvatar
                         ? `/storage/storage/avatars/${user()!.id}.jpeg`
@@ -224,7 +224,7 @@ const PublicProfile = () => {
                         <div class="border rounded-xl p-4 hover:shadow-md transition relative">
                           <div class="flex flex-col md:flex-row items-center gap-3">
                             <img
-                              class="w-12 h-12 rounded-full object-cover"
+                              class="w-12 h-12 rounded-full object-cover border-2 border-gray-100"
                               src={
                                 user.hasAvatar
                                   ? `/storage/storage/avatars/${user.id}.jpeg`
@@ -307,7 +307,7 @@ const PublicProfile = () => {
 
                 <div>
                   <h4 class="text-sm font-medium text-gray-500 mb-2">
-                    Классное руководство/менторство
+                    Классное руководство/наставничество
                   </h4>
                   <div class="flex flex-wrap gap-2">
                     <For each={teacherStudentGroups()}>
@@ -368,7 +368,7 @@ const PublicProfile = () => {
                         <div class="border rounded-xl p-4 hover:shadow-md transition">
                           <div class="flex items-center gap-3">
                             <img
-                              class="w-12 h-12 rounded-full object-cover"
+                              class="w-12 h-12 rounded-full object-cover border-2 border-gray-100"
                               src={
                                 user.hasAvatar
                                   ? `/storage/storage/avatars/${user.id}.jpeg`

@@ -59,7 +59,7 @@ const ListOfConversations = () => {
                         : "/storage/assets/default_avatar.jpeg"
                     }
                     alt={`Фото профиля пользователя ${conv.otherUser.firstName} ${conv.otherUser.lastName}`}
-                    class="w-12 h-12 rounded-full object-cover"
+                    class="w-12 h-12 rounded-full object-cover border-2 border-gray-100 hover:brightness-95 transition"
                   />
                   <div class="flex-1 min-w-0">
                     <div class="flex justify-between items-start">

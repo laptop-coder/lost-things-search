@@ -115,7 +115,7 @@ const ConversationView = () => {
                   : "/storage/assets/default_avatar.jpeg"
               }
               alt={`Фото профиля пользователя ${otherUser()!.firstName} ${otherUser()!.lastName}`}
-              class="w-10 h-10 rounded-full object-cover"
+              class="w-10 h-10 rounded-full object-cover border-2 border-gray-100 hover:brightness-95 transition"
             />
 
             <div>
