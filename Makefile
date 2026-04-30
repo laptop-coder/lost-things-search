@@ -8,7 +8,6 @@ cron:
 	sh -c "( crontab -l; cat ./crontab.tasks )" | crontab -
 
 deploy:
-	mkdir -p ./data/storage/{avatars,documents,post_photos}
 	$(COMPOSE) up -d
 
 first-run:
