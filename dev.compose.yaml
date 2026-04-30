@@ -54,9 +54,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-      args:
-        UID: ${UID:-1000}
-        GID: ${GID:-1000}
     container_name: lts-backend
     restart: unless-stopped
     volumes:
@@ -93,9 +90,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.migrate
-      args:
-        UID: ${UID:-1000}
-        GID: ${GID:-1000}
     container_name: lts-migrate
     environment:
       - POSTGRES_HOST=postgres
