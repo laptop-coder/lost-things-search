@@ -11,17 +11,15 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags='-w -s -extldflags "-static"' 
 
 FROM debian:12.11-slim
 COPY --from=builder /app/bin/main /usr/local/bin/app
-ARG UID=1000
-ARG GID=1000
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN apt-get update && \
     apt-get install -y wget && \
     rm -rf /var/lib/apt/lists/* && \
-    addgroup --gid $GID appuser && \
-    adduser --uid $UID --gid $GID appuser && \
+    adduser --disabled-password --gecos "" appuser && \
     chown appuser /usr/local/bin/app && \
-    chmod u+x /usr/local/bin/app
-USER appuser
-WORKDIR /app
+    chmod u+x /usr/local/bin/app && \
+    chmod u+x /usr/local/bin/entrypoint.sh
+
 EXPOSE 37190
 
-CMD /usr/local/bin/app
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

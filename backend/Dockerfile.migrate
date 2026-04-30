@@ -11,10 +11,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags='-w -s -extldflags "-static"' 
 
 FROM debian:12.11-slim
 COPY --from=builder /app/bin/migrate /usr/local/bin/migrate
-ARG UID=1000
-ARG GID=1000
-RUN addgroup --gid $GID appuser && \
-    adduser --uid $UID --gid $GID appuser && \
+RUN adduser --disabled-password --gecos "" appuser && \
     chown appuser /usr/local/bin/migrate && \
     chmod u+x /usr/local/bin/migrate
 USER appuser
