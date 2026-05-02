@@ -590,15 +590,17 @@ func (h *PostHandler) GetPostsPublic(w http.ResponseWriter, r *http.Request) {
 			}
 			studentIDs := []uuid.UUID{}
 			usedGroupIDs := []uint16{}
-			for _, student := range parent.Students {
-				if !slices.Contains(usedGroupIDs, student.StudentGroup.ID) {
-					group, err := h.studentGroupService.GetStudentGroupByID(r.Context(), student.StudentGroup.ID)
+			for _, child := range parent.Students {
+				if !slices.Contains(usedGroupIDs, child.StudentGroup.ID) {
+					group, err := h.studentGroupService.GetStudentGroupByID(r.Context(), child.StudentGroup.ID)
 					if err != nil {
 						helpers.HandleServiceError(h.log, w, err)
 						return
 					}
-					for _, student := range group.Students {
-						studentIDs = append(studentIDs, student.UserID)
+					for _, classmate := range group.Students {
+						if classmate.UserID != child.UserID {
+							studentIDs = append(studentIDs, classmate.UserID)
+						}
 					}
 					usedGroupIDs = append(usedGroupIDs, group.ID)
 				}
