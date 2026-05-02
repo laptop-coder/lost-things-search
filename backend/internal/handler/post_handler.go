@@ -543,8 +543,9 @@ func (h *PostHandler) GetPostsPublic(w http.ResponseWriter, r *http.Request) {
 	if authorString != "" {
 		switch authorString {
 		case "all":
+			// empty filter, return all posts
 		case "me":
-			filter.AuthorIDs = []uuid.UUID{userID}
+			filter.AuthorIDs = []uuid.UUID{userID} // filter never empty
 		case "students": // my students (for teacher role)
 			teacher, err := h.teacherService.GetTeacherByID(r.Context(), userID)
 			if err != nil {
@@ -557,6 +558,12 @@ func (h *PostHandler) GetPostsPublic(w http.ResponseWriter, r *http.Request) {
 					studentIDs = append(studentIDs, student.UserID)
 				}
 			}
+			if len(studentIDs) == 0 {
+				helpers.SuccessResponse(w, map[string]interface{}{
+					"posts": []interface{}{},
+				})
+				return
+			}
 			filter.AuthorIDs = studentIDs
 		case "children": // my children (for parent role)
 			parent, err := h.parentService.GetParentByID(r.Context(), userID)
@@ -567,6 +574,12 @@ func (h *PostHandler) GetPostsPublic(w http.ResponseWriter, r *http.Request) {
 			studentIDs := []uuid.UUID{}
 			for _, student := range parent.Students {
 				studentIDs = append(studentIDs, student.UserID)
+			}
+			if len(studentIDs) == 0 {
+				helpers.SuccessResponse(w, map[string]interface{}{
+					"posts": []interface{}{},
+				})
+				return
 			}
 			filter.AuthorIDs = studentIDs
 		case "children_groups": // my children student groups (for parent role)
@@ -590,6 +603,12 @@ func (h *PostHandler) GetPostsPublic(w http.ResponseWriter, r *http.Request) {
 					usedGroupIDs = append(usedGroupIDs, group.ID)
 				}
 			}
+			if len(studentIDs) == 0 {
+				helpers.SuccessResponse(w, map[string]interface{}{
+					"posts": []interface{}{},
+				})
+				return
+			}
 			filter.AuthorIDs = studentIDs
 		case "parents": // my parents (for student role)
 			student, err := h.studentService.GetStudentByID(r.Context(), userID)
@@ -601,6 +620,12 @@ func (h *PostHandler) GetPostsPublic(w http.ResponseWriter, r *http.Request) {
 			for _, parent := range student.Parents {
 				parentIDs = append(parentIDs, parent.UserID)
 			}
+			if len(parentIDs) == 0 {
+				helpers.SuccessResponse(w, map[string]interface{}{
+					"posts": []interface{}{},
+				})
+				return
+			}
 			filter.AuthorIDs = parentIDs
 		case "classmates": // my student group, i.e. my classmates (for student role)
 			student, err := h.studentService.GetStudentByID(r.Context(), userID)
@@ -610,7 +635,15 @@ func (h *PostHandler) GetPostsPublic(w http.ResponseWriter, r *http.Request) {
 			}
 			classmateIDs := []uuid.UUID{}
 			for _, classmate := range student.StudentGroup.Students {
-				classmateIDs = append(classmateIDs, classmate.UserID)
+				if classmate.UserID != userID {
+					classmateIDs = append(classmateIDs, classmate.UserID)
+				}
+			}
+			if len(classmateIDs) == 0 {
+				helpers.SuccessResponse(w, map[string]interface{}{
+					"posts": []interface{}{},
+				})
+				return
 			}
 			filter.AuthorIDs = classmateIDs
 		default:
