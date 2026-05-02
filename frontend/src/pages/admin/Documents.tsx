@@ -1,8 +1,9 @@
-import { createSignal, createEffect, onMount, For, Show } from "solid-js";
+import { createSignal, onMount, Show } from "solid-js";
 import { PERMISSIONS } from "../../lib/permissions";
 import { usePermissions } from "../../lib/permissions";
 import { api } from "../../lib/api";
 import { FileText, FileCheck } from "lucide-solid";
+import { Motion } from "solid-motionone";
 
 const Documents = () => {
   const [loading, setLoading] = createSignal(true);
@@ -82,10 +83,15 @@ const Documents = () => {
               </h2>
               <div class="flex gap-3 flex-col">
                 <Show when={hasPrivacy()}>
-                  <div class="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded-xl flex items-center gap-3">
+                  <Motion.div
+                    class="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded-xl flex items-center gap-3"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.2 }}
+                  >
                     <FileCheck />
                     <span>Документ загружен</span>
-                  </div>
+                  </Motion.div>
                 </Show>
                 <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-500 transition">
                   <div class="flex flex-col items-center justify-center pt-5 pb-6">

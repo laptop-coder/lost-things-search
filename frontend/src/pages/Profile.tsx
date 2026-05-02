@@ -392,7 +392,12 @@ const Profile = () => {
                   <h2 class="text-2xl font-bold text-gray-800">
                     {user()!.lastName} {user()!.firstName} {user()?.middleName}
                   </h2>
-                  <p class={`text-gray-500 mt-1 ${navigator.clipboard ? "cursor-copy" : ""}`} onClick={() => copyToClipboard(user()!.email)}>{user()!.email}</p>
+                  <p
+                    class={`text-gray-500 mt-1 ${navigator.clipboard ? "cursor-copy" : ""}`}
+                    onClick={() => copyToClipboard(user()!.email)}
+                  >
+                    {user()!.email}
+                  </p>
                   <div class="flex flex-wrap gap-2 mt-3">
                     <div class="flex flex-wrap gap-1">
                       <For each={user()!.roles}>
@@ -408,7 +413,12 @@ const Profile = () => {
                     </div>
                   </div>
                   <div class="text-sm text-gray-500 text-left mt-4">
-                    <p class={navigator.clipboard ? "cursor-copy" : ""} onClick={() => copyToClipboard(user()!.id)}>ID: {user()!.id}</p>
+                    <p
+                      class={navigator.clipboard ? "cursor-copy" : ""}
+                      onClick={() => copyToClipboard(user()!.id)}
+                    >
+                      ID: {user()!.id}
+                    </p>
                     <p>Аккаунт создан: {formatDate(user()!.createdAt)}</p>
                   </div>
                 </div>
@@ -528,7 +538,14 @@ const Profile = () => {
                                 </div>
                               </div>
                               <div class="text-sm text-gray-500">
-                                <p class={navigator.clipboard ? "cursor-copy" : ""} onClick={() => copyToClipboard(user.id)}>ID: {user.id}</p>
+                                <p
+                                  class={
+                                    navigator.clipboard ? "cursor-copy" : ""
+                                  }
+                                  onClick={() => copyToClipboard(user.id)}
+                                >
+                                  ID: {user.id}
+                                </p>
                                 <p>
                                   Аккаунт создан: {formatDate(user.createdAt)}
                                 </p>

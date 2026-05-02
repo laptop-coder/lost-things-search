@@ -37,7 +37,7 @@ const PostDetails = () => {
         Информация об объявлении
       </h1>
       <Show when={loading()}>
-        <div class="text-center py-8">Загрузка...</div>;
+        <div class="text-center py-8">Загрузка...</div>
       </Show>
       <Show when={error()}>
         <div class="bg-red-50 text-red-600 p-3 rounded-xl text-sm border border-red-200">

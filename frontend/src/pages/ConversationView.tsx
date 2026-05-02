@@ -1,4 +1,4 @@
-import { createSignal, onMount, For, Show, createEffect } from "solid-js";
+import { createSignal, onMount, Index, Show, createEffect } from "solid-js";
 import { A } from "@solidjs/router";
 import { useParams, useNavigate } from "@solidjs/router";
 import { conversationApi } from "../lib/api";
@@ -6,6 +6,7 @@ import { Conversation, Message } from "../lib/types";
 import { useAuth } from "../lib/auth";
 import { refreshUnreadMessagesCount } from "../lib/store";
 import { ChevronLeft, ChevronRight, NotepadText, Send } from "lucide-solid";
+import { Motion, Presence } from "solid-motionone";
 
 const ConversationView = () => {
   const params = useParams();
@@ -151,16 +152,18 @@ const ConversationView = () => {
         </Show>
 
         <div class="space-y-3">
-          <For each={messages()}>
+          <Index each={messages()}>
             {(msg, index) => {
-              const isOwn = msg.senderId === auth.user()?.id;
+              const isOwn = msg().senderId === auth.user()?.id;
 
               // Date
-              const prev = index() > 0 ? messages()[index() - 1] : null;
+              const prev = index > 0 ? messages()[index - 1] : null;
               const prevDate = prev
                 ? new Date(prev.createdAt).toLocaleDateString("ru")
                 : null;
-              const curDate = new Date(msg.createdAt).toLocaleDateString("ru");
+              const curDate = new Date(msg().createdAt).toLocaleDateString(
+                "ru",
+              );
               const showDate = prevDate !== curDate;
 
               return (
@@ -174,17 +177,20 @@ const ConversationView = () => {
                     class={`flex ${isOwn ? "justify-end" : "justify-start"}`}
                   >
                     <div class={`max-w-[70%] ${isOwn ? "order-2" : ""}`}>
-                      <div
+                      <Motion.div
                         class={`rounded-2xl px-4 py-2 ${
                           isOwn
                             ? "bg-blue-600 text-white"
                             : "bg-gray-100 text-gray-800"
                         }`}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2 }}
                       >
-                        <p class="text-sm">{msg.content}</p>
-                      </div>
+                        <p class="text-sm">{msg().content}</p>
+                      </Motion.div>
                       <p class="text-xs text-gray-400 mt-1">
-                        {new Date(msg.createdAt).toLocaleTimeString("ru", {
+                        {new Date(msg().createdAt).toLocaleTimeString("ru", {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
@@ -194,7 +200,7 @@ const ConversationView = () => {
                 </>
               );
             }}
-          </For>
+          </Index>
           <div ref={messagesEndRef} />
         </div>
       </div>

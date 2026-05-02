@@ -6,6 +6,7 @@ import { useAuth } from "../lib/auth";
 import { formatDate } from "../lib/utils";
 import { A } from "@solidjs/router";
 import { ChevronRight } from "lucide-solid";
+import { Motion } from "solid-motionone";
 
 interface Props {
   post: Post;
@@ -65,8 +66,11 @@ const PostCardCompact = (props: Props) => {
   };
 
   return (
-    <div
-      class={`rounded-2xl shadow-md hover:shadow-xl transition-all duration-200 overflow-hidden w-full ${props.post.thingReturnedToOwner ? "bg-gray-100 opacity-75" : "bg-white"}`}
+    <Motion.div
+      class={`rounded-2xl shadow-md hover:shadow-xl overflow-hidden w-full ${props.post.thingReturnedToOwner ? "bg-gray-100 opacity-75" : "bg-white"}`}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
     >
       <div class="p-5">
         <div class="flex flex-col md:flex-row items-start gap-4 w-full">
@@ -202,7 +206,7 @@ const PostCardCompact = (props: Props) => {
           </div>
         </div>
       </div>
-    </div>
+    </Motion.div>
   );
 };
 

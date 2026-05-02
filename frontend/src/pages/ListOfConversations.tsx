@@ -3,6 +3,7 @@ import { A } from "@solidjs/router";
 import { ConversationListItem } from "../lib/types";
 import { formatDate } from "../lib/utils";
 import { conversationApi } from "../lib/api";
+import { Motion, Presence } from "solid-motionone";
 
 const ListOfConversations = () => {
   const [conversations, setConversations] = createSignal<
@@ -44,51 +45,58 @@ const ListOfConversations = () => {
       </Show>
 
       <Show when={!loading() && conversations().length > 0}>
-        <div class="space-y-3">
-          <For each={conversations()}>
-            {(conv) => (
-              <A
-                href={`/conversations/${conv.id}`}
-                class="block bg-white rounded-xl shadow hover:shadow-md transition p-4"
-              >
-                <div class="flex items-center gap-4 relative">
-                  <img
-                    src={
-                      conv.otherUser.hasAvatar
-                        ? `/storage/storage/avatars/${conv.otherUser.id}.jpeg`
-                        : "/storage/assets/default_avatar.jpeg"
-                    }
-                    alt={`Фото профиля пользователя ${conv.otherUser.firstName} ${conv.otherUser.lastName}`}
-                    class="w-12 h-12 rounded-full object-cover border-2 border-gray-100 hover:brightness-95 transition"
-                  />
-                  <div class="flex-1 min-w-0">
-                    <div class="flex justify-between items-start">
-                      <h3 class="font-semibold text-gray-800 truncate">
-                        {conv.otherUser.firstName} {conv.otherUser.lastName}
-                      </h3>
-                      <span class="text-xs text-gray-400">
-                        {formatDate(conv.updatedAt)}
-                      </span>
-                    </div>
-                    <p class="text-sm text-gray-500 truncate mt-0.5">
-                      {conv.postName}
-                    </p>
-                    <Show when={conv.lastMessage}>
-                      <p class="text-sm text-gray-600 truncate mt-1">
-                        {conv.lastMessage}
+        <Presence>
+          <Motion.div
+            class="space-y-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.2 }}
+          >
+            <For each={conversations()}>
+              {(conv) => (
+                <A
+                  href={`/conversations/${conv.id}`}
+                  class="block bg-white rounded-xl shadow hover:shadow-md transition p-4"
+                >
+                  <div class="flex items-center gap-4 relative">
+                    <img
+                      src={
+                        conv.otherUser.hasAvatar
+                          ? `/storage/storage/avatars/${conv.otherUser.id}.jpeg`
+                          : "/storage/assets/default_avatar.jpeg"
+                      }
+                      alt={`Фото профиля пользователя ${conv.otherUser.firstName} ${conv.otherUser.lastName}`}
+                      class="w-12 h-12 rounded-full object-cover border-2 border-gray-100 hover:brightness-95 transition"
+                    />
+                    <div class="flex-1 min-w-0">
+                      <div class="flex justify-between items-start">
+                        <h3 class="font-semibold text-gray-800 truncate">
+                          {conv.otherUser.firstName} {conv.otherUser.lastName}
+                        </h3>
+                        <span class="text-xs text-gray-400">
+                          {formatDate(conv.updatedAt)}
+                        </span>
+                      </div>
+                      <p class="text-sm text-gray-500 truncate mt-0.5">
+                        {conv.postName}
                       </p>
+                      <Show when={conv.lastMessage}>
+                        <p class="text-sm text-gray-600 truncate mt-1">
+                          {conv.lastMessage}
+                        </p>
+                      </Show>
+                    </div>
+                    <Show when={conv.unreadCount > 0}>
+                      <div class="bg-blue-600 text-white text-xs font-medium px-2 py-1 rounded-full absolute right-0">
+                        {conv.unreadCount}
+                      </div>
                     </Show>
                   </div>
-                  <Show when={conv.unreadCount > 0}>
-                    <div class="bg-blue-600 text-white text-xs font-medium px-2 py-1 rounded-full absolute right-0">
-                      {conv.unreadCount}
-                    </div>
-                  </Show>
-                </div>
-              </A>
-            )}
-          </For>
-        </div>
+                </A>
+              )}
+            </For>
+          </Motion.div>
+        </Presence>
       </Show>
     </div>
   );

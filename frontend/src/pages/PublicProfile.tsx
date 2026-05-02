@@ -158,7 +158,6 @@ const PublicProfile = () => {
     }
   };
 
-
   return (
     <>
       {hasPermission(PERMISSIONS.USER_READ_OWN) && (
@@ -202,7 +201,12 @@ const PublicProfile = () => {
                     {user()!.lastName} {user()!.firstName} {user()?.middleName}
                   </h2>
                   <Show when={hasPermission(PERMISSIONS.USER_READ_ALL)}>
-                    <p class={`text-gray-500 mt-1 ${navigator.clipboard ? "cursor-copy" : ""}`} onClick={() => copyToClipboard(user()!.email)}>{user()!.email}</p>
+                    <p
+                      class={`text-gray-500 mt-1 ${navigator.clipboard ? "cursor-copy" : ""}`}
+                      onClick={() => copyToClipboard(user()!.email)}
+                    >
+                      {user()!.email}
+                    </p>
                   </Show>
                   <div class="flex flex-wrap gap-2 mt-3">
                     <div class="flex flex-wrap gap-1">
@@ -221,7 +225,12 @@ const PublicProfile = () => {
                 </div>
                 <div class="text-sm text-gray-500">
                   <Show when={hasRole(ROLES.ADMIN)}>
-                    <p class={navigator.clipboard ? "cursor-copy" : ""} onClick={() => copyToClipboard(user()!.id)}>ID: {user()!.id}</p>
+                    <p
+                      class={navigator.clipboard ? "cursor-copy" : ""}
+                      onClick={() => copyToClipboard(user()!.id)}
+                    >
+                      ID: {user()!.id}
+                    </p>
                     <p>Аккаунт создан: {formatDate(user()!.createdAt)}</p>
                   </Show>
                 </div>
@@ -274,7 +283,14 @@ const PublicProfile = () => {
                                 </div>
                               </div>
                               <div class="text-sm text-gray-500">
-                                <p class={navigator.clipboard ? "cursor-copy" : ""} onClick={() => copyToClipboard(user.id)}>ID: {user.id}</p>
+                                <p
+                                  class={
+                                    navigator.clipboard ? "cursor-copy" : ""
+                                  }
+                                  onClick={() => copyToClipboard(user.id)}
+                                >
+                                  ID: {user.id}
+                                </p>
                                 <p>
                                   Аккаунт создан: {formatDate(user.createdAt)}
                                 </p>

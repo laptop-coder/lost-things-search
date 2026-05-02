@@ -3,6 +3,7 @@ import { api } from "../lib/api";
 import { usePermissions, PERMISSIONS, ROLES } from "../lib/permissions";
 import QRCodeButton from "../components/QRCode";
 import { Download, Copy, Check } from "lucide-solid";
+import { Motion } from "solid-motionone";
 
 const InviteTokens = () => {
   const [count, setCount] = createSignal(1);
@@ -260,7 +261,12 @@ const InviteTokens = () => {
 
       {/* List of created tokens */}
       <Show when={tokens().length > 0}>
-        <div class="space-y-4">
+        <Motion.div
+          class="space-y-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
+        >
           <div class="flex justify-between items-center">
             <h2 class="text-xl font-semibold text-gray-800 text-center">
               Созданные токены
@@ -318,7 +324,7 @@ const InviteTokens = () => {
               </For>
             </div>
           </div>
-        </div>
+        </Motion.div>
       </Show>
     </div>
   );
