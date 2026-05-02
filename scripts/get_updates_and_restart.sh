@@ -1,11 +1,9 @@
 #!/bin/sh
 
-docker-compose -f "${HOME}/lts-service/compose.yaml" down
+cd "${HOME}/lts-service"
+make down
 
-docker rmi laptopcoder/lts-service-backend:latest > /dev/null
-docker rmi laptopcoder/lts-service-frontend:latest  > /dev/null
+docker compose pull backend > /dev/null
+docker compose pull frontend  > /dev/null
 
-docker pull laptopcoder/lts-service-backend:latest > /dev/null
-docker pull laptopcoder/lts-service-frontend:latest  > /dev/null
-
-docker-compose -f "${HOME}/lts-service/compose.yaml" up -d
+make deploy

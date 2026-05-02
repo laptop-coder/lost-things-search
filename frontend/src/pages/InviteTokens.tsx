@@ -147,15 +147,19 @@ const InviteTokens = () => {
   };
 
   const copyLinkToClipboard = async (text: string, index: number) => {
-    await navigator.clipboard.writeText(text);
-    setButtonCopiedIndex(index);
-    setTimeout(() => setButtonCopiedIndex(null), 2000);
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(text); // will work only on localhost/HTTPS
+      setButtonCopiedIndex(index);
+      setTimeout(() => setButtonCopiedIndex(null), 2000);
+    }
   };
 
   const copyTokenToClipboard = async (token: string) => {
-    await navigator.clipboard.writeText(token);
-    setShowTokenCopied(true);
-    setTimeout(() => setShowTokenCopied(false), 2000);
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(token); // will work only on localhost/HTTPS
+      setShowTokenCopied(true);
+      setTimeout(() => setShowTokenCopied(false), 2000);
+    }
   };
 
   return (
@@ -277,31 +281,33 @@ const InviteTokens = () => {
                 {(item, index) => (
                   <div class="p-4 hover:bg-gray-50 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <code
-                      class="text-sm font-mono break-all text-gray-600 bg-gray-50 px-3 leading-10 text-center rounded-lg cursor-copy truncate"
+                      class={`text-sm font-mono break-all text-gray-600 bg-gray-50 px-3 leading-10 text-center rounded-lg truncate ${navigator.clipboard ? "cursor-copy" : ""}`}
                       onClick={() => copyTokenToClipboard(item.token)}
                     >
                       {item.token}
                     </code>
                     <div class="flex gap-2">
-                      <button
-                        onClick={() =>
-                          copyLinkToClipboard(
-                            `${window.location.protocol}//${window.location.host}/register?inviteToken=${item.token}`,
-                            index(),
-                          )
-                        }
-                        class="w-full md:w-36 h-10 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition cursor-pointer font-medium gap-2 flex items-center justify-center px-4"
-                      >
-                        {buttonCopiedIndex() === index() ? (
-                          <>
-                            <Check /> Скопировано
-                          </>
-                        ) : (
-                          <>
-                            <Copy /> URL
-                          </>
-                        )}
-                      </button>
+                      <Show when={navigator.clipboard}>
+                        <button
+                          onClick={() =>
+                            copyLinkToClipboard(
+                              `${window.location.protocol}//${window.location.host}/register?inviteToken=${item.token}`,
+                              index(),
+                            )
+                          }
+                          class="w-full md:w-36 h-10 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition cursor-pointer font-medium gap-2 flex items-center justify-center px-4"
+                        >
+                          {buttonCopiedIndex() === index() ? (
+                            <>
+                              <Check /> Скопировано
+                            </>
+                          ) : (
+                            <>
+                              <Copy /> URL
+                            </>
+                          )}
+                        </button>
+                      </Show>
                       <QRCodeButton
                         text={`${window.location.protocol}//${window.location.host}/register?inviteToken=${item.token}`}
                         setError={setError}

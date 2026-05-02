@@ -373,9 +373,11 @@ const Users = () => {
 
   const [showCopied, setShowCopied] = createSignal(false);
   const copyToClipboard = async (text: string) => {
-    await navigator.clipboard.writeText(text);
-    setShowCopied(true);
-    setTimeout(() => setShowCopied(false), 2000);
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(text); // will work only on localhost/HTTPS
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
+    }
   };
 
   const addAdminRole = async (user: User) => {
@@ -536,18 +538,14 @@ const Users = () => {
                         </div>
                       </td>
                       <td
-                        class="px-6 py-4 text-sm text-gray-500 cursor-copy"
-                        onClick={() => {
-                          copyToClipboard(user.email);
-                        }}
+                        class={`px-6 py-4 text-sm text-gray-500 ${navigator.clipboard ? "cursor-copy" : ""}`}
+                        onClick={() => copyToClipboard(user.email)}
                       >
                         {user.email}
                       </td>
                       <td
-                        class="px-6 py-4 text-sm text-gray-400 font-mono cursor-copy"
-                        onClick={() => {
-                          copyToClipboard(user.id);
-                        }}
+                        class={`px-6 py-4 text-sm text-gray-400 font-mono ${navigator.clipboard ? "cursor-copy" : ""}`}
+                        onClick={() => copyToClipboard(user.id)}
                       >
                         {user.id.slice(0, 8)}...
                       </td>
