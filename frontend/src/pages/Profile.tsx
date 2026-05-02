@@ -320,10 +320,28 @@ const Profile = () => {
     await loadAllData();
   };
 
+  const [showCopied, setShowCopied] = createSignal(false);
+  const copyToClipboard = async (text: string) => {
+    if (navigator.clipboard) {
+      await navigator.clipboard.writeText(text); // will work only on localhost/HTTPS
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
+    }
+  };
+
   return (
     <>
       {hasPermission(PERMISSIONS.USER_READ_OWN) && (
         <div class="max-w-4xl mx-auto space-y-6 p-4">
+          {/* "Copied!" notification */}
+          <Show when={showCopied()}>
+            <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50">
+              <div class="bg-gray-800 text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium">
+                ✓ Скопировано!
+              </div>
+            </div>
+          </Show>
+
           <h1 class="text-2xl font-bold text-center text-gray-800">
             Личный кабинет
           </h1>
@@ -374,7 +392,12 @@ const Profile = () => {
                   <h2 class="text-2xl font-bold text-gray-800">
                     {user()!.lastName} {user()!.firstName} {user()?.middleName}
                   </h2>
-                  <p class="text-gray-500 mt-1">{user()!.email}</p>
+                  <p
+                    class={`text-gray-500 mt-1 ${navigator.clipboard ? "cursor-copy" : ""}`}
+                    onClick={() => copyToClipboard(user()!.email)}
+                  >
+                    {user()!.email}
+                  </p>
                   <div class="flex flex-wrap gap-2 mt-3">
                     <div class="flex flex-wrap gap-1">
                       <For each={user()!.roles}>
@@ -390,7 +413,12 @@ const Profile = () => {
                     </div>
                   </div>
                   <div class="text-sm text-gray-500 text-left mt-4">
-                    <p>ID: {user()!.id}</p>
+                    <p
+                      class={navigator.clipboard ? "cursor-copy" : ""}
+                      onClick={() => copyToClipboard(user()!.id)}
+                    >
+                      ID: {user()!.id}
+                    </p>
                     <p>Аккаунт создан: {formatDate(user()!.createdAt)}</p>
                   </div>
                 </div>
@@ -510,7 +538,14 @@ const Profile = () => {
                                 </div>
                               </div>
                               <div class="text-sm text-gray-500">
-                                <p>ID: {user.id}</p>
+                                <p
+                                  class={
+                                    navigator.clipboard ? "cursor-copy" : ""
+                                  }
+                                  onClick={() => copyToClipboard(user.id)}
+                                >
+                                  ID: {user.id}
+                                </p>
                                 <p>
                                   Аккаунт создан: {formatDate(user.createdAt)}
                                 </p>

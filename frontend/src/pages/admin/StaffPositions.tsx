@@ -5,6 +5,7 @@ import { usePermissions } from "../../lib/permissions";
 import type { StaffPosition } from "../../lib/types";
 import Pagination from "../../components/Pagination";
 import { Briefcase, Plus } from "lucide-solid";
+import { Motion } from "solid-motionone";
 
 const StaffPositions = () => {
   const [staffPositions, setStaffPositions] = createSignal<StaffPosition[]>([]);
@@ -159,7 +160,12 @@ const StaffPositions = () => {
       </Show>
 
       <Show when={!loading() && staffPositions().length > 0}>
-        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <Motion.div
+          class="bg-white rounded-2xl shadow-lg overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
+        >
           <div class="overflow-x-auto">
             <table class="w-full">
               <thead class="bg-gray-50 border-b border-gray-200">
@@ -208,7 +214,7 @@ const StaffPositions = () => {
               </tbody>
             </table>
           </div>
-        </div>
+        </Motion.div>
       </Show>
       <Pagination
         page={page()}

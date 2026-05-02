@@ -33,6 +33,7 @@ import { A } from "@solidjs/router";
 import Pagination from "../components/Pagination";
 import { Users as UsersIcon } from "lucide-solid";
 import { Trash, Plus } from "lucide-solid";
+import { Motion, Presence } from "solid-motionone";
 
 const Users = () => {
   const auth = useAuth();
@@ -483,7 +484,12 @@ const Users = () => {
       </Show>
 
       <Show when={!loading() && users().length > 0}>
-        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <Motion.div
+          class="bg-white rounded-2xl shadow-lg overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
+        >
           <div class="overflow-x-auto">
             <table class="w-full">
               <thead class="bg-gray-50 border-b border-gray-200">
@@ -632,237 +638,296 @@ const Users = () => {
               </tbody>
             </table>
           </div>
-        </div>
+        </Motion.div>
       </Show>
 
       {/* Modal */}
-      <Show when={selectedUser()}>
-        <div
-          class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          onClick={closeModal}
-        >
-          <div
-            class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
+      <Presence>
+        <Show when={selectedUser()}>
+          <Motion.div
+            class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            onClick={closeModal}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
           >
-            {/* Header */}
-            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4">
-              <div class="flex items-center gap-3">
-                <img
-                  src={
-                    selectedUser()?.hasAvatar
-                      ? `/storage/storage/avatars/${selectedUser()?.id}.jpeg`
-                      : "/storage/assets/default_avatar.jpeg"
-                  }
-                  alt="Аватар"
-                  class="w-10 h-10 rounded-full object-cover"
-                />
-                <div>
-                  <h2 class="text-xl font-bold text-gray-800">
-                    {selectedUser()?.lastName} {selectedUser()?.firstName}
-                  </h2>
-                  <p class="text-sm text-gray-500">{selectedUser()?.email}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Body */}
-            <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-5">
-              <Show when={error()}>
-                <div class="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-sm">
-                  {error()}
-                </div>
-              </Show>
-
-              {/* Roles selection */}
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-3">
-                  Выберите роли:
-                </label>
-                <div class="space-y-2">
-                  <For
-                    each={ROLES_TO_DISPLAY.filter((role) => {
-                      if (hasRole(ROLES.ADMIN)) {
-                        return (
-                          role.name !== ROLES.SUPERADMIN &&
-                          role.name !== ROLES.ADMIN
-                        ); // TODO: make in the whole frontend code like here
-                      }
-                      return false;
-                    })}
-                  >
-                    {(role) => (
-                      <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={selectedRoles().includes(role.id)}
-                          onChange={() => {
-                            setSaving(false);
-                            setError("");
-                            toggleRole(role.id);
-                          }}
-                          disabled={saving()}
-                          class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                        />
-                        <span class="text-gray-700">{role.displayName}</span>
-                      </label>
-                    )}
-                  </For>
+            <Motion.div
+              class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+            >
+              {/* Header */}
+              <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <img
+                    src={
+                      selectedUser()?.hasAvatar
+                        ? `/storage/storage/avatars/${selectedUser()?.id}.jpeg`
+                        : "/storage/assets/default_avatar.jpeg"
+                    }
+                    alt="Аватар"
+                    class="w-10 h-10 rounded-full object-cover"
+                  />
+                  <div>
+                    <h2 class="text-xl font-bold text-gray-800">
+                      {selectedUser()?.lastName} {selectedUser()?.firstName}
+                    </h2>
+                    <p class="text-sm text-gray-500">{selectedUser()?.email}</p>
+                  </div>
                 </div>
               </div>
 
-              {/* Institution Administrator Position */}
-              <Show when={selectedRoles().includes(3)}>
+              {/* Body */}
+              <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-5">
+                <Show when={error()}>
+                  <div class="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-sm">
+                    {error()}
+                  </div>
+                </Show>
+
+                {/* Roles selection */}
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Должность администрации ОУ *
+                  <label class="block text-sm font-medium text-gray-700 mb-3">
+                    Выберите роли:
                   </label>
-                  <select
-                    disabled={saving()}
-                    value={institutionAdministratorPositionId() || ""}
-                    onChange={(e) => {
-                      setSaving(false);
-                      setError("");
-                      setInstitutionAdministratorPositionId(
-                        Number(e.currentTarget.value),
-                      );
-                    }}
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    <option value="">Выберите должность</option>
-                    <For each={institutionAdministratorPositions()}>
-                      {(position) => (
-                        <option value={position.id}>{position.name}</option>
+                  <div class="space-y-2">
+                    <For
+                      each={ROLES_TO_DISPLAY.filter((role) => {
+                        if (hasRole(ROLES.ADMIN)) {
+                          return (
+                            role.name !== ROLES.SUPERADMIN &&
+                            role.name !== ROLES.ADMIN
+                          ); // TODO: make in the whole frontend code like here
+                        }
+                        return false;
+                      })}
+                    >
+                      {(role) => (
+                        <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={selectedRoles().includes(role.id)}
+                            onChange={() => {
+                              setSaving(false);
+                              setError("");
+                              toggleRole(role.id);
+                            }}
+                            disabled={saving()}
+                            class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                          />
+                          <span class="text-gray-700">{role.displayName}</span>
+                        </label>
                       )}
                     </For>
-                  </select>
+                  </div>
                 </div>
-              </Show>
 
-              {/* Staff Position */}
-              <Show when={selectedRoles().includes(4)}>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Должность сотрудника ОУ *
-                  </label>
-                  <select
-                    disabled={saving()}
-                    value={staffPositionId() || ""}
-                    onChange={(e) => {
-                      setSaving(false);
-                      setError("");
-                      setStaffPositionId(Number(e.currentTarget.value));
-                    }}
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    <option value="">Выберите должность</option>
-                    <For each={staffPositions()}>
-                      {(position) => (
-                        <option value={position.id}>{position.name}</option>
-                      )}
-                    </For>
-                  </select>
-                </div>
-              </Show>
-
-              {/* Teacher fields */}
-              <Show when={selectedRoles().includes(5)}>
-                <div class="space-y-4 border-t border-gray-100 pt-4">
-                  <h3 class="font-medium text-gray-800">Данные учителя</h3>
-
+                {/* Institution Administrator Position */}
+                <Show when={selectedRoles().includes(3)}>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                      Классный кабинет *
+                      Должность администрации ОУ *
                     </label>
                     <select
                       disabled={saving()}
-                      value={teacherClassroomId() || ""}
+                      value={institutionAdministratorPositionId() || ""}
                       onChange={(e) => {
                         setSaving(false);
                         setError("");
-                        setTeacherClassroomId(Number(e.currentTarget.value));
+                        setInstitutionAdministratorPositionId(
+                          Number(e.currentTarget.value),
+                        );
                       }}
                       class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
-                      <option value="">Выберите кабинет</option>
-                      <For each={rooms()}>
-                        {(room) => <option value={room.id}>{room.name}</option>}
+                      <option value="">Выберите должность</option>
+                      <For each={institutionAdministratorPositions()}>
+                        {(position) => (
+                          <option value={position.id}>{position.name}</option>
+                        )}
                       </For>
                     </select>
                   </div>
+                </Show>
 
+                {/* Staff Position */}
+                <Show when={selectedRoles().includes(4)}>
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                      Предметы *
+                      Должность сотрудника ОУ *
                     </label>
-                    <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border border-gray-200 rounded-xl p-2">
-                      <For each={subjects()}>
-                        {(subject) => (
-                          <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition">
-                            <input
-                              disabled={saving()}
-                              type="checkbox"
-                              checked={teacherSubjectIds().includes(subject.id)}
-                              onChange={() => {
-                                setSaving(false);
-                                setError("");
-                                if (teacherSubjectIds().includes(subject.id)) {
-                                  setTeacherSubjectIds((prev) =>
-                                    prev.filter((id) => id !== subject.id),
-                                  );
-                                } else {
-                                  setTeacherSubjectIds((prev) => [
-                                    ...prev,
-                                    subject.id,
-                                  ]);
-                                }
-                              }}
-                              class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                            />
-                            <span class="text-gray-700 text-sm">
-                              {subject.name}
-                            </span>
-                          </label>
+                    <select
+                      disabled={saving()}
+                      value={staffPositionId() || ""}
+                      onChange={(e) => {
+                        setSaving(false);
+                        setError("");
+                        setStaffPositionId(Number(e.currentTarget.value));
+                      }}
+                      class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      <option value="">Выберите должность</option>
+                      <For each={staffPositions()}>
+                        {(position) => (
+                          <option value={position.id}>{position.name}</option>
                         )}
                       </For>
+                    </select>
+                  </div>
+                </Show>
+
+                {/* Teacher fields */}
+                <Show when={selectedRoles().includes(5)}>
+                  <div class="space-y-4 border-t border-gray-100 pt-4">
+                    <h3 class="font-medium text-gray-800">Данные учителя</h3>
+
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Классный кабинет *
+                      </label>
+                      <select
+                        disabled={saving()}
+                        value={teacherClassroomId() || ""}
+                        onChange={(e) => {
+                          setSaving(false);
+                          setError("");
+                          setTeacherClassroomId(Number(e.currentTarget.value));
+                        }}
+                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      >
+                        <option value="">Выберите кабинет</option>
+                        <For each={rooms()}>
+                          {(room) => (
+                            <option value={room.id}>{room.name}</option>
+                          )}
+                        </For>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Предметы *
+                      </label>
+                      <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border border-gray-200 rounded-xl p-2">
+                        <For each={subjects()}>
+                          {(subject) => (
+                            <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition">
+                              <input
+                                disabled={saving()}
+                                type="checkbox"
+                                checked={teacherSubjectIds().includes(
+                                  subject.id,
+                                )}
+                                onChange={() => {
+                                  setSaving(false);
+                                  setError("");
+                                  if (
+                                    teacherSubjectIds().includes(subject.id)
+                                  ) {
+                                    setTeacherSubjectIds((prev) =>
+                                      prev.filter((id) => id !== subject.id),
+                                    );
+                                  } else {
+                                    setTeacherSubjectIds((prev) => [
+                                      ...prev,
+                                      subject.id,
+                                    ]);
+                                  }
+                                }}
+                                class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                              />
+                              <span class="text-gray-700 text-sm">
+                                {subject.name}
+                              </span>
+                            </label>
+                          )}
+                        </For>
+                      </div>
+                    </div>
+
+                    <div class="space-y-3 border-t border-gray-200 pt-4">
+                      <h3 class="font-medium text-gray-800">
+                        Классное руководство/наставничество
+                      </h3>
+
+                      <Index each={teacherStudentGroupIds}>
+                        {(groupId, index) => (
+                          <div class="flex gap-2">
+                            <select
+                              value={groupId() || ""}
+                              onChange={(e) =>
+                                updateTeacherStudentGroupId(
+                                  index,
+                                  Number(e.target.value),
+                                )
+                              }
+                              class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <option value="">Выберите группу</option>
+                              <For
+                                each={studentGroups().filter(
+                                  (group) =>
+                                    !teacherStudentGroupIds
+                                      .filter((_, i) => i !== index)
+                                      .includes(group.id),
+                                )}
+                              >
+                                {(group) => (
+                                  <option value={group.id}>{group.name}</option>
+                                )}
+                              </For>
+                            </select>
+                            <button
+                              type="button"
+                              onClick={() => removeTeacherStudentGroupId(index)}
+                              class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-red-700 text-white rounded-xl hover:bg-red-800 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                            >
+                              <span class="hidden md:flex">Удалить</span>
+                              <Trash class="flex md:hidden" />
+                            </button>
+                          </div>
+                        )}
+                      </Index>
+
+                      <button
+                        type="button"
+                        onClick={addTeacherStudentGroupId}
+                        class="w-full py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
+                      >
+                        <Plus /> Добавить группу
+                      </button>
                     </div>
                   </div>
+                </Show>
 
-                  <div class="space-y-3 border-t border-gray-200 pt-4">
-                    <h3 class="font-medium text-gray-800">
-                      Классное руководство/наставничество
-                    </h3>
+                {/* Parent fields */}
+                <Show when={selectedRoles().includes(6)}>
+                  <div class="space-y-3 border-t border-gray-100 pt-4">
+                    <h3 class="font-medium text-gray-800">Привязка учеников</h3>
 
-                    <Index each={teacherStudentGroupIds}>
-                      {(groupId, index) => (
+                    <Index each={parentStudentIds}>
+                      {(studentId, index) => (
                         <div class="flex gap-2">
-                          <select
-                            value={groupId() || ""}
-                            onChange={(e) =>
-                              updateTeacherStudentGroupId(
-                                index,
-                                Number(e.target.value),
-                              )
-                            }
-                            class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <option value="">Выберите группу</option>
-                            <For
-                              each={studentGroups().filter(
-                                (group) =>
-                                  !teacherStudentGroupIds
-                                    .filter((_, i) => i !== index)
-                                    .includes(group.id),
-                              )}
-                            >
-                              {(group) => (
-                                <option value={group.id}>{group.name}</option>
-                              )}
-                            </For>
-                          </select>
+                          <input
+                            disabled={saving()}
+                            type="text"
+                            value={studentId()}
+                            onInput={(e) => {
+                              setSaving(false);
+                              setError("");
+                              updateStudentId(index, e.target.value);
+                            }}
+                            placeholder={`ID ученика ${index + 1}`}
+                            class="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
+                          />
                           <button
+                            disabled={saving()}
                             type="button"
-                            onClick={() => removeTeacherStudentGroupId(index)}
+                            onClick={() => removeStudentId(index)}
                             class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-red-700 text-white rounded-xl hover:bg-red-800 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                           >
                             <span class="hidden md:flex">Удалить</span>
@@ -873,104 +938,61 @@ const Users = () => {
                     </Index>
 
                     <button
+                      disabled={saving()}
                       type="button"
-                      onClick={addTeacherStudentGroupId}
+                      onClick={addStudentId}
                       class="w-full py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
                     >
-                      <Plus /> Добавить группу
+                      <Plus /> Добавить ученика
                     </button>
                   </div>
-                </div>
-              </Show>
+                </Show>
 
-              {/* Parent fields */}
-              <Show when={selectedRoles().includes(6)}>
-                <div class="space-y-3 border-t border-gray-100 pt-4">
-                  <h3 class="font-medium text-gray-800">Привязка учеников</h3>
+                {/* Student fields */}
+                <Show when={selectedRoles().includes(7)}>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      Учебная группа *
+                    </label>
+                    <select
+                      disabled={saving()}
+                      value={studentGroupId() || ""}
+                      onChange={(e) =>
+                        setStudentGroupId(Number(e.currentTarget.value))
+                      }
+                      class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      <option value="">Выберите группу</option>
+                      <For each={studentGroups()}>
+                        {(group) => (
+                          <option value={group.id}>{group.name}</option>
+                        )}
+                      </For>
+                    </select>
+                  </div>
+                </Show>
+              </div>
 
-                  <Index each={parentStudentIds}>
-                    {(studentId, index) => (
-                      <div class="flex gap-2">
-                        <input
-                          disabled={saving()}
-                          type="text"
-                          value={studentId()}
-                          onInput={(e) => {
-                            setSaving(false);
-                            setError("");
-                            updateStudentId(index, e.target.value);
-                          }}
-                          placeholder={`ID ученика ${index + 1}`}
-                          class="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        />
-                        <button
-                          disabled={saving()}
-                          type="button"
-                          onClick={() => removeStudentId(index)}
-                          class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-red-700 text-white rounded-xl hover:bg-red-800 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                        >
-                          <span class="hidden md:flex">Удалить</span>
-                          <Trash class="flex md:hidden" />
-                        </button>
-                      </div>
-                    )}
-                  </Index>
-
-                  <button
-                    disabled={saving()}
-                    type="button"
-                    onClick={addStudentId}
-                    class="w-full py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
-                  >
-                    <Plus /> Добавить ученика
-                  </button>
-                </div>
-              </Show>
-
-              {/* Student fields */}
-              <Show when={selectedRoles().includes(7)}>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Учебная группа *
-                  </label>
-                  <select
-                    disabled={saving()}
-                    value={studentGroupId() || ""}
-                    onChange={(e) =>
-                      setStudentGroupId(Number(e.currentTarget.value))
-                    }
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                  >
-                    <option value="">Выберите группу</option>
-                    <For each={studentGroups()}>
-                      {(group) => (
-                        <option value={group.id}>{group.name}</option>
-                      )}
-                    </For>
-                  </select>
-                </div>
-              </Show>
-            </div>
-
-            {/* Footer */}
-            <div class="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
-              <button
-                onClick={closeModal}
-                class="w-40 h-10 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium cursor-pointer"
-              >
-                Отмена
-              </button>
-              <button
-                onClick={saveRoles}
-                disabled={saving()}
-                class="w-40 h-10 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
-              >
-                Сохранить
-              </button>
-            </div>
-          </div>
-        </div>
-      </Show>
+              {/* Footer */}
+              <div class="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+                <button
+                  onClick={closeModal}
+                  class="w-40 h-10 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium cursor-pointer"
+                >
+                  Отмена
+                </button>
+                <button
+                  onClick={saveRoles}
+                  disabled={saving()}
+                  class="w-40 h-10 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                >
+                  Сохранить
+                </button>
+              </div>
+            </Motion.div>
+          </Motion.div>
+        </Show>
+      </Presence>
       <Pagination
         page={page()}
         hasMore={hasMore()}

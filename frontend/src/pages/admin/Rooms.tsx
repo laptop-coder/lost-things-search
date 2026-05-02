@@ -5,6 +5,7 @@ import { usePermissions } from "../../lib/permissions";
 import type { Room } from "../../lib/types";
 import Pagination from "../../components/Pagination";
 import { DoorOpen, Plus } from "lucide-solid";
+import { Motion } from "solid-motionone";
 
 const Rooms = () => {
   const [rooms, setRooms] = createSignal<Room[]>([]);
@@ -151,7 +152,12 @@ const Rooms = () => {
       </Show>
 
       <Show when={!loading() && rooms().length > 0}>
-        <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+        <Motion.div
+          class="bg-white rounded-2xl shadow-lg overflow-hidden"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
+        >
           <div class="overflow-x-auto">
             <table class="w-full">
               <thead class="bg-gray-50 border-b border-gray-200">
@@ -196,7 +202,7 @@ const Rooms = () => {
               </tbody>
             </table>
           </div>
-        </div>
+        </Motion.div>
       </Show>
       <Pagination
         page={page()}

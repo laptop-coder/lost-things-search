@@ -6,6 +6,7 @@ import { useAuth } from "../lib/auth";
 import { formatDate } from "../lib/utils";
 import { A, useNavigate } from "@solidjs/router";
 import { ChevronLeft } from "lucide-solid";
+import { Motion, Presence } from "solid-motionone";
 
 interface Props {
   post: Post;
@@ -127,10 +128,13 @@ const PostCardDetailed = (props: Props) => {
   });
 
   return (
-    <div
+    <Motion.div
       class={
-        "rounded-2xl shadow-md hover:shadow-xl transition-all duration-200 overflow-hidden bg-white w-full"
+        "rounded-2xl shadow-md hover:shadow-xl overflow-hidden bg-white w-full"
       }
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
     >
       <div class="p-5 relative">
         <div class="flex flex-col md:flex-row items-center md:items-start gap-4">
@@ -281,76 +285,86 @@ const PostCardDetailed = (props: Props) => {
         </div>
       </div>
 
-      <Show when={showModal()}>
-        <div
-          class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          onClick={closeModal}
-        >
-          <div
-            class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
+      <Presence>
+        <Show when={showModal()}>
+          <Motion.div
+            class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            onClick={closeModal}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
           >
-            {/* Header */}
-            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4">
-              <h2 class="text-xl font-bold text-gray-800">
-                Связаться с автором
-              </h2>
-              <p class="text-sm text-gray-500">
-                {props.post.author.firstName} {props.post.author.lastName} ·{" "}
-                {props.post.name}
-              </p>
-            </div>
+            <Motion.div
+              class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+            >
+              {/* Header */}
+              <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4">
+                <h2 class="text-xl font-bold text-gray-800">
+                  Связаться с автором
+                </h2>
+                <p class="text-sm text-gray-500">
+                  {props.post.author.firstName} {props.post.author.lastName} ·{" "}
+                  {props.post.name}
+                </p>
+              </div>
 
-            {/* Body */}
-            <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-5 flex flex-col">
-              <Show when={error()}>
-                <div class="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-sm">
-                  {error()}
-                </div>
-              </Show>
-              <input
-                ref={messageInputRef}
-                disabled={contactLoading()}
-                type="text"
-                value={contactMessage()}
-                onInput={(e) => {
-                  setContactLoading(false);
-                  setError("");
-                  setContactMessage(e.target.value);
-                }}
-                onKeyDown={async (e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    if (contactLoading()) return;
-                    await contactAuthor();
-                  }
-                }}
-                placeholder="Введите сообщение..."
-                class="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
-                required
-              />
-            </div>
+              {/* Body */}
+              <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-5 flex flex-col">
+                <Show when={error()}>
+                  <div class="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-sm">
+                    {error()}
+                  </div>
+                </Show>
+                <input
+                  ref={messageInputRef}
+                  disabled={contactLoading()}
+                  type="text"
+                  value={contactMessage()}
+                  onInput={(e) => {
+                    setContactLoading(false);
+                    setError("");
+                    setContactMessage(e.target.value);
+                  }}
+                  onKeyDown={async (e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      if (contactLoading()) return;
+                      await contactAuthor();
+                    }
+                  }}
+                  placeholder="Введите сообщение..."
+                  class="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  required
+                />
+              </div>
 
-            {/* Footer */}
-            <div class="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
-              <button
-                onClick={closeModal}
-                class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium cursor-pointer"
-              >
-                Отмена
-              </button>
-              <button
-                onClick={contactAuthor}
-                disabled={contactLoading()}
-                class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
-              >
-                {contactLoading() ? "Отправка..." : "Отправить"}
-              </button>
-            </div>
-          </div>
-        </div>
-      </Show>
-    </div>
+              {/* Footer */}
+              <div class="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+                <button
+                  onClick={closeModal}
+                  class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium cursor-pointer"
+                >
+                  Отмена
+                </button>
+                <button
+                  onClick={contactAuthor}
+                  disabled={contactLoading()}
+                  class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                >
+                  {contactLoading() ? "Отправка..." : "Отправить"}
+                </button>
+              </div>
+            </Motion.div>
+          </Motion.div>
+        </Show>
+      </Presence>
+    </Motion.div>
   );
 };
 
