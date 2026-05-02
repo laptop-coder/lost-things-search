@@ -6,7 +6,7 @@ import { Conversation, Message } from "../lib/types";
 import { useAuth } from "../lib/auth";
 import { refreshUnreadMessagesCount } from "../lib/store";
 import { ChevronLeft, ChevronRight, NotepadText, Send } from "lucide-solid";
-import { Motion, Presence } from "solid-motionone";
+import { Motion } from "solid-motionone";
 
 const ConversationView = () => {
   const params = useParams();
@@ -142,7 +142,7 @@ const ConversationView = () => {
       </div>
 
       {/* Messages */}
-      <div class="flex-1 overflow-y-auto p-4 flex flex-col justify-end">
+      <div class="flex-1 overflow-y-auto p-4">
         <Show when={loading()}>
           <div class="text-center py-8 text-gray-500">Загрузка...</div>
         </Show>
@@ -150,58 +150,59 @@ const ConversationView = () => {
         <Show when={error()}>
           <div class="bg-red-50 text-red-600 p-3 rounded-xl">{error()}</div>
         </Show>
+        <div class="flex flex-col justify-end min-h-full">
+          <div class="space-y-3">
+            <Index each={messages()}>
+              {(msg, index) => {
+                const isOwn = msg().senderId === auth.user()?.id;
 
-        <div class="space-y-3">
-          <Index each={messages()}>
-            {(msg, index) => {
-              const isOwn = msg().senderId === auth.user()?.id;
+                // Date
+                const prev = index > 0 ? messages()[index - 1] : null;
+                const prevDate = prev
+                  ? new Date(prev.createdAt).toLocaleDateString("ru")
+                  : null;
+                const curDate = new Date(msg().createdAt).toLocaleDateString(
+                  "ru",
+                );
+                const showDate = prevDate !== curDate;
 
-              // Date
-              const prev = index > 0 ? messages()[index - 1] : null;
-              const prevDate = prev
-                ? new Date(prev.createdAt).toLocaleDateString("ru")
-                : null;
-              const curDate = new Date(msg().createdAt).toLocaleDateString(
-                "ru",
-              );
-              const showDate = prevDate !== curDate;
-
-              return (
-                <>
-                  <Show when={showDate}>
-                    <div class="text-center text-xs text-gray-400 py-2">
-                      {curDate}
+                return (
+                  <>
+                    <Show when={showDate}>
+                      <div class="text-center text-xs text-gray-400 py-2">
+                        {curDate}
+                      </div>
+                    </Show>
+                    <div
+                      class={`flex ${isOwn ? "justify-end" : "justify-start"}`}
+                    >
+                      <div class={`max-w-[70%] ${isOwn ? "order-2" : ""}`}>
+                        <Motion.div
+                          class={`rounded-2xl px-4 py-2 ${
+                            isOwn
+                              ? "bg-blue-600 text-white"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <p class="text-sm">{msg().content}</p>
+                        </Motion.div>
+                        <p class="text-xs text-gray-400 mt-1">
+                          {new Date(msg().createdAt).toLocaleTimeString("ru", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      </div>
                     </div>
-                  </Show>
-                  <div
-                    class={`flex ${isOwn ? "justify-end" : "justify-start"}`}
-                  >
-                    <div class={`max-w-[70%] ${isOwn ? "order-2" : ""}`}>
-                      <Motion.div
-                        class={`rounded-2xl px-4 py-2 ${
-                          isOwn
-                            ? "bg-blue-600 text-white"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                      >
-                        <p class="text-sm">{msg().content}</p>
-                      </Motion.div>
-                      <p class="text-xs text-gray-400 mt-1">
-                        {new Date(msg().createdAt).toLocaleTimeString("ru", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                </>
-              );
-            }}
-          </Index>
-          <div ref={messagesEndRef} />
+                  </>
+                );
+              }}
+            </Index>
+            <div ref={messagesEndRef} />
+          </div>
         </div>
       </div>
 
