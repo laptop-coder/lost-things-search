@@ -53,20 +53,19 @@ export const PublicRoute: Component<Props> = (props) => {
             />
             <span class="text-xl font-bold text-gray-800">
               <span class="hidden md:block">LostThingsSearch</span>
-              <span class="block md:hidden">LTS</span>
             </span>
           </A>
           <Show when={!auth.user() && location.pathname === "/"}>
             <A
               href="/documents/privacy.pdf"
               target="_blank"
-              class="text-sm text-gray-500 hover:text-gray-700 transition"
+              class="text-sm text-gray-500 hover:text-gray-700 transition text-nowrap hidden md:block"
             >
               Политика конфиденциальности
             </A>
             <A
               href="/about"
-              class="text-sm text-gray-500 hover:text-gray-700 transition"
+              class="text-sm text-gray-500 hover:text-gray-700 transition text-nowrap"
             >
               О проекте
             </A>
