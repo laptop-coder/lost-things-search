@@ -189,8 +189,10 @@ const Profile = () => {
   });
 
   const handleLogout = async () => {
-    await auth.logout();
-    navigate("/login");
+    if (confirm("Вы уверены, что хотите выйти из учётной записи?")) {
+      await auth.logout();
+      navigate("/login");
+    }
   };
 
   const loadParentStudents = async () => {
