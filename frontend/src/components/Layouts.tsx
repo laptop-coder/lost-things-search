@@ -149,21 +149,21 @@ export const PublicRoute: Component<Props> = (props) => {
         <footer class="bg-white border-t border-gray-200 mt-auto">
           <div class="container mx-auto px-4 py-6">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div class="text-sm text-gray-500">
+              <div class="text-sm text-gray-500 text-nowrap">
                 © {new Date().getFullYear()} LostThingsSearch.
               </div>
 
-              <div class="flex gap-6">
+              <div class="flex gap-4 md:gap-6 flex-col md:flex-row items-center justify-center">
                 <A
                   href="/documents/privacy.pdf"
                   target="_blank"
-                  class="text-sm text-gray-500 hover:text-gray-700 transition"
+                  class="text-sm text-gray-500 hover:text-gray-700 transition text-nowrap"
                 >
                   Политика конфиденциальности
                 </A>
                 <A
                   href="/about"
-                  class="text-sm text-gray-500 hover:text-gray-700 transition"
+                  class="text-sm text-gray-500 hover:text-gray-700 transition text-nowrap"
                 >
                   О проекте
                 </A>
