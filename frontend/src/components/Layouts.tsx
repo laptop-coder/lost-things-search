@@ -7,7 +7,7 @@ import {
   onMount,
   onCleanup,
 } from "solid-js";
-import { useNavigate, useLocation, A } from "@solidjs/router";
+import { useLocation, A, Navigate } from "@solidjs/router";
 import { useAuth } from "../lib/auth";
 import { usePermissions, PERMISSIONS, ROLES } from "../lib/permissions";
 import { unreadMessagesCount, refreshUnreadMessagesCount } from "../lib/store";
@@ -20,7 +20,7 @@ interface Props {
 export const PublicRoute: Component<Props> = (props) => {
   const auth = useAuth();
   const location = useLocation();
-  const { hasPermission, hasRole, hasAnyRole } = usePermissions();
+  const { hasPermission, hasAnyRole } = usePermissions();
 
   createEffect(async () => {
     if (auth.user()) {
@@ -177,18 +177,12 @@ export const PublicRoute: Component<Props> = (props) => {
 };
 
 export const ProtectedRoute: Component<Props> = (props) => {
-  const navigate = useNavigate();
   const auth = useAuth();
-
   return (
-    <>
-      {auth.isLoading() ? (
-        <div class="flex justify-center items-center h-screen">Загрузка...</div>
-      ) : auth.isAuthenticated() ? (
+    <Show when={!auth.isLoading()}>
+      <Show when={auth.isAuthenticated()} fallback={<Navigate href="/login" />}>
         <PublicRoute>{props?.children}</PublicRoute>
-      ) : (
-        navigate("/login")
-      )}
-    </>
+      </Show>
+    </Show>
   );
 };

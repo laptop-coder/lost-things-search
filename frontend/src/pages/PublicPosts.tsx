@@ -13,9 +13,11 @@ import PostCardCompact from "../components/PostCardCompact";
 import TabsToggle from "../components/TabsToggle";
 import { usePermissions, ROLES } from "../lib/permissions";
 import { useAuth } from "../lib/auth";
+import Skeleton from "../components/Skeleton";
 
 const PublicPosts = () => {
   const [posts, setPosts] = createSignal<Post[]>([]);
+  const [refreshLoading, setRefreshLoading] = createSignal(false);
   const [loading, setLoading] = createSignal(false);
   const [error, setError] = createSignal("");
   const { hasRole } = usePermissions();
@@ -63,7 +65,7 @@ const PublicPosts = () => {
     const statusQuery = statusTab?.query ?? statusTabsActive().query;
     setPage(0);
     setHasMore(true);
-    setLoading(true);
+    setRefreshLoading(true);
     try {
       const data = await api.get<{ posts: Post[] }>(
         `/posts/public?author=${ownerQuery}&thingReturnedToOwner=${statusQuery}&limit=10&offset=0`,
@@ -76,7 +78,7 @@ const PublicPosts = () => {
         err instanceof Error ? err.message : "Ошибка загрузки объявлений",
       );
     } finally {
-      setLoading(false);
+      setRefreshLoading(false);
     }
   };
 
@@ -88,7 +90,12 @@ const PublicPosts = () => {
     observer?.disconnect();
     observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMore() && !loading()) {
+        if (
+          entries[0].isIntersecting &&
+          hasMore() &&
+          !loading() &&
+          !refreshLoading()
+        ) {
           loadPosts();
         }
       },
@@ -162,25 +169,50 @@ const PublicPosts = () => {
         />
       </div>
 
-      <Show when={loading() && posts().length === 0}>
-        <div class="text-center py-8">Загрузка...</div>
-      </Show>
-
       <Show when={error()}>
         <div class="bg-red-100 text-red-700 p-4 rounded-lg">{error()}</div>
       </Show>
 
-      <Show when={!loading() && !error()}>
+      <Show when={refreshLoading()}>
+        <div class="space-y-4 pt-4 md:flex md:flex-row md:gap-4 md:items-start">
+          <Skeleton class="w-10 h-10 !rounded-full flex-shrink-0" />
+          <div class="flex flex-col space-y-2 flex-1 max-md:pt-2">
+            <Skeleton class="h-4 w-2/3" />
+            <Skeleton class="h-3 w-1/3" />
+            <Skeleton class="h-3 w-3/5" />
+          </div>
+        </div>
+        <div class="space-y-4 pt-4 md:flex md:flex-row md:gap-4 md:items-start">
+          <Skeleton class="w-10 h-10 !rounded-full flex-shrink-0" />
+          <div class="flex flex-col space-y-2 flex-1 max-md:pt-2">
+            <Skeleton class="h-4 w-2/3" />
+            <Skeleton class="h-3 w-1/3" />
+            <Skeleton class="h-3 w-3/5" />
+          </div>
+        </div>
+      </Show>
+
+      <Show when={!refreshLoading() && !error()}>
         <div class="space-y-4">
           <Index each={posts()}>
             {(post) => (
               <PostCardCompact post={post()} onChange={refreshPosts} />
             )}
           </Index>
+          <Show when={loading()}>
+            <div class="space-y-4 pt-4 md:flex md:flex-row md:gap-4 md:items-start">
+              <Skeleton class="w-10 h-10 !rounded-full flex-shrink-0" />
+              <div class="flex flex-col space-y-2 flex-1 max-md:pt-2">
+                <Skeleton class="h-4 w-2/3" />
+                <Skeleton class="h-3 w-1/3" />
+                <Skeleton class="h-3 w-3/5" />
+              </div>
+            </div>
+          </Show>
         </div>
       </Show>
       <div ref={observerRef} class="h-10">
-        <Show when={posts().length === 0 && !loading()}>
+        <Show when={posts().length === 0 && !refreshLoading() && !loading()}>
           <div class="text-center text-gray-500 py-8">Пока нет объявлений</div>
         </Show>
         <Show when={!hasMore() && posts().length > 0}>

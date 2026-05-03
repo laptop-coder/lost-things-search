@@ -21,6 +21,7 @@ import type {
 } from "../lib/types";
 import RequestStudentOrParentInvite from "./RequestStudentOrParentInvite";
 import { User, X } from "lucide-solid";
+import Spinner from "../components/Spinner";
 
 const Register = () => {
   // Data about new user
@@ -52,6 +53,7 @@ const Register = () => {
   const [avatarPreview, setAvatarPreview] = createSignal<string | null>(null);
 
   const [error, setError] = createSignal("");
+  const [initialLoading, setInitialLoading] = createSignal(true);
   const [loading, setLoading] = createSignal(false);
 
   const [searchParams] = useSearchParams();
@@ -111,7 +113,7 @@ const Register = () => {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Возникла ошибка");
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
     }
   });
 
@@ -270,21 +272,28 @@ const Register = () => {
           <h1 class="text-3xl font-bold text-gray-800">
             Создание учётной записи
           </h1>
-          <p class="text-gray-500 mt-2">
-            Роли:{" "}
-            <span class="font-medium text-blue-600">
-              {ROLES_TO_DISPLAY.filter((role) =>
-                roleNames().includes(role.name),
-              )
-                .map((role) => role.displayName)
-                .join(", ")}
-            </span>
-          </p>
+          <Show when={!initialLoading()}>
+            <p class="text-gray-500 mt-2">
+              Роли:{" "}
+              <span class="font-medium text-blue-600">
+                {ROLES_TO_DISPLAY.filter((role) =>
+                  roleNames().includes(role.name),
+                )
+                  .map((role) => role.displayName)
+                  .join(", ")}
+              </span>
+            </p>
+          </Show>
         </div>
 
-        {loading() ? (
-          <div class="text-center py-12 text-gray-500">Загрузка...</div>
-        ) : (
+        <Show
+          when={!initialLoading()}
+          fallback={
+            <div class="flex justify-center items-center py-16">
+              <Spinner />
+            </div>
+          }
+        >
           <form
             onSubmit={handleSubmit}
             class="bg-white rounded-2xl shadow-lg p-6 space-y-5"
@@ -650,7 +659,7 @@ const Register = () => {
               </button>
             </div>
           </form>
-        )}
+        </Show>
       </div>
     </div>
   );

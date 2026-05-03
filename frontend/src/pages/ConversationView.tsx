@@ -7,6 +7,7 @@ import { useAuth } from "../lib/auth";
 import { refreshUnreadMessagesCount } from "../lib/store";
 import { ChevronLeft, ChevronRight, NotepadText, Send } from "lucide-solid";
 import { Motion } from "solid-motionone";
+import Spinner from "../components/Spinner";
 
 const ConversationView = () => {
   const params = useParams();
@@ -144,7 +145,9 @@ const ConversationView = () => {
       {/* Messages */}
       <div class="flex-1 overflow-y-auto p-4">
         <Show when={loading()}>
-          <div class="text-center py-8 text-gray-500">Загрузка...</div>
+          <div class="flex items-center justify-center h-full">
+            <Spinner />
+          </div>
         </Show>
 
         <Show when={error()}>

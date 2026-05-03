@@ -4,6 +4,7 @@ import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { useNavigate, useParams } from "@solidjs/router";
 import type { Post } from "../lib/types";
+import Spinner from "../components/Spinner";
 import { X, Image } from "lucide-solid";
 
 const EditPost = () => {
@@ -101,19 +102,22 @@ const EditPost = () => {
 
   return (
     <>
-      <Show when={initialLoading()}>
-        <div class="text-center py-8">Загрузка...</div>;
-      </Show>
-      <Show when={!initialLoading()}>
-        {(hasPermission(PERMISSIONS.POST_UPDATE_ANY) ||
-          (hasPermission(PERMISSIONS.POST_UPDATE_OWN) &&
-            postAuthorId() &&
-            postAuthorId() === auth.user()?.id)) && (
-          <div class="max-w-2xl mx-auto">
-            <h1 class="text-2xl font-bold text-gray-800 text-center mb-6">
-              Редактировать объявление
-            </h1>
+      <div class="max-w-2xl mx-auto flex flex-col min-h-[50vh]">
+        <h1 class="text-2xl font-bold text-gray-800 text-center mb-6">
+          Редактировать объявление
+        </h1>
 
+        <Show when={initialLoading()}>
+          <div class="flex flex-1 justify-center items-center">
+            <Spinner />
+          </div>
+        </Show>
+
+        <Show when={!initialLoading()}>
+          {(hasPermission(PERMISSIONS.POST_UPDATE_ANY) ||
+            (hasPermission(PERMISSIONS.POST_UPDATE_OWN) &&
+              postAuthorId() &&
+              postAuthorId() === auth.user()?.id)) && (
             <form
               onSubmit={handleSubmit}
               class="bg-white rounded-2xl shadow-lg p-6 space-y-5"
@@ -220,9 +224,9 @@ const EditPost = () => {
                 </button>
               </div>
             </form>
-          </div>
-        )}
-      </Show>
+          )}
+        </Show>
+      </div>
     </>
   );
 };
