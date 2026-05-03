@@ -4,6 +4,7 @@ import { ConversationListItem } from "../lib/types";
 import { formatDate } from "../lib/utils";
 import { conversationApi } from "../lib/api";
 import { Motion, Presence } from "solid-motionone";
+import Skeleton from "../components/Skeleton";
 
 const ListOfConversations = () => {
   const [conversations, setConversations] = createSignal<
@@ -30,7 +31,22 @@ const ListOfConversations = () => {
       <h1 class="text-2xl font-bold text-gray-800">Сообщения</h1>
 
       <Show when={loading()}>
-        <div class="text-center py-8 text-gray-500">Загрузка...</div>
+        <div class="space-y-3">
+          <div class="flex items-center gap-4 p-4 bg-white rounded-xl">
+            <Skeleton class="w-12 h-12 !rounded-full" />
+            <div class="flex-1 space-y-2">
+              <Skeleton class="h-4 w-1/3" />
+              <Skeleton class="h-3 w-2/3" />
+            </div>
+          </div>
+          <div class="flex items-center gap-4 p-4 bg-white rounded-xl">
+            <Skeleton class="w-12 h-12 !rounded-full" />
+            <div class="flex-1 space-y-2">
+              <Skeleton class="h-4 w-1/4" />
+              <Skeleton class="h-3 w-1/2" />
+            </div>
+          </div>
+        </div>
       </Show>
 
       <Show when={error()}>

@@ -3,7 +3,7 @@ import {
   createEffect,
   onMount,
   onCleanup,
-  For,
+  Index,
   Show,
 } from "solid-js";
 import { api } from "../../lib/api";
@@ -11,6 +11,7 @@ import { usePermissions, PERMISSIONS } from "../../lib/permissions";
 import type { Post } from "../../lib/types";
 import PostCardCompact from "../../components/PostCardCompact";
 import { Inbox } from "lucide-solid";
+import Skeleton from "../../components/Skeleton";
 
 const PostsToVerify = () => {
   const { hasPermission } = usePermissions();
@@ -93,7 +94,7 @@ const PostsToVerify = () => {
 
   return (
     hasPermission(PERMISSIONS.POST_READ_ANY) && (
-      <div class="space-y-6 p-4">
+      <div class="space-y-6 p-4 overflow-hidden">
         <div class="mb-6">
           <h1 class="text-3xl font-bold text-gray-800">
             Верификация объявлений
@@ -103,27 +104,52 @@ const PostsToVerify = () => {
           </p>
         </div>
 
-        <Show when={loading() && posts().length === 0}>
-          <div class="flex justify-center items-center py-16">
-            <div class="text-gray-500">Загрузка...</div>
-          </div>
-        </Show>
-
         <Show when={error()}>
           <div class="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl">
             {error()}
           </div>
         </Show>
 
-        <Show when={!loading() && !error()}>
-          <div class="space-y-4">
-            <For each={posts()}>
-              {(post) => (
-                <PostCardCompact post={post} onChange={refreshPosts} />
-              )}
-            </For>
+        <Show when={loading() && posts().length === 0}>
+          <div class="space-y-4 pt-4 md:flex md:flex-row md:gap-4 md:items-start">
+            <Skeleton class="w-10 h-10 !rounded-full flex-shrink-0" />
+            <div class="flex flex-col space-y-2 flex-1 max-md:pt-2">
+              <Skeleton class="h-4 w-2/3" />
+              <Skeleton class="h-3 w-1/3" />
+              <Skeleton class="h-3 w-3/5" />
+            </div>
           </div>
-          <Show when={posts().length === 0}>
+          <div class="space-y-4 pt-4 md:flex md:flex-row md:gap-4 md:items-start">
+            <Skeleton class="w-10 h-10 !rounded-full flex-shrink-0" />
+            <div class="flex flex-col space-y-2 flex-1 max-md:pt-2">
+              <Skeleton class="h-4 w-2/3" />
+              <Skeleton class="h-3 w-1/3" />
+              <Skeleton class="h-3 w-3/5" />
+            </div>
+          </div>
+        </Show>
+
+        <Show when={(!loading() || posts().length > 0) && !error()}>
+          <div class="space-y-4">
+            <Index each={posts()}>
+              {(post) => (
+                <PostCardCompact post={post()} onChange={refreshPosts} />
+              )}
+            </Index>
+            <Show when={loading()}>
+              <div class="space-y-4 pt-4 md:flex md:flex-row md:gap-4 md:items-start">
+                <Skeleton class="w-10 h-10 !rounded-full flex-shrink-0" />
+                <div class="flex flex-col space-y-2 flex-1 max-md:pt-2">
+                  <Skeleton class="h-4 w-2/3" />
+                  <Skeleton class="h-3 w-1/3" />
+                  <Skeleton class="h-3 w-3/5" />
+                </div>
+              </div>
+            </Show>
+          </div>
+        </Show>
+        <div ref={observerRef} class="h-10">
+          <Show when={posts().length === 0 && !loading()}>
             <div class="flex flex-col items-center justify-center gap-1 py-16">
               <Inbox class="w-15 h-15 mb-3" />
               <p class="text-gray-500">Нет объявлений на верификацию</p>
@@ -135,8 +161,7 @@ const PostsToVerify = () => {
               Больше нет объявлений
             </div>
           </Show>
-          <div ref={observerRef} class="h-10" />
-        </Show>
+        </div>
       </div>
     )
   );

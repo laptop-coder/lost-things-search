@@ -21,6 +21,7 @@ import type {
   StaffPosition,
   InstitutionAdministratorPosition,
 } from "../lib/types";
+import Skeleton from "../components/Skeleton";
 
 const PublicProfile = () => {
   const params = useParams();
@@ -59,6 +60,7 @@ const PublicProfile = () => {
 
   const loadUser = async () => {
     try {
+      setLoading(true);
       const data = await api.get<{ user: User }>(`/users/${params.id}`);
       setUser(data.user);
     } catch (err) {
@@ -172,17 +174,33 @@ const PublicProfile = () => {
           </Show>
 
           <h1 class="text-2xl font-bold text-center text-gray-800">
-            Профиль пользователя
+            Информация о пользователе
           </h1>
 
-          <Show when={!user()}>
-            <div class="text-center py-8 text-gray-500">Загрузка...</div>
+          <Show when={loading() || !user()}>
+            <div class="p-6">
+              <div class="flex flex-col md:flex-row gap-6 items-center md:items-start">
+                <Skeleton class="w-32 h-32 !rounded-full flex-shrink-0" />
+                <div class="flex flex-col gap-8">
+                  <div class="flex-1 space-y-2">
+                    <Skeleton class="h-5 w-48 max-md:mx-auto" />
+                    <Skeleton class="h-4 w-36 max-md:mx-auto" />
+                  </div>
+                  <div class="text-sm text-gray-500 space-y-2 mt-4">
+                    <Skeleton class="h-3 w-52" />
+                    <Skeleton class="h-4 w-40" />
+                    <Skeleton class="h-3 w-48" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </Show>
 
           <Show when={error()}>
             <div class="bg-red-100 text-red-700 p-4 rounded-xl">{error()}</div>
           </Show>
-          <Show when={user() && !error()}>
+
+          <Show when={user() && !error() && !loading()}>
             <div class="bg-white rounded-2xl shadow-lg p-6">
               <div class="flex flex-col md:flex-row gap-6 items-center md:items-start">
                 <div class="relative group w-32 h-32 rounded-full">

@@ -34,6 +34,7 @@ import Pagination from "../components/Pagination";
 import { Users as UsersIcon } from "lucide-solid";
 import { Trash, Plus } from "lucide-solid";
 import { Motion, Presence } from "solid-motionone";
+import Skeleton from "../components/Skeleton";
 
 const Users = () => {
   const auth = useAuth();
@@ -471,8 +472,11 @@ const Users = () => {
       </Show>
 
       <Show when={loading()}>
-        <div class="flex justify-center py-16">
-          <div class="text-gray-500">Загрузка...</div>
+        <div class="space-y-4 py-8">
+          <Skeleton class="h-6 w-3/4" />
+          <Skeleton class="h-4 w-1/2" />
+          <Skeleton class="h-32 w-full" />
+          <Skeleton class="h-10 w-24" />
         </div>
       </Show>
 

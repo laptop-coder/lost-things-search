@@ -7,7 +7,7 @@ import {
   onMount,
   onCleanup,
 } from "solid-js";
-import { useNavigate, useLocation, A } from "@solidjs/router";
+import { useLocation, A, Navigate } from "@solidjs/router";
 import { useAuth } from "../lib/auth";
 import { usePermissions, PERMISSIONS, ROLES } from "../lib/permissions";
 import { unreadMessagesCount, refreshUnreadMessagesCount } from "../lib/store";
@@ -20,7 +20,7 @@ interface Props {
 export const PublicRoute: Component<Props> = (props) => {
   const auth = useAuth();
   const location = useLocation();
-  const { hasPermission, hasRole, hasAnyRole } = usePermissions();
+  const { hasPermission, hasAnyRole } = usePermissions();
 
   createEffect(async () => {
     if (auth.user()) {
@@ -53,20 +53,19 @@ export const PublicRoute: Component<Props> = (props) => {
             />
             <span class="text-xl font-bold text-gray-800">
               <span class="hidden md:block">LostThingsSearch</span>
-              <span class="block md:hidden">LTS</span>
             </span>
           </A>
           <Show when={!auth.user() && location.pathname === "/"}>
             <A
               href="/documents/privacy.pdf"
               target="_blank"
-              class="text-sm text-gray-500 hover:text-gray-700 transition"
+              class="text-sm text-gray-500 hover:text-gray-700 transition text-nowrap hidden md:block"
             >
               Политика конфиденциальности
             </A>
             <A
               href="/about"
-              class="text-sm text-gray-500 hover:text-gray-700 transition"
+              class="text-sm text-gray-500 hover:text-gray-700 transition text-nowrap"
             >
               О проекте
             </A>
@@ -149,21 +148,21 @@ export const PublicRoute: Component<Props> = (props) => {
         <footer class="bg-white border-t border-gray-200 mt-auto">
           <div class="container mx-auto px-4 py-6">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div class="text-sm text-gray-500">
+              <div class="text-sm text-gray-500 text-nowrap">
                 © {new Date().getFullYear()} LostThingsSearch.
               </div>
 
-              <div class="flex gap-6">
+              <div class="flex gap-4 md:gap-6 flex-col md:flex-row items-center justify-center">
                 <A
                   href="/documents/privacy.pdf"
                   target="_blank"
-                  class="text-sm text-gray-500 hover:text-gray-700 transition"
+                  class="text-sm text-gray-500 hover:text-gray-700 transition text-nowrap"
                 >
                   Политика конфиденциальности
                 </A>
                 <A
                   href="/about"
-                  class="text-sm text-gray-500 hover:text-gray-700 transition"
+                  class="text-sm text-gray-500 hover:text-gray-700 transition text-nowrap"
                 >
                   О проекте
                 </A>
@@ -177,18 +176,12 @@ export const PublicRoute: Component<Props> = (props) => {
 };
 
 export const ProtectedRoute: Component<Props> = (props) => {
-  const navigate = useNavigate();
   const auth = useAuth();
-
   return (
-    <>
-      {auth.isLoading() ? (
-        <div class="flex justify-center items-center h-screen">Загрузка...</div>
-      ) : auth.isAuthenticated() ? (
+    <Show when={!auth.isLoading()}>
+      <Show when={auth.isAuthenticated()} fallback={<Navigate href="/login" />}>
         <PublicRoute>{props?.children}</PublicRoute>
-      ) : (
-        navigate("/login")
-      )}
-    </>
+      </Show>
+    </Show>
   );
 };

@@ -4,6 +4,7 @@ import { usePermissions } from "../../lib/permissions";
 import { api } from "../../lib/api";
 import { FileText, FileCheck } from "lucide-solid";
 import { Motion } from "solid-motionone";
+import Spinner from "../../components/Spinner";
 
 const Documents = () => {
   const [loading, setLoading] = createSignal(true);
@@ -65,15 +66,17 @@ const Documents = () => {
       </Show>
 
       <Show when={loading()}>
-        <div class="text-center py-12 text-gray-500">Загрузка...</div>
+        <div class="flex justify-center items-center py-16">
+          <Spinner />
+        </div>
       </Show>
 
       <Show when={!loading() && !error()}>
         {/* Privacy uploading */}
         <Show when={hasPermission(PERMISSIONS.DOCUMENT_PRIVACY_UPLOAD)}>
           <Show when={uploadingPrivacy()}>
-            <div class="text-center py-12 text-gray-500">
-              Загрузка документа...
+            <div class="flex justify-center items-center py-16">
+              <Spinner />
             </div>
           </Show>
           <Show when={!uploadingPrivacy()}>
