@@ -5,7 +5,7 @@ import { conversationApi } from "../lib/api";
 import { Conversation, Message } from "../lib/types";
 import { useAuth } from "../lib/auth";
 import { refreshUnreadMessagesCount } from "../lib/store";
-import { ChevronLeft, ChevronRight, NotepadText, Send } from "lucide-solid";
+import { ChevronLeft, ChevronRight, NotepadText, ArrowUp } from "lucide-solid";
 import { Motion } from "solid-motionone";
 import Spinner from "../components/Spinner";
 
@@ -231,7 +231,7 @@ const ConversationView = () => {
           <span class="hidden md:flex md:items-center md:justify-center">
             Отправить
           </span>
-          <Send class="md:hidden flex items-center justify-center aspect-square" />
+          <ArrowUp class="md:hidden flex items-center justify-center aspect-square" />
         </button>
       </form>
     </div>
