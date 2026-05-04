@@ -228,8 +228,10 @@ const ConversationView = () => {
           disabled={sending() || !newMessage().trim()}
           class="max-md:aspect-square flex items-center justify-center md:px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition font-medium cursor-pointer disabled:cursor-not-allowed"
         >
-          <span class="hidden md:block">Отправить</span>
-          <Send class="block md:hidden" />
+          <span class="hidden md:flex md:items-center md:justify-center">
+            Отправить
+          </span>
+          <Send class="md:hidden flex items-center justify-center aspect-square" />
         </button>
       </form>
     </div>
