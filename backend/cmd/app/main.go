@@ -47,6 +47,7 @@ func main() {
 			}(),
 			TimeZone: env.GetStringRequired("POSTGRES_TIME_ZONE"),
 			User:     env.GetStringRequired("POSTGRES_USER"),
+			AppMode: appConfig.AppMode,
 		},
 	)
 	if err != nil {

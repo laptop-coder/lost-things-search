@@ -1,6 +1,7 @@
 package main
 
 import (
+	"backend/internal/config"
 	"backend/internal/database"
 	"backend/internal/model"
 	"backend/internal/permissions"
@@ -13,6 +14,11 @@ func main() {
 	// Logger
 	log := logger.New()
 	log.Info("MIGRATION | Starting...")
+
+	// Configs
+	log.Info("MIGRATION | Loading configurations...")
+	appMode := config.ParseAppMode(env.GetStringRequired("APP_MODE"))
+	appConfig := config.LoadAppConfig(appMode)
 
 	// Database
 	log.Info("MIGRATION | Initializing database...")
@@ -30,6 +36,7 @@ func main() {
 			}(),
 			TimeZone: env.GetStringRequired("POSTGRES_TIME_ZONE"),
 			User:     env.GetStringRequired("POSTGRES_USER"),
+			AppMode:  appConfig.AppMode,
 		},
 	)
 	if err != nil {

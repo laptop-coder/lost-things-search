@@ -1,6 +1,7 @@
 package database
 
 import (
+	"backend/pkg/env"
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -15,6 +16,7 @@ type Config struct {
 	SSLMode  string // TODO: rewrite to bool
 	TimeZone string
 	User     string
+	AppMode  env.AppMode
 }
 
 func Connect(config Config) (*gorm.DB, error) {
@@ -29,7 +31,12 @@ func Connect(config Config) (*gorm.DB, error) {
 		config.TimeZone,
 	)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
+		Logger: logger.Default.LogMode(func() logger.LogLevel {
+			if config.AppMode == env.AppModeProd {
+				return logger.Silent
+			}
+			return logger.Info
+		}()),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
