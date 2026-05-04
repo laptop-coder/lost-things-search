@@ -81,9 +81,6 @@ func (h *SubjectHandler) GetSubjects(w http.ResponseWriter, r *http.Request) {
 	// Parse limit if passed
 	if limitString != "" {
 		if limit, err := strconv.Atoi(limitString); err == nil && limit > 0 {
-			if limit > 100 {
-				limit = 100 // max value
-			}
 			filter.Limit = limit
 		} else {
 			h.log.Error("invalid limit")
