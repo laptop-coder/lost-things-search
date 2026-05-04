@@ -99,15 +99,24 @@ const Login = () => {
             </button>
           </div>
 
-          <p class="text-sm text-gray-500 mt-4 flex flex-col">
-            Ученик или родитель?
+          <div class="flex flex-col">
             <a
-              href="/register"
+              href="/forgot-password"
               class="text-blue-600 hover:text-blue-700 hover:underline"
             >
-              Запросить пригласительную ссылку
+              Забыли пароль?
             </a>
-          </p>
+
+            <p class="text-sm text-gray-500 mt-4 flex flex-col">
+              Ученик или родитель?
+              <a
+                href="/register"
+                class="text-blue-600 hover:text-blue-700 hover:underline"
+              >
+                Запросить пригласительную ссылку
+              </a>
+            </p>
+          </div>
         </form>
       </div>
     </div>

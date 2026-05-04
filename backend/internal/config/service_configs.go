@@ -18,7 +18,7 @@ func NewServiceConfigs(sharedConfig SharedConfig, appConfig AppConfig) ServiceCo
 	return ServiceConfigs{
 		User:     newUserServiceConfig(sharedConfig),
 		Post:     newPostServiceConfig(sharedConfig),
-		Auth:     newAuthServiceConfig(sharedConfig),
+		Auth:     newAuthServiceConfig(sharedConfig, appConfig),
 		Invite:   newInviteServiceConfig(sharedConfig, appConfig),
 		Email:    newEmailServiceConfig(appConfig),
 		Document: newDocumentServiceConfig(sharedConfig),
@@ -42,13 +42,15 @@ func newPostServiceConfig(sharedConfig SharedConfig) service.PostServiceConfig {
 	}
 }
 
-func newAuthServiceConfig(sharedConfig SharedConfig) service.AuthServiceConfig {
+func newAuthServiceConfig(sharedConfig SharedConfig, appConfig AppConfig) service.AuthServiceConfig {
 	return service.AuthServiceConfig{
 		JWTSecret:          sharedConfig.Security.AuthJWTSecret,
 		AccessTokenExpiry:  sharedConfig.Security.AccessTokenExpiry,
 		RefreshTokenExpiry: sharedConfig.Security.RefreshTokenExpiry,
 		TokenIssuer:        sharedConfig.Security.AuthTokenIssuer,
 		CookieSecure:       sharedConfig.Security.CookieSecure,
+		FrontendURL:        appConfig.FrontendURL,
+		BcryptCost:         sharedConfig.Security.BcryptCost,
 	}
 }
 

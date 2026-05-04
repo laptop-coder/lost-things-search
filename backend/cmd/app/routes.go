@@ -73,6 +73,8 @@ func SetupRoutes(
 	mux.Handle("DELETE /api/v1/users/{id}", authMiddleware(false)(requirePermissions(log, false, permissions.UserDeleteAnyAdmin, permissions.UserDeleteAnyUser)(http.HandlerFunc(authHandler.DeleteAccount))))
 	mux.Handle("DELETE /api/v1/users/me", authMiddleware(false)(requirePermissions(log, false, permissions.UserDeleteOwn)(http.HandlerFunc(authHandler.DeleteOwnAccount))))
 	mux.Handle("POST /api/v1/auth/logout", authMiddleware(false)(http.HandlerFunc(authHandler.Logout)))
+	mux.HandleFunc("POST /api/v1/auth/forgot-password", authHandler.ForgotPassword)
+	mux.HandleFunc("POST /api/v1/auth/reset-password", authHandler.ResetPassword)
 	// Posts
 	mux.Handle("GET /api/v1/posts/public", authMiddleware(true)(http.HandlerFunc(postHandler.GetPostsPublic)))
 	mux.Handle("POST /api/v1/posts", authMiddleware(false)(requirePermissions(log, false, permissions.PostCreate)(http.HandlerFunc(postHandler.Create))))

@@ -571,3 +571,87 @@ func (h *AuthHandler) DeleteOwnAccount(w http.ResponseWriter, r *http.Request) {
 	// Return response
 	helpers.JsonResponse(w, map[string]interface{}{}, http.StatusNoContent)
 }
+
+func (h *AuthHandler) ForgotPassword(w http.ResponseWriter, r *http.Request) {
+	// Check method
+	if r.Method != http.MethodPost {
+		helpers.MethodNotAllowedError(h.log, w)
+		return
+	}
+	// Restrictions
+	r.Body = http.MaxBytesReader(w, r.Body, 1<<20) // 1 MB
+	// Parse form
+	if err := r.ParseForm(); err != nil {
+		h.log.Error("failed to parse x-www-form-urlencoded form")
+		helpers.BadRequestError(h.log, w)
+		return
+	}
+	// Get email
+	emailFields := r.PostForm["email"]
+	if len(emailFields) == 0 {
+		h.log.Error("failed to parse form: email field is required")
+		helpers.FieldRequiredError(h.log, w, "email")
+		return
+	} else if len(emailFields) > 1 {
+		h.log.Error("failed to parse form: too many email values")
+		helpers.TooManyFieldsError(h.log, w, "email")
+		return
+	}
+	email := emailFields[0]
+	// Service
+	if err := h.authService.ForgotPassword(r.Context(), email); err != nil {
+		helpers.HandleServiceError(h.log, w, err)
+		return
+	}
+	helpers.SuccessResponse(w, map[string]interface{}{
+		"message": "Если учётная запись существует, инструкция была отправлена",
+	})
+}
+
+func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
+	// Check method
+	if r.Method != http.MethodPost {
+		helpers.MethodNotAllowedError(h.log, w)
+		return
+	}
+	// Restrictions
+	r.Body = http.MaxBytesReader(w, r.Body, 1<<20) // 1 MB
+	// Parse form
+	if err := r.ParseForm(); err != nil {
+		h.log.Error("failed to parse x-www-form-urlencoded form")
+		helpers.BadRequestError(h.log, w)
+		return
+	}
+	// Get token
+	tokenFields := r.PostForm["token"]
+	if len(tokenFields) == 0 {
+		h.log.Error("failed to parse form: token field is required")
+		helpers.FieldRequiredError(h.log, w, "token")
+		return
+	} else if len(tokenFields) > 1 {
+		h.log.Error("failed to parse form: too many token values")
+		helpers.TooManyFieldsError(h.log, w, "token")
+		return
+	}
+	token := tokenFields[0]
+	// Get password
+	passwordFields := r.PostForm["password"]
+	if len(passwordFields) == 0 {
+		h.log.Error("failed to parse form: password field is required")
+		helpers.FieldRequiredError(h.log, w, "password")
+		return
+	} else if len(passwordFields) > 1 {
+		h.log.Error("failed to parse form: too many password values")
+		helpers.TooManyFieldsError(h.log, w, "password")
+		return
+	}
+	password := passwordFields[0]
+	// Service
+	if err := h.authService.ResetPassword(r.Context(), token, password); err != nil {
+		helpers.HandleServiceError(h.log, w, err)
+		return
+	}
+	helpers.SuccessResponse(w, map[string]interface{}{
+		"message": "Пароль успешно изменён",
+	})
+}

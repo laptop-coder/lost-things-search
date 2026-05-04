@@ -7,6 +7,8 @@ import { ROLES, usePermissions } from "./lib/permissions";
 
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const PublicPosts = lazy(() => import("./pages/PublicPosts"));
 const PostsToVerify = lazy(() => import("./pages/admin/PostsToVerify"));
 const CreatePost = lazy(() => import("./pages/CreatePost"));
@@ -47,6 +49,16 @@ function App() {
         path="/register"
         component={PublicRoute}
         children={<Route path="/" component={Register} />}
+      />
+      <Route
+        path="/forgot-password"
+        component={PublicRoute}
+        children={<Route path="/" component={ForgotPassword} />}
+      />
+      <Route
+        path="/reset-password"
+        component={PublicRoute}
+        children={<Route path="/" component={ResetPassword} />}
       />
       <Route
         path="/"

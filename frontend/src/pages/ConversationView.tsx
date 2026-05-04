@@ -5,7 +5,7 @@ import { conversationApi } from "../lib/api";
 import { Conversation, Message } from "../lib/types";
 import { useAuth } from "../lib/auth";
 import { refreshUnreadMessagesCount } from "../lib/store";
-import { ChevronLeft, ChevronRight, NotepadText, Send } from "lucide-solid";
+import { ChevronLeft, ChevronRight, NotepadText, ArrowUp } from "lucide-solid";
 import { Motion } from "solid-motionone";
 import Spinner from "../components/Spinner";
 
@@ -228,8 +228,10 @@ const ConversationView = () => {
           disabled={sending() || !newMessage().trim()}
           class="max-md:aspect-square flex items-center justify-center md:px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition font-medium cursor-pointer disabled:cursor-not-allowed"
         >
-          <span class="hidden md:block">Отправить</span>
-          <Send class="block md:hidden" />
+          <span class="hidden md:flex md:items-center md:justify-center">
+            Отправить
+          </span>
+          <ArrowUp class="md:hidden flex items-center justify-center aspect-square" />
         </button>
       </form>
     </div>
