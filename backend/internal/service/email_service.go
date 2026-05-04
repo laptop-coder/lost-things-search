@@ -24,6 +24,7 @@ type EmailService interface {
 	SendInviteLink(ctx context.Context, to *string, link string) error
 	SendAddStudentToParentGuide(ctx context.Context, to *string) error
 	SendNewMessageNotification(ctx context.Context, dto *NewMessageNotificationDTO) error
+	SendForgotPasswordLink(ctx context.Context, to *string, link string) error
 }
 
 type emailService struct {
@@ -176,4 +177,20 @@ func (s *emailService) SendNewMessageNotification(ctx context.Context, dto *NewM
 		return err
 	}
 	return s.Send(ctx, []string{dto.Recipient.Email}, fmt.Sprintf("LTS: новое сообщение по объявлению «%s»", dto.Post.Name), body.String())
+}
+
+func (s *emailService) SendForgotPasswordLink(ctx context.Context, to *string, link string) error {
+	if to == nil {
+		return fmt.Errorf("email cannot be nil: %w", apperrors.ErrRequiredField)
+	} else if strings.TrimSpace(*to) == "" {
+		return fmt.Errorf("email cannot be empty or only whitespace: %w", apperrors.ErrRequiredField)
+	}
+	var body bytes.Buffer
+	if err := s.templates.ExecuteTemplate(&body, "forgot_password_link.html", map[string]string{
+		"ForgotPasswordLink": link,
+		"FooterText":         env.GetStringRequired("FOOTER_TEXT"), // TODO: move to the config
+	}); err != nil {
+		return err
+	}
+	return s.Send(ctx, []string{*to}, "Сброс пароля", body.String())
 }

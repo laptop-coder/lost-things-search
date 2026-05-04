@@ -29,6 +29,8 @@ type AuthServiceConfig struct {
 	RefreshTokenExpiry time.Duration
 	TokenIssuer        string
 	CookieSecure       bool
+	FrontendURL        string
+	BcryptCost         int
 }
 
 type InviteServiceConfig struct {

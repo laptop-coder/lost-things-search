@@ -20,6 +20,7 @@ type UserRepository interface {
 	// ID must be set to update
 	Update(ctx context.Context, user *model.User) error
 	Delete(ctx context.Context, id *uuid.UUID) error
+	UpdatePassword(ctx context.Context, userID *uuid.UUID, newPasswordHash string) error
 }
 
 type userRepository struct {
@@ -137,6 +138,9 @@ func (r *userRepository) Update(ctx context.Context, user *model.User) error {
 }
 
 func (r *userRepository) Delete(ctx context.Context, id *uuid.UUID) error {
+	if id == nil {
+		return fmt.Errorf("id cannot be nil: %w", apperrors.ErrRequiredField)
+	}
 	result := r.db.WithContext(ctx).Unscoped().Delete(&model.User{}, *id)
 	if result.Error != nil {
 		return fmt.Errorf("failed to delete user with id %s: %w", *id, result.Error)
@@ -145,4 +149,14 @@ func (r *userRepository) Delete(ctx context.Context, id *uuid.UUID) error {
 		return fmt.Errorf("user to delete was not found by id: %w", apperrors.ErrUserNotFound)
 	}
 	return nil
+}
+
+func (r *userRepository) UpdatePassword(ctx context.Context, userID *uuid.UUID, newPasswordHash string) error {
+	if userID == nil {
+		return fmt.Errorf("userID cannot be nil: %w", apperrors.ErrRequiredField)
+	}
+	return r.db.WithContext(ctx).
+		Model(&model.User{}).
+		Where("id = ?", *userID).
+		Update("password", newPasswordHash).Error
 }

@@ -60,6 +60,8 @@ func main() {
 	log.Info("Initializing Valkey...")
 	jwtClient := valkey.NewClient(valkey.ClientDBs.JWT, log)
 	defer valkey.Close(jwtClient)
+	businessClient := valkey.NewClient(valkey.ClientDBs.Business, log)
+	defer valkey.Close(businessClient)
 	log.Info("Valkey client(-s) connected successfully")
 
 	// Repositories
@@ -85,9 +87,9 @@ func main() {
 	log.Info("Creating service configurations...")
 	serviceConfigs := config.NewServiceConfigs(sharedConfig, appConfig)
 	log.Info("Initializing services...")
-	authService := service.NewAuthService(userRepo, jwtRepo, db, serviceConfigs.Auth, log)
-	userService := service.NewUserService(userRepo, studentRepo, roomRepo, db, serviceConfigs.User, log)
 	emailService, err := service.NewEmailService(serviceConfigs.Email, log)
+	authService := service.NewAuthService(emailService, userRepo, jwtRepo, db, businessClient, serviceConfigs.Auth, log)
+	userService := service.NewUserService(userRepo, studentRepo, roomRepo, db, serviceConfigs.User, log)
 	postService := service.NewPostService(postRepo, db, serviceConfigs.Post, log)
 	conversationService := service.NewConversationService(convRepo, msgRepo, postRepo, userRepo, emailService, db, log)
 	studentGroupService := service.NewStudentGroupService(userRepo, studentGroupRepo, db, log)

@@ -9,11 +9,13 @@ import (
 )
 
 type clientDBs struct {
-	JWT int
+	JWT      int
+	Business int
 }
 
 var ClientDBs = &clientDBs{
-	JWT: 0,
+	JWT:      0,
+	Business: 1,
 }
 
 type Config struct {

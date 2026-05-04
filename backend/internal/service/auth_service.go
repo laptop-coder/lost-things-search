@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
+	"github.com/valkey-io/valkey-go"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"time"
@@ -35,6 +36,8 @@ type AuthService interface {
 	RefreshToken(ctx context.Context, refreshToken string) (*TokenResponse, error)
 	ParseToken(tokenString string) (*TokenClaims, error)
 	RevokeToken(ctx context.Context, tokenString string) error
+	ForgotPassword(ctx context.Context, email string) error
+	ResetPassword(ctx context.Context, token string, password string) error
 }
 
 type TokenResponse struct {
@@ -43,26 +46,32 @@ type TokenResponse struct {
 }
 
 type authService struct {
-	userRepo repository.UserRepository
-	jwtRepo  repository.JWTRepository
-	db       *gorm.DB
-	config   AuthServiceConfig
-	log      logger.Logger
+	emailService   EmailService
+	userRepo       repository.UserRepository
+	jwtRepo        repository.JWTRepository
+	db             *gorm.DB
+	businessClient valkey.Client
+	config         AuthServiceConfig
+	log            logger.Logger
 }
 
 func NewAuthService(
+	emailService EmailService,
 	userRepo repository.UserRepository,
 	jwtRepo repository.JWTRepository,
 	db *gorm.DB,
+	businessClient valkey.Client,
 	config AuthServiceConfig,
 	log logger.Logger,
 ) AuthService {
 	return &authService{
-		userRepo: userRepo,
-		jwtRepo:  jwtRepo,
-		db:       db,
-		config:   config,
-		log:      log,
+		emailService:   emailService,
+		userRepo:       userRepo,
+		jwtRepo:        jwtRepo,
+		db:             db,
+		businessClient: businessClient,
+		config:         config,
+		log:            log,
 	}
 }
 
@@ -237,4 +246,101 @@ func (s *authService) ParseToken(tokenString string) (*TokenClaims, error) {
 		return claims, nil
 	}
 	return nil, fmt.Errorf("invalid token (failed to parse token): %w", apperrors.ErrInvalidToken)
+}
+
+func (s *authService) ForgotPassword(ctx context.Context, email string) error {
+	user, err := s.userRepo.FindByEmail(ctx, &email)
+	if err != nil || user == nil {
+		if errors.Is(err, apperrors.ErrUserNotFound) {
+			s.log.Warn("failed to reset password: invalid credentials: user with this email does not exist")
+			return nil
+		}
+		return err
+	}
+	// 1 request per 5 minutes
+	rateKey := fmt.Sprintf("pwd_reset_rate:%s", user.ID.String())
+	n, err := s.businessClient.Do(ctx, s.businessClient.B().
+		Exists().
+		Key(rateKey).
+		Build(),
+	).AsInt64()
+	if err != nil {
+		return err
+	}
+	if n >= 1 {
+		s.log.Warn("failed to reset password: exceeded the limit")
+		return nil // exceeded the limit
+	}
+	// Set
+	err = s.businessClient.Do(ctx, s.businessClient.B().
+		Set().
+		Key(rateKey).
+		Value("1").
+		Px(5*time.Minute).
+		Build(),
+	).Error()
+	if err != nil {
+		s.log.Error("failed to reset password: %w", err)
+		return nil
+	}
+	// Generate token
+	token := uuid.New().String()
+	tokenKey := fmt.Sprintf("pwd_reset:%s", token)
+	err = s.businessClient.Do(ctx, s.businessClient.B().
+		Set().
+		Key(tokenKey).
+		Value(user.ID.String()).
+		Px(1*time.Hour).
+		Build(),
+	).Error()
+	if err != nil {
+		s.log.Error("failed to reset password: %w", err)
+		return nil
+	}
+	// Send email
+	link := fmt.Sprintf("%s/reset-password?token=%s", s.config.FrontendURL, token)
+	if err := s.emailService.SendForgotPasswordLink(ctx, &email, link); err != nil {
+		s.log.Error("failed to reset password: failed to send email: %w", err)
+		return err
+	}
+	return nil
+}
+
+func (s *authService) ResetPassword(ctx context.Context, token string, newPassword string) error {
+	tokenKey := fmt.Sprintf("pwd_reset:%s", token)
+	// Get user ID from Valkey
+	userIDStr, err := s.businessClient.Do(ctx, s.businessClient.B().
+		Get().
+		Key(tokenKey).
+		Build(),
+	).ToString()
+	if err != nil {
+		s.log.Warn("invalid or expired token for password reset")
+		return fmt.Errorf("invalid reset token: %w", apperrors.ErrInvalidToken)
+	}
+	// Parse user ID
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		s.log.Error("failed to parse userID from reset token", "userID", userIDStr)
+		return fmt.Errorf("invalid user ID in token: %w", err)
+	}
+	// Hash new password
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(newPassword), s.config.BcryptCost)
+	if err != nil {
+		s.log.Error("failed to hash new password", "error", err.Error())
+		return fmt.Errorf("failed to hash new password: %w", err)
+	}
+	// Update password in DB
+	if err := s.userRepo.UpdatePassword(ctx, &userID, string(passwordHash)); err != nil {
+		s.log.Error("failed to update password", "user_id", userID.String(), "error", err.Error())
+		return fmt.Errorf("failed to update password: %w", err)
+	}
+	// Delete token from Valkey
+	s.businessClient.Do(ctx, s.businessClient.B().
+		Del().
+		Key(tokenKey).
+		Build(),
+	)
+	s.log.Info("password reset successfully", "user_id", userID.String())
+	return nil
 }
