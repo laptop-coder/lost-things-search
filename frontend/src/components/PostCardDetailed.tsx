@@ -86,16 +86,18 @@ const PostCardDetailed = (props: Props) => {
   };
 
   const markReturned = async () => {
-    try {
-      setLoading(true);
-      await api.patch<{ posts: Post[] }>(`/posts/${props.post.id}/return`);
-      props.onChange?.();
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Не удалось закрыть объявление",
-      );
-    } finally {
-      setLoading(false);
+    if (confirm("Закрыть объявление? Это действие необратимо.")) {
+      try {
+        setLoading(true);
+        await api.patch<{ posts: Post[] }>(`/posts/${props.post.id}/return`);
+        props.onChange?.();
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Не удалось закрыть объявление",
+        );
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -221,27 +223,28 @@ const PostCardDetailed = (props: Props) => {
                   )}
                 {(hasPermission(PERMISSIONS.POST_DELETE_ANY) ||
                   (hasPermission(PERMISSIONS.POST_DELETE_OWN) &&
-                    props.post.author.id === auth.user()?.id)) &&
-                  !props.post.thingReturnedToOwner && (
-                    <button
-                      onClick={deletePost}
-                      disabled={loading()}
-                      type="button"
-                      class="w-full sm:w-auto px-3 h-10 bg-red-100 text-red-700 text-sm rounded-lg hover:bg-red-200 transition font-medium cursor-pointer"
-                    >
-                      Удалить
-                    </button>
-                  )}
-                {auth.user() && auth.user()?.id !== props.post.author.id && (
+                    props.post.author.id === auth.user()?.id)) && (
                   <button
-                    onClick={openModal}
-                    disabled={contactLoading()}
+                    onClick={deletePost}
+                    disabled={loading()}
                     type="button"
-                    class="w-full sm:w-auto px-3 h-10 bg-blue-100 text-blue-700 text-sm rounded-lg hover:bg-blue-200 transition font-medium cursor-pointer"
+                    class="w-full sm:w-auto px-3 h-10 bg-red-100 text-red-700 text-sm rounded-lg hover:bg-red-200 transition font-medium cursor-pointer"
                   >
-                    Связаться с автором
+                    Удалить
                   </button>
                 )}
+                {auth.user() &&
+                  auth.user()?.id !== props.post.author.id &&
+                  hasPermission(PERMISSIONS.CONVERSATION_MESSAGE_SEND) && (
+                    <button
+                      onClick={openModal}
+                      disabled={contactLoading()}
+                      type="button"
+                      class="w-full sm:w-auto px-3 h-10 bg-blue-100 text-blue-700 text-sm rounded-lg hover:bg-blue-200 transition font-medium cursor-pointer"
+                    >
+                      Связаться с автором
+                    </button>
+                  )}
               </div>
               <div class="flex gap-3 flex-wrap">
                 {hasPermission(PERMISSIONS.POST_VERIFY) &&
@@ -266,7 +269,7 @@ const PostCardDetailed = (props: Props) => {
                       type="button"
                       class="w-full sm:w-auto px-3 h-10 bg-green-100 text-green-700 text-sm rounded-lg hover:bg-green-200 transition font-medium cursor-pointer"
                     >
-                      Найдено
+                      Отметить найденным
                     </button>
                   )}
                 <button
