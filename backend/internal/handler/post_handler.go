@@ -846,6 +846,18 @@ func (h *PostHandler) ReturnToOwner(w http.ResponseWriter, r *http.Request) {
 		helpers.BadRequestFieldError(h.log, w, "id")
 		return
 	}
+	// Get post
+	post, err := h.postService.GetPostByID(r.Context(), postID)
+	if err != nil || post == nil {
+		helpers.HandleServiceError(h.log, w, fmt.Errorf("failed to find the post by ID: %w", err))
+		return
+	}
+	// Check if the post is verified
+	if !post.Verified {
+		h.log.Error("forbidden: you cannot close unverified post")
+		helpers.ForbiddenError(h.log, w)
+		return
+	}
 	// Get user permissions
 	userPermissions, ok := r.Context().Value(middleware.UserPermissionsKey).([]string)
 	if !ok {
@@ -860,12 +872,6 @@ func (h *PostHandler) ReturnToOwner(w http.ResponseWriter, r *http.Request) {
 		if !ok {
 			h.log.Error("failed to get userID from context and convert it to UUID")
 			helpers.InternalError(h.log, w)
-			return
-		}
-		// Get post
-		post, err := h.postService.GetPostByID(r.Context(), postID)
-		if err != nil || post == nil {
-			helpers.HandleServiceError(h.log, w, fmt.Errorf("failed to find the post by ID: %w", err))
 			return
 		}
 		// Check if the post belongs to the user
