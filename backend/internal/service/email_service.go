@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"html/template"
+	"mime"
 	"net/smtp"
 	"strings"
 )
@@ -98,7 +99,7 @@ func (s *emailService) Send(ctx context.Context, to []string, subject, body stri
 			"Content-Type: text/html; charset=UTF-8\r\n"+
 			"\r\n"+
 			"%s\r\n",
-		s.config.From, strings.Join(to, ", "), subject, body,
+		s.config.From, strings.Join(to, ", "), fmt.Sprintf("=?UTF-8?Q?%s?=", mime.QEncoding.Encode("utf-8", subject)), body,
 	))
 	// Send email
 	_, err = w.Write([]byte(msg))
