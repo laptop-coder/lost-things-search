@@ -113,6 +113,7 @@ const PostCardDetailed = (props: Props) => {
         );
       } finally {
         setLoading(false);
+        navigate("/");
       }
     }
   };
