@@ -20,11 +20,11 @@ type StaffPositionService interface {
 }
 
 type CreateStaffPositionDTO struct {
-	Name string `form:"name" validate:"required,min=4,max=100"`
+	Name string `form:"name" validate:"required,min=4,max=200"`
 }
 
 type UpdateStaffPositionDTO struct {
-	Name *string `form:"name,omitempty" validate:"max=100"`
+	Name *string `form:"name,omitempty" validate:"max=200"`
 }
 
 type StaffPositionResponseDTO struct {
@@ -163,8 +163,8 @@ func (s *staffPositionService) validateCreatePositionDTO(dto *CreateStaffPositio
 	if len(dto.Name) < 4 {
 		return fmt.Errorf("name must be at least 4 characters: %w", apperrors.ErrValueTooShort)
 	}
-	if len(dto.Name) > 100 {
-		return fmt.Errorf("name must be at most 100 characters: %w", apperrors.ErrValueTooLong)
+	if len(dto.Name) > 200 {
+		return fmt.Errorf("name must be at most 200 characters: %w", apperrors.ErrValueTooLong)
 	}
 	return nil
 }
@@ -177,8 +177,8 @@ func (s *staffPositionService) validateUpdatePositionDTO(dto *UpdateStaffPositio
 		if len(*dto.Name) < 4 {
 			return fmt.Errorf("name must be at least 4 characters: %w", apperrors.ErrValueTooShort)
 		}
-		if len(*dto.Name) > 100 {
-			return fmt.Errorf("name must be at most 100 characters: %w", apperrors.ErrValueTooLong)
+		if len(*dto.Name) > 200 {
+			return fmt.Errorf("name must be at most 200 characters: %w", apperrors.ErrValueTooLong) // TODO: count of bytes, not of characters!
 		}
 	}
 	return nil
