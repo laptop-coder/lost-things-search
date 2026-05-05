@@ -136,7 +136,8 @@ const PostCardCompact = (props: Props) => {
               <div class="flex gap-3 flex-wrap">
                 {(hasPermission(PERMISSIONS.POST_UPDATE_ANY) ||
                   (hasPermission(PERMISSIONS.POST_UPDATE_OWN) &&
-                    props.post.author.id === auth.user()?.id)) &&
+                    props.post.author.id === auth.user()?.id &&
+                    !props.post.verified)) &&
                   !props.post.thingReturnedToOwner && (
                     <button
                       onClick={() =>

@@ -156,6 +156,12 @@ func (h *PostHandler) Update(w http.ResponseWriter, r *http.Request) {
 			helpers.ForbiddenError(h.log, w)
 			return
 		}
+		// Forbid to edit post after verification
+		if post.Verified {
+			h.log.Error("forbidden: you cannot edit post after verification")
+			helpers.ForbiddenError(h.log, w)
+			return
+		}
 	}
 	// DTO (all fields are optional)
 	dto := service.UpdatePostDTO{}
@@ -277,6 +283,12 @@ func (h *PostHandler) RemovePhoto(w http.ResponseWriter, r *http.Request) {
 			helpers.ForbiddenError(h.log, w)
 			return
 		}
+		// Forbid to remove post photo after post verification
+		if post.Verified {
+			h.log.Error("forbidden: you cannot remove photo of the verified post")
+			helpers.ForbiddenError(h.log, w)
+			return
+		}
 	}
 	// Remove post photo file
 	if err := h.postService.RemovePhoto(r.Context(), postID); err != nil {
@@ -333,6 +345,12 @@ func (h *PostHandler) UpdatePhoto(w http.ResponseWriter, r *http.Request) {
 		// Check if the post belongs to the user
 		if userID != post.Author.ID {
 			h.log.Error("forbidden: you do not have permission to update photo of this post")
+			helpers.ForbiddenError(h.log, w)
+			return
+		}
+		// Forbid to update post photo after post verification
+		if post.Verified {
+			h.log.Error("forbidden: you cannot update photo of the verified post")
 			helpers.ForbiddenError(h.log, w)
 			return
 		}
