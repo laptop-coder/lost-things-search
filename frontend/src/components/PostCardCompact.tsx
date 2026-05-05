@@ -86,16 +86,18 @@ const PostCardCompact = (props: Props) => {
   };
 
   const markReturned = async () => {
-    try {
-      setLoading(true);
-      await api.patch<{ posts: Post[] }>(`/posts/${props.post.id}/return`);
-      props.onChange?.();
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Не удалось закрыть объявление",
-      );
-    } finally {
-      setLoading(false);
+    if (confirm("Закрыть объявление? Это действие необратимо.")) {
+      try {
+        setLoading(true);
+        await api.patch<{ posts: Post[] }>(`/posts/${props.post.id}/return`);
+        props.onChange?.();
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Не удалось закрыть объявление",
+        );
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
