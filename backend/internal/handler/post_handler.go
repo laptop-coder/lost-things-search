@@ -156,6 +156,12 @@ func (h *PostHandler) Update(w http.ResponseWriter, r *http.Request) {
 			helpers.ForbiddenError(h.log, w)
 			return
 		}
+		// Forbid to edit post after verification
+		if post.Verified {
+			h.log.Error("forbidden: you cannot edit post after verification")
+			helpers.ForbiddenError(h.log, w)
+			return
+		}
 	}
 	// DTO (all fields are optional)
 	dto := service.UpdatePostDTO{}
@@ -277,6 +283,12 @@ func (h *PostHandler) RemovePhoto(w http.ResponseWriter, r *http.Request) {
 			helpers.ForbiddenError(h.log, w)
 			return
 		}
+		// Forbid to remove post photo after post verification
+		if post.Verified {
+			h.log.Error("forbidden: you cannot remove photo of the verified post")
+			helpers.ForbiddenError(h.log, w)
+			return
+		}
 	}
 	// Remove post photo file
 	if err := h.postService.RemovePhoto(r.Context(), postID); err != nil {
@@ -333,6 +345,12 @@ func (h *PostHandler) UpdatePhoto(w http.ResponseWriter, r *http.Request) {
 		// Check if the post belongs to the user
 		if userID != post.Author.ID {
 			h.log.Error("forbidden: you do not have permission to update photo of this post")
+			helpers.ForbiddenError(h.log, w)
+			return
+		}
+		// Forbid to update post photo after post verification
+		if post.Verified {
+			h.log.Error("forbidden: you cannot update photo of the verified post")
 			helpers.ForbiddenError(h.log, w)
 			return
 		}
@@ -828,6 +846,18 @@ func (h *PostHandler) ReturnToOwner(w http.ResponseWriter, r *http.Request) {
 		helpers.BadRequestFieldError(h.log, w, "id")
 		return
 	}
+	// Get post
+	post, err := h.postService.GetPostByID(r.Context(), postID)
+	if err != nil || post == nil {
+		helpers.HandleServiceError(h.log, w, fmt.Errorf("failed to find the post by ID: %w", err))
+		return
+	}
+	// Check if the post is verified
+	if !post.Verified {
+		h.log.Error("forbidden: you cannot close unverified post")
+		helpers.ForbiddenError(h.log, w)
+		return
+	}
 	// Get user permissions
 	userPermissions, ok := r.Context().Value(middleware.UserPermissionsKey).([]string)
 	if !ok {
@@ -842,12 +872,6 @@ func (h *PostHandler) ReturnToOwner(w http.ResponseWriter, r *http.Request) {
 		if !ok {
 			h.log.Error("failed to get userID from context and convert it to UUID")
 			helpers.InternalError(h.log, w)
-			return
-		}
-		// Get post
-		post, err := h.postService.GetPostByID(r.Context(), postID)
-		if err != nil || post == nil {
-			helpers.HandleServiceError(h.log, w, fmt.Errorf("failed to find the post by ID: %w", err))
 			return
 		}
 		// Check if the post belongs to the user
