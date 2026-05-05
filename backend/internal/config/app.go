@@ -12,9 +12,17 @@ type AppConfig struct {
 }
 
 func LoadAppConfig(appMode env.AppMode) AppConfig {
+	protocol := "http"
+	host := fmt.Sprintf("%s:%d", env.GetStringRequired("FRONTEND_HOST"), env.GetStringRequired("FRONTEND_PORT"))
+
+	if appMode == env.AppModeProd {
+		protocol = "https"
+		host = env.GetStringRequired("FRONTEND_DOMAIN")
+	}
+
 	return AppConfig{
 		Port:        37190,
-		FrontendURL: fmt.Sprintf("http://%s:%d", env.GetStringRequired("FRONTEND_HOST"), env.GetIntRequired("FRONTEND_PORT")),
+		FrontendURL: fmt.Sprintf("%s://%s", protocol, host),
 		AppMode:     appMode,
 	}
 }
