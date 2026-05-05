@@ -50,6 +50,7 @@ const PostsToVerify = () => {
     setPage(0);
     setHasMore(true);
     setLoading(true);
+    setPosts([]);
     try {
       const data = await api.get<{ posts: Post[] }>(
         "/posts?verified=false&limit=10&offset=0",
@@ -148,14 +149,14 @@ const PostsToVerify = () => {
             </Show>
           </div>
         </Show>
+        <Show when={posts().length === 0 && !loading()}>
+          <div class="flex flex-col items-center justify-center gap-1 py-16">
+            <Inbox class="w-15 h-15 mb-3" />
+            <p class="text-gray-500">Нет объявлений на верификацию</p>
+            <p class="text-gray-400 text-sm mt-1">Все объявления проверены</p>
+          </div>
+        </Show>
         <div ref={observerRef} class="h-10">
-          <Show when={posts().length === 0 && !loading()}>
-            <div class="flex flex-col items-center justify-center gap-1 py-16">
-              <Inbox class="w-15 h-15 mb-3" />
-              <p class="text-gray-500">Нет объявлений на верификацию</p>
-              <p class="text-gray-400 text-sm mt-1">Все объявления проверены</p>
-            </div>
-          </Show>
           <Show when={!hasMore() && posts().length > 0}>
             <div class="text-center text-gray-500 py-8">
               Больше нет объявлений
