@@ -13,7 +13,7 @@ type AppConfig struct {
 
 func LoadAppConfig(appMode env.AppMode) AppConfig {
 	protocol := "http"
-	host := fmt.Sprintf("%s:%d", env.GetStringRequired("FRONTEND_HOST"), env.GetStringRequired("FRONTEND_PORT"))
+	host := fmt.Sprintf("%s:%d", env.GetStringRequired("FRONTEND_HOST"), env.GetIntRequired("FRONTEND_PORT"))
 
 	if appMode == env.AppModeProd {
 		protocol = "https"
