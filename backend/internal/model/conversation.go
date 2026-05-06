@@ -13,8 +13,8 @@ type Conversation struct {
 	Messages  []Message `gorm:"foreignKey:ConversationID;references:ID;constraint:OnDelete:cascade,OnUpdate:restrict"`
 
 	// Post
-	PostID uuid.UUID `gorm:"type:uuid;not null;uniqueIndex:idx_conversation_unique;constraint:OnDelete:CASCADE"`
-	Post   Post      `gorm:"foreignKey:PostID"`
+	PostID uuid.UUID `gorm:"type:uuid;not null;uniqueIndex:idx_conversation_unique"`
+	Post   Post      `gorm:"foreignKey:PostID;constraint:OnDelete:CASCADE"`
 
 	// Participants
 	RequesterID uuid.UUID `gorm:"type:uuid;not null;uniqueIndex:idx_conversation_unique"` // user who pressed button "contact"
