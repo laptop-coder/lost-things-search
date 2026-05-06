@@ -15,11 +15,14 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
+    outputs:
+      version: ${{ steps.release.outputs.release_version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          fetch-tags: true
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -32,15 +35,19 @@ jobs:
           @semantic-release/github \
           semantic-release
       - name: Release
+        id: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx semantic-release --branches main --plugins "@semantic-release/commit-analyzer,@semantic-release/release-notes-generator,@semantic-release/github"
+        run: |
+          npx semantic-release --branches main --plugins "@semantic-release/commit-analyzer,@semantic-release/release-notes-generator,@semantic-release/github"
+          VERSION=$(git describe --tags --abbrev=0)
+          echo "release_version=$VERSION" >> $GITHUB_OUTPUT
   push-backend:
     name: Push backend
     needs: release
     runs-on: ubuntu-latest
     environment: docker-images-ci-actions-env
-    if: success()
+    if: needs.release.result == 'success'
     steps:
       - uses: actions/checkout@v4
       - name: Login to Docker Hub
@@ -54,15 +61,17 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
             ${{ vars.DOCKERHUB_USERNAME }}/lts-service-backend:latest
-            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-backend:${{ github.ref_name }}
+            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-backend:${{ needs.release.outputs.version }}
   push-migrate:
     name: Push migrate
     needs: release
     runs-on: ubuntu-latest
     environment: docker-images-ci-actions-env
-    if: success()
+    if: needs.release.result == 'success'
     steps:
       - uses: actions/checkout@v4
       - name: Login to Docker Hub
@@ -76,15 +85,17 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile.migrate
           push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
             ${{ vars.DOCKERHUB_USERNAME }}/lts-service-migrate:latest
-            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-migrate:${{ github.ref_name }}
+            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-migrate:${{ needs.release.outputs.version }}
   push-frontend:
     name: Push frontend
     needs: release
     runs-on: ubuntu-latest
     environment: docker-images-ci-actions-env
-    if: success()
+    if: needs.release.result == 'success'
     steps:
       - uses: actions/checkout@v4
       - name: Login to Docker Hub
@@ -98,7 +109,9 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
             ${{ vars.DOCKERHUB_USERNAME }}/lts-service-frontend:latest
-            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-frontend:${{ github.ref_name }}
+            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-frontend:${{ needs.release.outputs.version }}
 
