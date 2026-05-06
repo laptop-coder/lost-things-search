@@ -1,12 +1,46 @@
-name: Docker Images CI
+name: Release
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+
+permissions:
+  contents: read
+
 jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+      - name: Install semantic-release tools
+        run: |
+          npm install -g \
+          @semantic-release/commit-analyzer \
+          @semantic-release/release-notes-generator \
+          @semantic-release/github \
+          semantic-release
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release --branches main --plugins "@semantic-release/commit-analyzer,@semantic-release/release-notes-generator,@semantic-release/github"
   push-backend:
+    name: Push backend
+    needs: release
     runs-on: ubuntu-latest
     environment: docker-images-ci-actions-env
+    if: success()
     steps:
       - uses: actions/checkout@v4
       - name: Login to Docker Hub
@@ -24,8 +58,11 @@ jobs:
             ${{ vars.DOCKERHUB_USERNAME }}/lts-service-backend:latest
             ${{ vars.DOCKERHUB_USERNAME }}/lts-service-backend:${{ github.ref_name }}
   push-migrate:
+    name: Push migrate
+    needs: release
     runs-on: ubuntu-latest
     environment: docker-images-ci-actions-env
+    if: success()
     steps:
       - uses: actions/checkout@v4
       - name: Login to Docker Hub
@@ -43,8 +80,11 @@ jobs:
             ${{ vars.DOCKERHUB_USERNAME }}/lts-service-migrate:latest
             ${{ vars.DOCKERHUB_USERNAME }}/lts-service-migrate:${{ github.ref_name }}
   push-frontend:
+    name: Push frontend
+    needs: release
     runs-on: ubuntu-latest
     environment: docker-images-ci-actions-env
+    if: success()
     steps:
       - uses: actions/checkout@v4
       - name: Login to Docker Hub
@@ -61,3 +101,4 @@ jobs:
           tags: |
             ${{ vars.DOCKERHUB_USERNAME }}/lts-service-frontend:latest
             ${{ vars.DOCKERHUB_USERNAME }}/lts-service-frontend:${{ github.ref_name }}
+
