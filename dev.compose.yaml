@@ -4,20 +4,20 @@ services:
     image: valkey/valkey:latest
     container_name: lts-valkey
     restart: unless-stopped
-    ports:
-      - "${VALKEY_PORT:-6379}:6379"
     volumes:
       - valkey:/data
     command:
       - "valkey-server"
       - "--bind"
-      - "${VALKEY_HOST}"
+      - "0.0.0.0"
       - "--port"
       - "${VALKEY_PORT}"
       - "--protected-mode"
       - "yes"
       - "--requirepass"
       - "${VALKEY_PASSWORD}"
+      - "--appendonly"
+      - "yes"
       - "--dir"
       - "/data"
     env_file:
@@ -25,7 +25,7 @@ services:
     networks:
       - lts_network
     healthcheck:
-      test: ["CMD", "valkey-cli", "--no-auth-warning", "--pass", "${VALKEY_PASSWORD}", "-h", "${VALKEY_HOST}", "-p", "${VALKEY_PORT}", "PING"]
+      test: ["CMD", "valkey-cli", "--no-auth-warning", "--pass", "${VALKEY_PASSWORD}", "-h", "127.0.0.1", "-p", "${VALKEY_PORT}", "PING"]
       interval: 10s
       timeout: 5s
       retries: 5
