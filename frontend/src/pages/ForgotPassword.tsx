@@ -44,7 +44,10 @@ const ForgotPassword = () => {
             <div class="flex flex-col justify-center items-center">
               <div class="bg-green-50 border border-green-200 text-green-800 p-6 rounded-xl text-center">
                 <Mail class="w-10 h-10 mx-auto mb-3 text-green-600" />
-                <p>Инструкция по сбросу пароля отправлена на указанный email</p>
+                <p>
+                  Если указанный email зарегистрирован в системе, на него будет
+                  отправлена инструкция по сбросу пароля.
+                </p>
               </div>
               <A href="/login" class="block mt-4 text-blue-600 hover:underline">
                 Вернуться ко входу
