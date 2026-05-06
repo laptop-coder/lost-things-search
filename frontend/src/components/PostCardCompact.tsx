@@ -190,7 +190,7 @@ const PostCardCompact = (props: Props) => {
 
             <Show when={props.post.description}>
               <p
-                class={`mt-2 text-sm line-clamp-2 ${props.post.thingReturnedToOwner ? "text-gray-400" : "text-gray-600"}`}
+                class={`mt-2 text-sm line-clamp-2 whitespace-pre-wrap ${props.post.thingReturnedToOwner ? "text-gray-400" : "text-gray-600"}`}
               >
                 {props.post.description}
               </p>
