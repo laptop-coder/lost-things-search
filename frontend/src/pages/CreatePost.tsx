@@ -130,7 +130,7 @@ const CreatePost = () => {
                       Нажмите для загрузки фото
                     </p>
                     <p class="text-xs text-gray-400 mt-1">
-                      JPEG, PNG, WebP, GIF (макс. 10MB)
+                      JPEG, PNG, WebP, GIF (макс. 15MB)
                     </p>
                   </div>
                   <input
