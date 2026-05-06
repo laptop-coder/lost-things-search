@@ -177,11 +177,11 @@ const EditPost = () => {
                 </Show>
 
                 <Show when={photoPreview()}>
-                  <div class="relative">
+                  <div class="relative flex justify-center">
                     <img
                       src={photoPreview()!}
                       alt="Preview"
-                      class="w-full h-48 object-cover rounded-xl"
+                      class="max-h-100 object-contain rounded-xl"
                     />
                     {(hasPermission(PERMISSIONS.POST_PHOTO_DELETE_ANY) ||
                       (hasPermission(PERMISSIONS.POST_PHOTO_DELETE_OWN) &&

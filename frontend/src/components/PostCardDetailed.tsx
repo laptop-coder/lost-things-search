@@ -194,7 +194,7 @@ const PostCardDetailed = (props: Props) => {
                 <img
                   src={`/storage/storage/post_photos/${props.post.id}.jpeg`}
                   alt="Фото объявления"
-                  class={"max-h-100 object-contain rounded-xl"}
+                  class="max-h-100 object-contain rounded-xl"
                 />
               </div>
             </Show>
