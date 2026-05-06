@@ -57,12 +57,12 @@ func LoadSharedConfig() SharedConfig {
 		Storage: StorageConfig{
 			Avatar: ImageStorageConfig{
 				UploadPath:       filepath.Join(env.GetStringRequired("PATH_TO_STORAGE"), "avatars"),
-				MaxSize:          5 * 1024 * 1024, // 5 MB
+				MaxSize:          15 * 1024 * 1024, // 15 MB
 				AllowedMIMETypes: []string{"image/jpeg", "image/png", "image/webp", "image/gif"},
 			},
 			PostPhoto: ImageStorageConfig{
 				UploadPath:       filepath.Join(env.GetStringRequired("PATH_TO_STORAGE"), "post_photos"),
-				MaxSize:          10 * 1024 * 1024, // 10 MB
+				MaxSize:          15 * 1024 * 1024, // 15 MB
 				AllowedMIMETypes: []string{"image/jpeg", "image/png", "image/webp", "image/gif"},
 			},
 			Document: FileStorageConfig{

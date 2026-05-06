@@ -577,11 +577,25 @@ func (s *userService) saveAvatarFile(userID uuid.UUID, fileHeader *multipart.Fil
 	bounds := img.Bounds()
 	rgba := image.NewRGBA(bounds)
 	draw.Draw(rgba, bounds, img, bounds.Min, draw.Src)
+	// Crop square from the image center
+	srcBounds := rgba.Bounds()
+	srcWidth := srcBounds.Dx()
+	srcHeight := srcBounds.Dy()
+	// Make the smallest side the side of the square
+	squareSize := srcWidth
+	if srcHeight < srcWidth {
+		squareSize = srcHeight
+	}
+	// Crop image to square
+	cropX := (srcWidth - squareSize) / 2
+	cropY := (srcHeight - squareSize) / 2
+	cropRect := image.Rect(cropX, cropY, cropX+squareSize, cropY+squareSize)
+	croppedImg := rgba.SubImage(cropRect)
 	// Resize to 200x200
 	const avatarSize = 200
 	dst := image.NewRGBA(image.Rect(0, 0, avatarSize, avatarSize))
 	draw.Draw(dst, dst.Bounds(), image.NewUniform(color.White), image.Point{}, draw.Src) // white background (instead of transparent background in PNG)
-	draw.ApproxBiLinear.Scale(dst, dst.Bounds(), rgba, rgba.Bounds(), draw.Over, nil)
+	draw.ApproxBiLinear.Scale(dst, dst.Bounds(), croppedImg, croppedImg.Bounds(), draw.Over, nil)
 	// Creating file path (where to save avatar)
 	filePath := filepath.Join(
 		s.config.AvatarUploadPath,
