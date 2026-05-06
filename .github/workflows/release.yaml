@@ -61,8 +61,6 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           tags: |
             ${{ vars.DOCKERHUB_USERNAME }}/lts-service-backend:latest
             ${{ vars.DOCKERHUB_USERNAME }}/lts-service-backend:${{ needs.release.outputs.version }}
@@ -85,8 +83,6 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile.migrate
           push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           tags: |
             ${{ vars.DOCKERHUB_USERNAME }}/lts-service-migrate:latest
             ${{ vars.DOCKERHUB_USERNAME }}/lts-service-migrate:${{ needs.release.outputs.version }}
@@ -109,8 +105,6 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           tags: |
             ${{ vars.DOCKERHUB_USERNAME }}/lts-service-frontend:latest
             ${{ vars.DOCKERHUB_USERNAME }}/lts-service-frontend:${{ needs.release.outputs.version }}
