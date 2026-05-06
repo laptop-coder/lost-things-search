@@ -200,7 +200,7 @@ const PostCardDetailed = (props: Props) => {
             </Show>
 
             <Show when={props.post.description}>
-              <p class={"mt-2 text-sm line-clamp-2 text-gray-600"}>
+              <p class={"mt-2 text-sm text-gray-600"}>
                 {props.post.description}
               </p>
             </Show>
