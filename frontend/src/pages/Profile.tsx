@@ -1,4 +1,12 @@
-import { createSignal, For, Show, onMount, Index } from "solid-js";
+import {
+  createSignal,
+  For,
+  Show,
+  onMount,
+  Index,
+  createEffect,
+  onCleanup,
+} from "solid-js";
 import { createStore } from "solid-js/store";
 import { useNavigate } from "@solidjs/router";
 import {
@@ -26,6 +34,7 @@ import type {
 import { Pencil, Trash, LogOut, Plus } from "lucide-solid";
 import Skeleton from "../components/Skeleton";
 import Spinner from "../components/Spinner";
+import { Motion, Presence } from "solid-motionone";
 
 const Profile = () => {
   const auth = useAuth();
@@ -334,6 +343,83 @@ const Profile = () => {
     }
   };
 
+  const [deleteAccountLoading, setDeleteAccountLoading] = createSignal(false);
+  const [deleteAccountEmail, setDeleteAccountEmail] = createSignal("");
+  const [showDeleteAccountModal, setShowDeleteAccountModal] =
+    createSignal(false);
+
+  const openDeleteAccountModal = async () => {
+    setShowDeleteAccountModal(true);
+    focusDeleteAccountEmailInput();
+  };
+
+  const closeDeleteAccountModal = () => {
+    setShowDeleteAccountModal(false);
+    setDeleteAccountEmail("");
+    setError("");
+    setDeleteAccountLoading(false);
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "Escape" && showDeleteAccountModal()) {
+      closeDeleteAccountModal();
+    }
+  };
+
+  onMount(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    onCleanup(() => {
+      window.removeEventListener("keydown", handleKeyDown);
+    });
+  });
+
+  const deleteAccount = async () => {
+    if (!user()) return;
+    try {
+      if (!deleteAccountEmail().trim()) {
+        setError("Введите email");
+        return;
+      }
+      if (
+        deleteAccountEmail().toLowerCase().trim() !==
+        user()!.email.toLowerCase().trim()
+      ) {
+        setError("Неверный email");
+        return;
+      }
+      if (
+        confirm(
+          "Вы уверены, что хотите удалить учётную запись? Это действие необратимо",
+        )
+      ) {
+        setDeleteAccountLoading(true);
+        await api.delete("/users/me");
+        document.cookie = "authorized=; max-age=0; path=/;";
+        setError("");
+        navigate("/");
+        setTimeout(() => window.location.reload(), 200);
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Не удалось удалить пользователя",
+      );
+    } finally {
+      setDeleteAccountLoading(false);
+    }
+  };
+
+  let deleteAccountEmailInputRef: HTMLInputElement | undefined;
+
+  const focusDeleteAccountEmailInput = () => {
+    if (deleteAccountEmailInputRef) {
+      deleteAccountEmailInputRef.focus();
+    }
+  };
+
+  createEffect(() => {
+    focusDeleteAccountEmailInput();
+  });
+
   return (
     <>
       {hasPermission(PERMISSIONS.USER_READ_OWN) && (
@@ -448,21 +534,27 @@ const Profile = () => {
                     <Show when={!editMode()}>
                       <button
                         onClick={() => setEditMode(true)}
-                        class="w-40 h-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer"
+                        class="w-55 h-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer"
                       >
                         Редактировать
+                      </button>
+                      <button
+                        onClick={openDeleteAccountModal}
+                        class="w-55 h-10 bg-red-600 text-white rounded-lg hover:bg-red-700 transition cursor-pointer"
+                      >
+                        Удалить учётную запись
                       </button>
                     </Show>
                     <Show when={editMode()}>
                       <button
                         onClick={cancelEdit}
-                        class="w-40 h-10 bg-red-700 text-white rounded-lg hover:bg-red-800 transition cursor-pointer"
+                        class="w-55 h-10 bg-red-700 text-white rounded-lg hover:bg-red-800 transition cursor-pointer"
                       >
                         Отмена
                       </button>
                       <button
                         onClick={saveProfile}
-                        class="w-40 h-10 bg-green-700 text-white rounded-lg hover:bg-green-800 transition cursor-pointer"
+                        class="w-55 h-10 bg-green-700 text-white rounded-lg hover:bg-green-800 transition cursor-pointer"
                       >
                         Сохранить
                       </button>
@@ -907,6 +999,86 @@ const Profile = () => {
               </div>
             </Show>
           </Show>
+
+          {/*TODO: this code duplicates the code from the PostCardDetailed.tsx*/}
+          <Presence>
+            <Show when={showDeleteAccountModal()}>
+              <Motion.div
+                class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+                onClick={closeDeleteAccountModal}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Motion.div
+                  class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
+                  onClick={(e) => e.stopPropagation()}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  {/* Header */}
+                  <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4">
+                    <h2 class="text-xl font-bold text-gray-800">
+                      Подтвердите удаление
+                    </h2>
+                    <p class="text-sm text-gray-500">
+                      Введите email, на который зарегистрирована учётная запись
+                    </p>
+                  </div>
+
+                  {/* Body */}
+                  <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-5 flex flex-col">
+                    <Show when={error()}>
+                      <div class="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-sm">
+                        {error()}
+                      </div>
+                    </Show>
+                    <input
+                      ref={deleteAccountEmailInputRef}
+                      disabled={deleteAccountLoading()}
+                      type="text"
+                      value={deleteAccountEmail()}
+                      onInput={(e) => {
+                        setDeleteAccountLoading(false);
+                        setError("");
+                        setDeleteAccountEmail(e.target.value);
+                      }}
+                      onKeyDown={async (e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          if (deleteAccountLoading()) return;
+                          await deleteAccount();
+                        }
+                      }}
+                      placeholder={user() ? user()!.email : "email@example.ru"}
+                      class="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      required
+                    />
+                  </div>
+
+                  {/* Footer */}
+                  <div class="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+                    <button
+                      onClick={closeDeleteAccountModal}
+                      class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium cursor-pointer"
+                    >
+                      Отмена
+                    </button>
+                    <button
+                      onClick={deleteAccount}
+                      disabled={deleteAccountLoading()}
+                      class="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-medium disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                    >
+                      {deleteAccountLoading() ? "Удаление..." : "Удалить"}
+                    </button>
+                  </div>
+                </Motion.div>
+              </Motion.div>
+            </Show>
+          </Presence>
         </div>
       )}
     </>
