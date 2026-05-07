@@ -62,8 +62,8 @@ jobs:
           file: ./backend/Dockerfile
           push: true
           tags: |
-            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-backend:latest
-            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-backend:${{ needs.release.outputs.version }}
+            ${{ vars.DOCKERHUB_USERNAME }}/lost-things-search-backend:latest
+            ${{ vars.DOCKERHUB_USERNAME }}/lost-things-search-backend:${{ needs.release.outputs.version }}
   push-migrate:
     name: Push migrate
     needs: release
@@ -84,8 +84,8 @@ jobs:
           file: ./backend/Dockerfile.migrate
           push: true
           tags: |
-            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-migrate:latest
-            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-migrate:${{ needs.release.outputs.version }}
+            ${{ vars.DOCKERHUB_USERNAME }}/lost-things-search-migrate:latest
+            ${{ vars.DOCKERHUB_USERNAME }}/lost-things-search-migrate:${{ needs.release.outputs.version }}
   push-frontend:
     name: Push frontend
     needs: release
@@ -106,6 +106,6 @@ jobs:
           file: ./frontend/Dockerfile
           push: true
           tags: |
-            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-frontend:latest
-            ${{ vars.DOCKERHUB_USERNAME }}/lts-service-frontend:${{ needs.release.outputs.version }}
+            ${{ vars.DOCKERHUB_USERNAME }}/lost-things-search-frontend:latest
+            ${{ vars.DOCKERHUB_USERNAME }}/lost-things-search-frontend:${{ needs.release.outputs.version }}
 

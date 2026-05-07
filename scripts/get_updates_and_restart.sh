@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd "${HOME}/lts-service"
+cd "${HOME}/lost-things-search"
 make down
 
 docker compose pull backend > /dev/null

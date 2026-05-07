@@ -25,8 +25,8 @@ Lost and found service for educational institutions.
 ## Getting Started
 ```bash
 # Clone the repository
-git clone https://github.com/laptop-coder/lts-service.git
-cd ./lts-service
+git clone https://github.com/laptop-coder/lost-things-search.git
+cd ./lost-things-search
 # Set up env variables
 cp .env.example .env
 vi .env
