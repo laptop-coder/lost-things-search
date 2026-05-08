@@ -113,7 +113,8 @@ const RequestStudentOrParentInvite = () => {
                 <span class="text-nowrap">
                   <span class="font-semibold underline">{email()}</span>!
                 </span>{" "}
-                Перейдите по ссылке в письме для завершения регистрации.
+                Перейдите по ссылке в письме для завершения регистрации. Если
+                письмо не пришло, проверьте папку "Спам".
               </span>
             </div>
           ) : (

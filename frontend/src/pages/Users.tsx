@@ -673,7 +673,7 @@ const Users = () => {
                         ? `/storage/storage/avatars/${selectedUser()?.id}.jpeg`
                         : "/storage/assets/default_avatar.jpeg"
                     }
-                    alt="Аватар"
+                    alt="Фотография"
                     class="w-10 h-10 rounded-full object-cover"
                   />
                   <div>

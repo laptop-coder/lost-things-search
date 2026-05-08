@@ -29,6 +29,7 @@ const PostDetails = lazy(() => import("./pages/PostDetails"));
 const ListOfConversations = lazy(() => import("./pages/ListOfConversations"));
 const ConversationView = lazy(() => import("./pages/ConversationView"));
 const Documents = lazy(() => import("./pages/admin/Documents"));
+const RegistrationGuide = lazy(() => import("./pages/RegistrationGuide"));
 
 function App() {
   const auth = useAuth();
@@ -83,6 +84,11 @@ function App() {
         path="/about"
         component={PublicRoute}
         children={<Route path="/" component={About} />}
+      />
+      <Route
+        path="/registration_guide/:role"
+        component={PublicRoute}
+        children={<Route path="/" component={RegistrationGuide} />}
       />
 
       {/* Protected routes */}
