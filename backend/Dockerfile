@@ -1,15 +1,15 @@
-FROM golang:1.25.6-bookworm AS deps
+FROM golang:1.26.3-trixie AS deps
 WORKDIR /app
 COPY go.mod go.sum .
 RUN go mod download
 
-FROM golang:1.25.6-bookworm AS builder
+FROM golang:1.26.3-trixie AS builder
 WORKDIR /app
 COPY --from=deps /go /go
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags='-w -s -extldflags "-static"' -o ./bin/main ./cmd/app
 
-FROM debian:12.11-slim
+FROM debian:12.13-slim
 COPY --from=builder /app/bin/main /usr/local/bin/app
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN apt-get update && \

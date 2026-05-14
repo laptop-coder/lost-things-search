@@ -1,7 +1,7 @@
 services:
 
   valkey:
-    image: valkey/valkey:latest
+    image: valkey/valkey:9.0.4-alpine3.23
     container_name: lts-valkey
     restart: unless-stopped
     volumes:
@@ -31,7 +31,7 @@ services:
       retries: 5
 
   postgres:
-    image: postgres:latest
+    image: postgres:18.3-trixie
     container_name: lts-postgres
     restart: unless-stopped
     env_file:
@@ -103,7 +103,7 @@ services:
       - lts_network
 
   mailhog:
-    image: mailhog/mailhog:latest
+    image: mailhog/mailhog:v1.0.1
     container_name: lts-mailhog
     restart: unless-stopped
     ports:
