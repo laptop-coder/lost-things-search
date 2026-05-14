@@ -81,7 +81,7 @@ services:
         - action: rebuild
           path: ./backend
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://${BACKEND_HOST}:${BACKEND_PORT}/health || exit 1"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:${BACKEND_PORT}/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
