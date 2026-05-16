@@ -113,6 +113,8 @@ jobs:
     name: Build App (${{ matrix.os }})
     needs: release
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     if: needs.release.result == 'success'
     strategy:
       matrix:
