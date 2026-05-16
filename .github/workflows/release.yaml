@@ -109,3 +109,91 @@ jobs:
             ${{ vars.DOCKERHUB_USERNAME }}/lost-things-search-frontend:latest
             ${{ vars.DOCKERHUB_USERNAME }}/lost-things-search-frontend:${{ needs.release.outputs.version }}
 
+  build-app:
+    name: Build App (${{ matrix.os }})
+    needs: release
+    runs-on: ${{ matrix.os }}
+    if: needs.release.result == 'success'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Set app version
+        run: |
+          VERSION=$(echo "${{ needs.release.outputs.version }}" | sed 's/^v//')
+          sed -i "s/^version: .*/version: $VERSION/" pubspec.yaml
+
+      - name: Get Flutter packages
+        run: flutter pub get
+
+      - name: Build for Android
+        if: runner.os == 'Linux'
+        run: |
+          flutter build apk --release --split-per-abi
+          flutter build appbundle --release
+      - name: Upload Android binaries
+        if: runner.os == 'Linux'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.release.outputs.version }}
+          files: |
+            build/app/outputs/flutter-apk/*apk
+            build/app/outputs/bundle/release/*.aab
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build for iOS
+        if: runner.os == 'macOS'
+        run: flutter build ios --release --no-codesign
+      - name: Upload iOS binaries
+        if: runner.os == 'macOS'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.release.outputs.version }}
+          files: build/ios/Release-iphoneos/*.app
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build for Linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libgtk-3-dev
+          flutter build linux
+      - name: Upload Linux binaries
+        if: runner.os == 'Linux'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.release.outputs.version }}
+          files: build/linux/x64/release/bundle/*.deb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build for Windows
+        if: runner.os == 'Windows'
+        run: flutter build windows
+      - name: Upload Windows binaries
+        if: runner.os == 'Windows'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.release.outputs.version }}
+          files: build/windows/x64/runner/Release/*.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build for macOS
+        if: runner.os == 'macOS'
+        run: flutter build macos
+      - name: Upload macOS binaries
+        if: runner.os == 'macOS'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.release.outputs.version }}
+          files: build/macos/Build/Products/Release/*.app
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
