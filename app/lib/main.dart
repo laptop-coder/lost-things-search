@@ -1,68 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'screens/server_connect_screen.dart';
+import 'screens/public_posts.dart';
 
-void main() {
-  runApp(const LostThingsSearchApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final prefs = await SharedPreferences.getInstance();
+  final savedHost = prefs.getString('server_host');
+
+  runApp(
+    LostThingsSearchApp(initialRoute: savedHost != null ? '/home' : '/connect_server'),
+  );
 }
 
 class LostThingsSearchApp extends StatelessWidget {
-  const LostThingsSearchApp({super.key});
+  final String initialRoute;
+
+  const LostThingsSearchApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'LostThingsSearch',
+      initialRoute: initialRoute,
+      routes: {
+        '/connect_server': (_) => const ServerConnectScreen(title: 'LostThingsSearch'),
+        '/home': (_) => const PublicPostsPage(title: 'LostThingsSearch'),
+      },
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.blue.shade300)),
-      home: const PublicPostsPage(title: 'LostThingsSearch'),
-    );
-  }
-}
-
-class PublicPostsPage extends StatefulWidget {
-  const PublicPostsPage({super.key, required this.title});
-  final String title;
-
-  @override
-  State<PublicPostsPage> createState() => _PublicPostsPageState();
-}
-
-class _PublicPostsPageState extends State<PublicPostsPage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: .center,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }
