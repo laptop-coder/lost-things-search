@@ -168,7 +168,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.release.outputs.version }}
-          files: app/build/ios/iphoneos/Runner.app
+          files: app/build/ios/iphoneos/Runner.app/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -211,7 +211,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.release.outputs.version }}
-          files: app/build/macos/Build/Products/Release/LostThingsSearch.app
+          files: app/build/macos/Build/Products/Release/LostThingsSearch.app/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
