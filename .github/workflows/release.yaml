@@ -122,11 +122,19 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
-      - name: Set app version
+
+      - name: Set app version (Linux/Windows)
         working-directory: ./app
+        if: runner.os != 'macOS'
         run: |
           VERSION=$(echo "${{ needs.release.outputs.version }}" | sed 's/^v//')
           sed -i "s/^version: .*/version: $VERSION/" pubspec.yaml
+      - name: Set app version (macOS)
+        working-directory: ./app
+        if: runner.os == 'macOS'
+        run: |
+          VERSION=$(echo "${{ needs.release.outputs.version }}" | sed 's/^v//')
+          sed -i '' "s/^version: .*/version: $VERSION/" pubspec.yaml
 
       - name: Get Flutter packages
         working-directory: ./app
