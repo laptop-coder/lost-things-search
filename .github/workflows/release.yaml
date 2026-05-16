@@ -126,6 +126,7 @@ jobs:
       - name: Set app version (Linux/Windows)
         working-directory: ./app
         if: runner.os != 'macOS'
+        shell: bash
         run: |
           VERSION=$(echo "${{ needs.release.outputs.version }}" | sed 's/^v//')
           sed -i "s/^version: .*/version: $VERSION/" pubspec.yaml
@@ -138,6 +139,7 @@ jobs:
 
       - name: Get Flutter packages
         working-directory: ./app
+        shell: bash
         run: flutter pub get
 
       - name: Build for Android
@@ -188,6 +190,7 @@ jobs:
 
       - name: Build for Windows
         working-directory: ./app
+        shell: bash
         if: runner.os == 'Windows'
         run: flutter build windows
       - name: Upload Windows binaries
