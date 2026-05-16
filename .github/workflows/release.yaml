@@ -123,14 +123,17 @@ jobs:
         with:
           channel: stable
       - name: Set app version
+        working-directory: ./app
         run: |
           VERSION=$(echo "${{ needs.release.outputs.version }}" | sed 's/^v//')
           sed -i "s/^version: .*/version: $VERSION/" pubspec.yaml
 
       - name: Get Flutter packages
+        working-directory: ./app
         run: flutter pub get
 
       - name: Build for Android
+        working-directory: ./app
         if: runner.os == 'Linux'
         run: |
           flutter build apk --release --split-per-abi
@@ -141,12 +144,13 @@ jobs:
         with:
           tag_name: ${{ needs.release.outputs.version }}
           files: |
-            build/app/outputs/flutter-apk/*apk
-            build/app/outputs/bundle/release/*.aab
+            app/build/app/outputs/flutter-apk/*apk
+            app/build/app/outputs/bundle/release/*.aab
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build for iOS
+        working-directory: ./app
         if: runner.os == 'macOS'
         run: flutter build ios --release --no-codesign
       - name: Upload iOS binaries
@@ -154,11 +158,12 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.release.outputs.version }}
-          files: build/ios/Release-iphoneos/*.app
+          files: app/build/ios/Release-iphoneos/*.app
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build for Linux
+        working-directory: ./app
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
@@ -169,11 +174,12 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.release.outputs.version }}
-          files: build/linux/x64/release/bundle/*.deb
+          files: app/build/linux/x64/release/bundle/*.deb
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build for Windows
+        working-directory: ./app
         if: runner.os == 'Windows'
         run: flutter build windows
       - name: Upload Windows binaries
@@ -181,11 +187,12 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.release.outputs.version }}
-          files: build/windows/x64/runner/Release/*.exe
+          files: app/build/windows/x64/runner/Release/*.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build for macOS
+        working-directory: ./app
         if: runner.os == 'macOS'
         run: flutter build macos
       - name: Upload macOS binaries
@@ -193,7 +200,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.release.outputs.version }}
-          files: build/macos/Build/Products/Release/*.app
+          files: app/build/macos/Build/Products/Release/*.app
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
