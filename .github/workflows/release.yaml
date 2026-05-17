@@ -117,6 +117,7 @@ jobs:
       contents: write
     if: needs.release.result == 'success'
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
@@ -158,6 +159,7 @@ jobs:
           files: |
             app/build/app/outputs/flutter-apk/*apk
             app/build/app/outputs/bundle/release/*.aab
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -165,12 +167,19 @@ jobs:
         working-directory: ./app
         if: runner.os == 'macOS'
         run: flutter build ios --release --no-codesign
+      - name: Zip iOS binaries
+        if: runner.os == 'macOS'
+        working-directory: ./app
+        run: |
+          cd build/ios/iphoneos/Runner.app
+          zip -r ../../../../LostThingsSearch-ios.zip *
       - name: Upload iOS binaries
         if: runner.os == 'macOS'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.release.outputs.version }}
-          files: app/build/ios/iphoneos/Runner.app/**
+          files: app/LostThingsSearch-ios.zip
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -187,6 +196,7 @@ jobs:
         with:
           tag_name: ${{ needs.release.outputs.version }}
           files: app/build/linux/x64/release/bundle/*.deb
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -195,12 +205,20 @@ jobs:
         shell: bash
         if: runner.os == 'Windows'
         run: flutter build windows
+      - name: Zip Windows binaries
+        if: runner.os == 'Windows'
+        working-directory: ./app
+        shell: bash
+        run: |
+          cd build/windows/x64/runner/Release
+          zip -r ../../../../../LostThingsSearch-windows.zip *
       - name: Upload Windows binaries
         if: runner.os == 'Windows'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.release.outputs.version }}
-          files: app/build/windows/x64/runner/Release/*.exe
+          files: app/LostThingsSearch-windows.zip
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -208,12 +226,19 @@ jobs:
         working-directory: ./app
         if: runner.os == 'macOS'
         run: flutter build macos
+      - name: Zip macOS binaries
+        if: runner.os == 'macOS'
+        working-directory: ./app
+        run: |
+          cd build/macos/Build/Products/Release/LostThingsSearch.app/
+          zip -r ../../../../../../LostThingsSearch-macos.zip *
       - name: Upload macOS binaries
         if: runner.os == 'macOS'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.release.outputs.version }}
-          files: app/build/macos/Build/Products/Release/LostThingsSearch.app/**
+          files: app/LostThingsSearch-macos.zip
+          overwrite: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
