@@ -159,7 +159,7 @@ jobs:
           files: |
             app/build/app/outputs/flutter-apk/*apk
             app/build/app/outputs/bundle/release/*.aab
-          overwrite: true
+          overwrite_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -179,7 +179,7 @@ jobs:
         with:
           tag_name: ${{ needs.release.outputs.version }}
           files: app/LostThingsSearch-ios.zip
-          overwrite: true
+          overwrite_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -190,13 +190,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ninja-build libgtk-3-dev
           flutter build linux
+      - name: Zip Linux binaries
+        if: runner.os == 'Linux'
+        working-directory: ./app
+        run: |
+          cd build/linux/x64/release/bundle
+          zip -r ../../../../../LostThingsSearch-linux.zip *
       - name: Upload Linux binaries
         if: runner.os == 'Linux'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.release.outputs.version }}
-          files: app/build/linux/x64/release/bundle/*.deb
-          overwrite: true
+          files: app/LostThingsSearch-linux.zip
+          overwrite_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -208,17 +214,15 @@ jobs:
       - name: Zip Windows binaries
         if: runner.os == 'Windows'
         working-directory: ./app
-        shell: bash
-        run: |
-          cd build/windows/x64/runner/Release
-          zip -r ../../../../../LostThingsSearch-windows.zip *
+        shell: pwsh
+        run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath LostThingsSearch-windows.zip
       - name: Upload Windows binaries
         if: runner.os == 'Windows'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.release.outputs.version }}
           files: app/LostThingsSearch-windows.zip
-          overwrite: true
+          overwrite_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -238,7 +242,7 @@ jobs:
         with:
           tag_name: ${{ needs.release.outputs.version }}
           files: app/LostThingsSearch-macos.zip
-          overwrite: true
+          overwrite_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
