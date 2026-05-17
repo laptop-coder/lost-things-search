@@ -20,6 +20,7 @@ Lost and found service for educational institutions.
 
 - **Backend:** Go, GORM, PostgreSQL, Valkey
 - **Frontend:** SolidJS, TailwindCSS
+- **Android/iOS/Linux/Windows/macOS app**: Flutter (Dart)
 - **Deploy:** Docker, Docker Compose, Nginx
 
 ## Getting Started
