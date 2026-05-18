@@ -2,6 +2,8 @@
 
 Lost and found service for educational institutions.
 
+[![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](https://github.com/laptop-coder/lost-things-search/blob/main/LICENSE) [![Latest](https://img.shields.io/github/v/release/laptop-coder/lost-things-search?style=flat-square&label=latest)](https://github.com/laptop-coder/lost-things-search/releases) [![Release](https://img.shields.io/github/actions/workflow/status/laptop-coder/lost-things-search/release.yaml?branch=main&style=flat-square&label=release)](https://github.com/laptop-coder/lost-things-search/actions/workflows/release.yaml) [![Tests](https://img.shields.io/github/actions/workflow/status/laptop-coder/lost-things-search/test.yaml?style=flat-square&label=tests)](https://github.com/laptop-coder/lost-things-search/actions/workflows/test.yaml)
+
 ## User roles
 
 | ID | Role |
