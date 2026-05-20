@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
-import '../widgets/app_header.dart';
 import '../services/permissions.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -49,7 +48,9 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (mounted) {
-        Navigator.of(context).pushReplacementNamed('/home');
+        Navigator.of(
+          context,
+        ).pushNamedAndRemoveUntil('/home', (route) => false);
       }
     } on ApiException catch (e) {
       setState(() => _error = e.message);
@@ -63,11 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppHeader(
-        api: widget.api,
-        auth: widget.auth,
-        permissions: widget.permissions,
-      ),
+      appBar: AppBar(),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
