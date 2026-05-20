@@ -1,14 +1,25 @@
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
+import '../services/auth_service.dart';
+import '../services/permissions.dart';
 
-class PublicPostsPage extends StatefulWidget {
-  const PublicPostsPage({super.key, required this.title});
-  final String title;
+class PublicPostsScreen extends StatefulWidget {
+  final ApiService api;
+  final AuthService auth;
+  final Permissions permissions;
+
+  const PublicPostsScreen({
+    super.key,
+    required this.api,
+    required this.auth,
+    required this.permissions,
+  });
 
   @override
-  State<PublicPostsPage> createState() => _PublicPostsPageState();
+  State<PublicPostsScreen> createState() => _PublicPostsScreenState();
 }
 
-class _PublicPostsPageState extends State<PublicPostsPage> {
+class _PublicPostsScreenState extends State<PublicPostsScreen> {
   int _counter = 0;
 
   void _incrementCounter() {
@@ -25,10 +36,6 @@ class _PublicPostsPageState extends State<PublicPostsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: .center,
