@@ -6,13 +6,8 @@ class Staff {
 
   const Staff({required this.userId, required this.position});
 
-  factory Staff.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {'userId': String userId, 'position': StaffPosition position} => Staff(
-        userId: userId,
-        position: position,
-      ),
-      _ => throw const FormatException('Не удалось загрузить сотрудника'),
-    };
-  }
+  factory Staff.fromJson(Map<String, dynamic> json) => Staff(
+    userId: json['userId'] as String,
+    position: StaffPosition.fromJson(json['position'] as Map<String, dynamic>),
+  );
 }

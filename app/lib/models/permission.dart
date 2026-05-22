@@ -11,24 +11,10 @@ class Permission {
     required this.name,
   });
 
-  factory Permission.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'id': int id,
-        'createdAt': String createdAt,
-        'updatedAt': String updatedAt,
-        'name': String name,
-      } =>
-        Permission(
-          id: id,
-          createdAt: createdAt,
-          updatedAt: updatedAt,
-          name: name,
-        ),
-      _ => throw const FormatException('Не удалось загрузить право доступа'),
-    };
-  }
+  factory Permission.fromJson(Map<String, dynamic> json) => Permission(
+    id: json['id'] as int,
+    createdAt: json['createdAt'] as String,
+    updatedAt: json['updatedAt'] as String,
+    name: json['name'] as String,
+  );
 }
-
-
-

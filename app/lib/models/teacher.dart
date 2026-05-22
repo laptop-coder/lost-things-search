@@ -15,25 +15,20 @@ class Teacher {
     required this.studentGroups,
   });
 
-  factory Teacher.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'userId': String userId,
-        'classroom': Room? classroom,
-        'subjects': List<dynamic> subjects,
-        'studentGroups': List<dynamic> studentGroups,
-      } =>
-        Teacher(
-          userId: userId,
-          classroom: classroom,
-          subjects: subjects
-              .map((e) => Subject.fromJson(e as Map<String, dynamic>))
-              .toList(),
-          studentGroups: studentGroups
-              .map((e) => StudentGroup.fromJson(e as Map<String, dynamic>))
-              .toList(),
-        ),
-      _ => throw const FormatException('Не удалось загрузить учителя'),
-    };
-  }
+  factory Teacher.fromJson(Map<String, dynamic> json) => Teacher(
+    userId: json['userId'] as String,
+    classroom: json['classroom'] != null
+        ? Room.fromJson(json['classroom'] as Map<String, dynamic>)
+        : null,
+    subjects:
+        (json['subjects'] as List<dynamic>?)
+            ?.map((e) => Subject.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [],
+    studentGroups:
+        (json['studentGroups'] as List<dynamic>?)
+            ?.map((e) => StudentGroup.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [],
+  );
 }

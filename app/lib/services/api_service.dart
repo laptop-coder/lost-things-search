@@ -16,12 +16,16 @@ class ApiService {
     return ApiService._(prefs: prefs, client: client);
   }
 
-  String get _baseUrl {
+  String get baseHost {
     final host = _prefs.getString('server_host');
     if (host == null || host.isEmpty) {
       throw ApiException(statusCode: 0, message: 'Адрес сервера не настроен');
     }
-    return 'https://$host/api/v1';
+    return 'https://$host';
+  }
+
+  String get baseUrl {
+    return '$baseHost/api/v1';
   }
 
   Future<Map<String, dynamic>> _request(
@@ -29,7 +33,7 @@ class ApiService {
     String method = 'GET',
     Object? body,
   }) async {
-    final uri = Uri.parse('$_baseUrl$path');
+    final uri = Uri.parse('$baseUrl$path');
 
     // multipart/form-data
     if (body is http.MultipartRequest) {

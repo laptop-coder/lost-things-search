@@ -11,23 +11,12 @@ class InstitutionAdministratorPosition {
     required this.name,
   });
 
-  factory InstitutionAdministratorPosition.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'id': int id,
-        'createdAt': String createdAt,
-        'updatedAt': String updatedAt,
-        'name': String name,
-      } =>
-        InstitutionAdministratorPosition(
-          id: id,
-          createdAt: createdAt,
-          updatedAt: updatedAt,
-          name: name,
-        ),
-      _ => throw const FormatException('Не удалось загрузить должность администрации ОУ'),
-    };
-  }
+  factory InstitutionAdministratorPosition.fromJson(
+    Map<String, dynamic> json,
+  ) => InstitutionAdministratorPosition(
+    id: json['id'] as int,
+    createdAt: json['createdAt'] as String,
+    updatedAt: json['updatedAt'] as String,
+    name: json['name'] as String,
+  );
 }
-
-

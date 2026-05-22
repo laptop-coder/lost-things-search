@@ -23,33 +23,19 @@ class User {
     required this.roles,
   });
 
-  factory User.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'id': String id,
-        'createdAt': String createdAt,
-        'updatedAt': String updatedAt,
-        'email': String email,
-        'firstName': String firstName,
-        'middleName': String? middleName,
-        'lastName': String lastName,
-        'hasAvatar': bool hasAvatar,
-        'roles': List<dynamic> roles,
-      } =>
-        User(
-          id: id,
-          createdAt: createdAt,
-          updatedAt: updatedAt,
-          email: email,
-          firstName: firstName,
-          middleName: middleName,
-          lastName: lastName,
-          hasAvatar: hasAvatar,
-          roles: roles
+  factory User.fromJson(Map<String, dynamic> json) => User(
+    id: json['id'] as String,
+    createdAt: json['createdAt'] as String,
+    updatedAt: json['updatedAt'] as String,
+    email: json['email'] as String,
+    firstName: json['firstName'] as String,
+    middleName: json['middleName'] as String?,
+    lastName: json['lastName'] as String,
+    hasAvatar: json['hasAvatar'] as bool,
+    roles: json['roles'] != null
+        ? (json['roles'] as List<dynamic>)
               .map((e) => Role.fromJson(e as Map<String, dynamic>))
-              .toList(),
-        ),
-      _ => throw const FormatException('Не удалось загрузить пользователя'),
-    };
-  }
+              .toList()
+        : [],
+  );
 }
