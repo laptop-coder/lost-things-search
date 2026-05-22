@@ -103,6 +103,15 @@ class _MainNavigationBarState extends State<MainNavigationBar> {
           ),
         ],
       ),
+      floatingActionButton:
+          currentPageIndex == 0 &&
+              widget.permissions.hasPermission(PERMISSIONS.POST_CREATE)
+          ? FloatingActionButton(
+              onPressed: () => Navigator.of(context).pushNamed('/posts/new'),
+              tooltip: 'Создать объявление',
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 }
