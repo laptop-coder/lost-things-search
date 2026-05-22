@@ -11,22 +11,10 @@ class StaffPosition {
     required this.name,
   });
 
-  factory StaffPosition.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'id': int id,
-        'createdAt': String createdAt,
-        'updatedAt': String updatedAt,
-        'name': String name,
-      } =>
-        StaffPosition(
-          id: id,
-          createdAt: createdAt,
-          updatedAt: updatedAt,
-          name: name,
-        ),
-      _ => throw const FormatException('Не удалось загрузить должность сотрудника'),
-    };
-  }
+  factory StaffPosition.fromJson(Map<String, dynamic> json) => StaffPosition(
+    id: json['id'] as int,
+    createdAt: json['createdAt'] as String,
+    updatedAt: json['updatedAt'] as String,
+    name: json['name'] as String,
+  );
 }
-

@@ -13,23 +13,11 @@ class Room {
     this.teacherId,
   });
 
-  factory Room.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'id': int id,
-        'createdAt': String createdAt,
-        'updatedAt': String updatedAt,
-        'name': String name,
-        'teacherId': String? teacherId,
-      } =>
-        Room(
-          id: id,
-          createdAt: createdAt,
-          updatedAt: updatedAt,
-          name: name,
-          teacherId: teacherId,
-        ),
-      _ => throw const FormatException('Не удалось загрузить кабинет'),
-    };
-  }
+  factory Room.fromJson(Map<String, dynamic> json) => Room(
+    id: json['id'] as int,
+    createdAt: json['createdAt'] as String,
+    updatedAt: json['updatedAt'] as String,
+    name: json['name'] as String,
+    teacherId: json['teacherId'] as String?,
+  );
 }

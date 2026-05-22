@@ -15,25 +15,15 @@ class Role {
     required this.permissions,
   });
 
-  factory Role.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'id': int id,
-        'createdAt': String createdAt,
-        'updatedAt': String updatedAt,
-        'name': String name,
-        'permissions': List<dynamic> permissions,
-      } =>
-        Role(
-          id: id,
-          createdAt: createdAt,
-          updatedAt: updatedAt,
-          name: name,
-          permissions: permissions
+  factory Role.fromJson(Map<String, dynamic> json) => Role(
+    id: json['id'] as int,
+    createdAt: json['createdAt'] as String,
+    updatedAt: json['updatedAt'] as String,
+    name: json['name'] as String,
+    permissions: json['permissions'] != null
+        ? (json['permissions'] as List<dynamic>)
               .map((e) => Permission.fromJson(e as Map<String, dynamic>))
-              .toList(),
-        ),
-      _ => throw const FormatException('Не удалось загрузить роль'),
-    };
-  }
+              .toList()
+        : [],
+  );
 }

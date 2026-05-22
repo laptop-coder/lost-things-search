@@ -15,25 +15,12 @@ class Message {
     required this.isRead,
   });
 
-  factory Message.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'id': String id,
-        'createdAt': String createdAt,
-        'updatedAt': String updatedAt,
-        'senderId': String senderId,
-        'content': String content,
-        'isRead': bool isRead,
-      } =>
-        Message(
-          id: id,
-          createdAt: createdAt,
-          updatedAt: updatedAt,
-          senderId: senderId,
-          content: content,
-          isRead: isRead,
-        ),
-      _ => throw const FormatException('Не удалось загрузить сообщение'),
-    };
-  }
+  factory Message.fromJson(Map<String, dynamic> json) => Message(
+    id: json['id'] as String,
+    createdAt: json['createdAt'] as String,
+    updatedAt: json['updatedAt'] as String,
+    senderId: json['senderId'] as String,
+    content: json['content'] as String,
+    isRead: json['isRead'] as bool,
+  );
 }

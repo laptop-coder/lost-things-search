@@ -11,23 +11,10 @@ class Subject {
     required this.name,
   });
 
-  factory Subject.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'id': int id,
-        'createdAt': String createdAt,
-        'updatedAt': String updatedAt,
-        'name': String name,
-      } =>
-        Subject(
-          id: id,
-          createdAt: createdAt,
-          updatedAt: updatedAt,
-          name: name,
-        ),
-      _ => throw const FormatException('Не удалось загрузить предмет'),
-    };
-  }
+  factory Subject.fromJson(Map<String, dynamic> json) => Subject(
+    id: json['id'] as int,
+    createdAt: json['createdAt'] as String,
+    updatedAt: json['updatedAt'] as String,
+    name: json['name'] as String,
+  );
 }
-
-

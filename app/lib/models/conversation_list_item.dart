@@ -15,28 +15,13 @@ class ConversationListItem {
     this.lastMessage,
   });
 
-  factory ConversationListItem.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'id': String id,
-        'updatedAt': String updatedAt,
-        'postId': String postId,
-        'postName': String postName,
-        'unreadCount': int unreadCount,
-        'lastMessage': String? lastMessage,
-      } =>
-        ConversationListItem(
-          id: id,
-          updatedAt: updatedAt,
-          postId: postId,
-          postName: postName,
-          unreadCount: unreadCount,
-          lastMessage: lastMessage,
-        ),
-      _ => throw const FormatException('Не удалось загрузить переписку'),
-    };
-  }
+  factory ConversationListItem.fromJson(Map<String, dynamic> json) =>
+      ConversationListItem(
+        id: json['id'] as String,
+        updatedAt: json['updatedAt'] as String,
+        postId: json['postId'] as String,
+        postName: json['postName'] as String,
+        unreadCount: json['unreadCount'] as int,
+        lastMessage: json['lastMessage'] as String?,
+      );
 }
-
-
-

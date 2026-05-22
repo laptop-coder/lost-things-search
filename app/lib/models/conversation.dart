@@ -17,25 +17,15 @@ class Conversation {
     required this.otherUser,
   });
 
-  factory Conversation.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'id': String id,
-        'createdAt': String createdAt,
-        'post': Post post,
-        'messages': List<dynamic> messages,
-        'otherUser': User otherUser,
-      } =>
-        Conversation(
-          id: id,
-          createdAt: createdAt,
-          post: post,
-          messages: messages
-              .map((e) => Message.fromJson(e as Map<String, dynamic>))
-              .toList(),
-          otherUser: otherUser,
-        ),
-      _ => throw const FormatException('Не удалось загрузить ученика'),
-    };
-  }
+  factory Conversation.fromJson(Map<String, dynamic> json) => Conversation(
+    id: json['id'] as String,
+    createdAt: json['createdAt'] as String,
+    post: Post.fromJson(json['post'] as Map<String, dynamic>),
+    messages:
+        (json['messages'] as List<dynamic>?)
+            ?.map((e) => Message.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [],
+    otherUser: User.fromJson(json['otherUser'] as Map<String, dynamic>),
+  );
 }

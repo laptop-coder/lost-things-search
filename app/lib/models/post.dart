@@ -23,31 +23,15 @@ class Post {
     required this.author,
   });
 
-  factory Post.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'id': String id,
-        'createdAt': String createdAt,
-        'updatedAt': String updatedAt,
-        'name': String name,
-        'description': String? description,
-        'verified': bool verified,
-        'thingReturnedToOwner': bool thingReturnedToOwner,
-        'hasPhoto': bool hasPhoto,
-        'author': User author,
-      } =>
-        Post(
-          id: id,
-          createdAt: createdAt,
-          updatedAt: updatedAt,
-          name: name,
-          description: description,
-          verified: verified,
-          thingReturnedToOwner: thingReturnedToOwner,
-          hasPhoto: hasPhoto,
-          author: author,
-        ),
-      _ => throw const FormatException('Не удалось загрузить объявление'),
-    };
-  }
+  factory Post.fromJson(Map<String, dynamic> json) => Post(
+    id: json['id'] as String,
+    createdAt: json['createdAt'] as String,
+    updatedAt: json['updatedAt'] as String,
+    name: json['name'] as String,
+    description: json['description'] as String?,
+    verified: json['verified'] as bool,
+    thingReturnedToOwner: json['thingReturnedToOwner'] as bool,
+    hasPhoto: json['hasPhoto'] as bool,
+    author: User.fromJson(json['author'] as Map<String, dynamic>),
+  );
 }

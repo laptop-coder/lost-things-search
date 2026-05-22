@@ -12,21 +12,15 @@ class Student {
     required this.studentGroup,
   });
 
-  factory Student.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'userId': String userId,
-        'parents': List<dynamic> parents,
-        'studentGroup': StudentGroup studentGroup,
-      } =>
-        Student(
-          userId: userId,
-          parents: parents
-              .map((e) => Parent.fromJson(e as Map<String, dynamic>))
-              .toList(),
-          studentGroup: studentGroup,
-        ),
-      _ => throw const FormatException('Не удалось загрузить ученика'),
-    };
-  }
+  factory Student.fromJson(Map<String, dynamic> json) => Student(
+    userId: json['userId'] as String,
+    parents:
+        (json['parents'] as List<dynamic>?)
+            ?.map((e) => Parent.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        [],
+    studentGroup: StudentGroup.fromJson(
+      json['studentGroup'] as Map<String, dynamic>,
+    ),
+  );
 }

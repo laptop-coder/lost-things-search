@@ -17,29 +17,18 @@ class StudentGroup {
     required this.students,
   });
 
-  factory StudentGroup.fromJson(Map<String, dynamic> json) {
-    return switch (json) {
-      {
-        'id': int id,
-        'createdAt': String createdAt,
-        'updatedAt': String updatedAt,
-        'name': String name,
-        'groupAdvisorId': String? groupAdvisorId,
-        'students': List<dynamic> students,
-      } =>
-        StudentGroup(
-          id: id,
-          createdAt: createdAt,
-          updatedAt: updatedAt,
-          name: name,
-          groupAdvisorId: groupAdvisorId,
-          students: students
-              .map(
-                (e) => StudentGroupStudent.fromJson(e as Map<String, dynamic>),
-              )
-              .toList(),
-        ),
-      _ => throw const FormatException('Не удалось загрузить учебную группу'),
-    };
-  }
+  factory StudentGroup.fromJson(Map<String, dynamic> json) => StudentGroup(
+    id: json['id'] as int,
+    createdAt: json['createdAt'] as String,
+    updatedAt: json['updatedAt'] as String,
+    name: json['name'] as String,
+    groupAdvisorId: json['groupAdvisorId'] as String?,
+    students:
+        (json['students'] as List<dynamic>?)
+            ?.map(
+              (e) => StudentGroupStudent.fromJson(e as Map<String, dynamic>),
+            )
+            .toList() ??
+        [],
+  );
 }
