@@ -1,0 +1,42 @@
+vars: {
+  d2-config: {
+    pad: 100
+  }
+}
+
+new: "Новое объявление" {
+  shape: oval
+}
+
+yolo: "YOLO\n\nРаспознаём объекты на фото"
+
+translate: "Переводим объекты с английского на русский\nпо словарю (всего порядка 80-и слов)"
+
+compare: "sergeyzh/rubert-mini-sts\n\nПредметы на фотографии совпадают\nс содержанием объявления?" {
+  shape: diamond
+}
+
+unacceptable: "apanc/russian-inappropriate-messages\n\nОтсутствует неприемлемый контент?" {
+  shape: diamond
+}
+
+need_check: "Ручная модерация" {
+  shape: oval
+}
+
+publish: "Опубликовать" {
+  shape: oval
+}
+
+reject: "Отказать" {
+  shape: oval
+}
+
+new -> unacceptable
+
+unacceptable -> reject: Нет
+unacceptable -> yolo: Да
+yolo -> translate -> compare
+compare -> publish: Да
+compare -> need_check: Нет
+
