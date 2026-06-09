@@ -76,12 +76,33 @@ services:
         condition: service_started
       mailhog:
         condition: service_started
+      ml:
+        condition: service_started
     develop:
       watch:
         - action: rebuild
           path: ./backend
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:${BACKEND_PORT}/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ml:
+    build:
+      context: ./ml
+      dockerfile: Dockerfile
+    container_name: lts-ml
+    restart: unless-stopped
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - storage:/storage
+    env_file:
+      - .env
+    networks:
+      - lts_network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:4746/health || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
