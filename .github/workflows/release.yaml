@@ -46,68 +46,74 @@ jobs:
     name: Push backend
     needs: release
     runs-on: ubuntu-latest
-    environment: docker-images-ci-actions-env
+    permissions:
+      packages: write
     if: needs.release.result == 'success'
     steps:
       - uses: actions/checkout@v6
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PAT }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push backend
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./backend
           file: ./backend/Dockerfile
           push: true
           tags: |
-            ${{ vars.DOCKERHUB_USERNAME }}/lost-things-search-backend:latest
-            ${{ vars.DOCKERHUB_USERNAME }}/lost-things-search-backend:${{ needs.release.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/lost-things-search-backend:latest
+            ghcr.io/${{ github.repository_owner }}/lost-things-search-backend:${{ needs.release.outputs.version }}
   push-migrate:
     name: Push migrate
     needs: release
     runs-on: ubuntu-latest
-    environment: docker-images-ci-actions-env
+    permissions:
+      packages: write
     if: needs.release.result == 'success'
     steps:
       - uses: actions/checkout@v6
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PAT }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push migrate
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./backend
           file: ./backend/Dockerfile.migrate
           push: true
           tags: |
-            ${{ vars.DOCKERHUB_USERNAME }}/lost-things-search-migrate:latest
-            ${{ vars.DOCKERHUB_USERNAME }}/lost-things-search-migrate:${{ needs.release.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/lost-things-search-migrate:latest
+            ghcr.io/${{ github.repository_owner }}/lost-things-search-migrate:${{ needs.release.outputs.version }}
   push-frontend:
     name: Push frontend
     needs: release
     runs-on: ubuntu-latest
-    environment: docker-images-ci-actions-env
+    permissions:
+      packages: write
     if: needs.release.result == 'success'
     steps:
       - uses: actions/checkout@v6
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
         with:
-          username: ${{ vars.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PAT }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push frontend
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: true
           tags: |
-            ${{ vars.DOCKERHUB_USERNAME }}/lost-things-search-frontend:latest
-            ${{ vars.DOCKERHUB_USERNAME }}/lost-things-search-frontend:${{ needs.release.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/lost-things-search-frontend:latest
+            ghcr.io/${{ github.repository_owner }}/lost-things-search-frontend:${{ needs.release.outputs.version }}
 
   build-app:
     name: Build App (${{ matrix.os }})
