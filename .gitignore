@@ -3,6 +3,7 @@
 *.log
 *.pem
 *.sqlite3
+*.pt
 .env
 __pycache__
 cache
