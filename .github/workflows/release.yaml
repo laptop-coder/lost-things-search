@@ -186,7 +186,7 @@ jobs:
           mv build/app/outputs/bundle/release/app-release.aab LostThingsSearch-${{ needs.release.outputs.version }}-android.aab
       - name: Upload Android binaries
         if: runner.os == 'Linux'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.release.outputs.version }}
           files: |
@@ -209,7 +209,7 @@ jobs:
           zip -r ../../../../LostThingsSearch-${{ needs.release.outputs.version }}-ios.zip *
       - name: Upload iOS binaries
         if: runner.os == 'macOS'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.release.outputs.version }}
           files: app/LostThingsSearch-${{ needs.release.outputs.version }}-ios.zip
@@ -232,7 +232,7 @@ jobs:
           zip -r ../../../../../LostThingsSearch-${{ needs.release.outputs.version }}-linux-x86_64-portable.zip *
       - name: Upload Linux binaries
         if: runner.os == 'Linux'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.release.outputs.version }}
           files: app/LostThingsSearch-${{ needs.release.outputs.version }}-linux-x86_64-portable.zip
@@ -252,7 +252,7 @@ jobs:
         run: Compress-Archive -Path build/windows/x64/runner/Release/* -DestinationPath LostThingsSearch-${{ needs.release.outputs.version }}-windows-x86_64-portable.zip
       - name: Upload Windows binaries
         if: runner.os == 'Windows'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.release.outputs.version }}
           files: app/LostThingsSearch-${{ needs.release.outputs.version }}-windows-x86_64-portable.zip
@@ -272,7 +272,7 @@ jobs:
           zip -r ../../../../../../LostThingsSearch-${{ needs.release.outputs.version }}-macos-x86_64.zip *
       - name: Upload macOS binaries
         if: runner.os == 'macOS'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ needs.release.outputs.version }}
           files: app/LostThingsSearch-${{ needs.release.outputs.version }}-macos-x86_64.zip
