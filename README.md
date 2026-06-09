@@ -48,4 +48,4 @@ make first-run
 | `logs` | See logs |
 | `down` | Stop the app |
 | `dev` | Run app in the development mode (with migrations) |
-
+| `help` | Display available `make` commands |
