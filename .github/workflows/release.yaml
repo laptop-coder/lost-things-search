@@ -90,6 +90,30 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/lost-things-search-migrate:latest
             ghcr.io/${{ github.repository_owner }}/lost-things-search-migrate:${{ needs.release.outputs.version }}
+  push-ml:
+    name: Push ml
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    if: needs.release.result == 'success'
+    steps:
+      - uses: actions/checkout@v6
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push ml
+        uses: docker/build-push-action@v7
+        with:
+          context: ./ml
+          file: ./ml/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/lost-things-search-ml:latest
+            ghcr.io/${{ github.repository_owner }}/lost-things-search-ml:${{ needs.release.outputs.version }}
   push-frontend:
     name: Push frontend
     needs: release
