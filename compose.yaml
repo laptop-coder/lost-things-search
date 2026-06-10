@@ -93,6 +93,8 @@ services:
       - lts_network
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:4746/health || exit 1"]
+      start_period: 140s
+      start_interval: 10s
       interval: 10s
       timeout: 5s
       retries: 5
