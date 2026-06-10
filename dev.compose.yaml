@@ -112,8 +112,13 @@ services:
       context: ./backend
       dockerfile: Dockerfile.migrate
     container_name: lts-migrate
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - storage:/backend/data/storage
     environment:
+      - PATH_TO_STORAGE=/backend/data/storage
       - POSTGRES_HOST=postgres
+      - JWT_ISSUER_PREFIX=lts-backend
     profiles: ["migrate"]
     env_file:
       - .env

@@ -21,6 +21,7 @@ Lost and found service for educational institutions.
 ## Tech Stack
 
 - **Backend:** Go, GORM, PostgreSQL, Valkey
+- **ML:** Python (`apanc/russian-inappropriate-messages`, `sergeyzh/rubert-mini-sts`, YOLO)
 - **Frontend:** SolidJS, TailwindCSS
 - **Android/iOS/Linux/Windows/macOS app**: Flutter (Dart)
 - **Deploy:** Docker, Docker Compose, Nginx
