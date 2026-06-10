@@ -8,7 +8,7 @@ COPY pyproject.toml uv.lock ./
 
 # Install the application dependencies.
 RUN apt-get update && \
-    apt-get install -y gcc g++ meson && \
+    apt-get install -y gcc g++ meson wget && \
     rm -rf /var/lib/apt/lists/* && \
     uv sync --frozen # --no-cache
 
