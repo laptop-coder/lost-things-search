@@ -23,4 +23,6 @@ type Post struct {
 	HasPhoto bool      `gorm:"type:boolean;default:false"`
 	AuthorID uuid.UUID `gorm:"type:uuid"`
 	Author   User      `gorm:"foreignKey:AuthorID;references:ID"`
+	// one-to-one (post-to-post_moderation)
+	PostModeration PostModeration `gorm:"foreignKey:PostID;references:ID;constraint:OnDelete:cascade,OnUpdate:restrict"`
 }
