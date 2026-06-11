@@ -8,7 +8,12 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/valkey-io/valkey-go"
 	"gorm.io/gorm"
+	"math/bits"
+	"slices"
+	"strconv"
+	"strings"
 )
 
 type PostRepository interface {
@@ -17,11 +22,19 @@ type PostRepository interface {
 	FindByID(ctx context.Context, id *uuid.UUID) (*model.Post, error)
 	Update(ctx context.Context, post *model.Post) error
 	Delete(ctx context.Context, id *uuid.UUID) error
+	FindSimilarByImageHashDistance(ctx context.Context, hash uint64, maxDistance uint16) ([]model.Post, error)
+	FindSimilarByName(ctx context.Context, name string) ([]model.Post, error)
+	FindSimilarByDescription(ctx context.Context, description string) ([]model.Post, error)
+	GetPhotoHash(ctx context.Context, postID uuid.UUID) (uint64, error)
+	UpdatePhotoHash(ctx context.Context, postID uuid.UUID, hash uint64) error
+	DeletePhotoHash(ctx context.Context, postID uuid.UUID) error
+	FindPhotosWithoutHashes(ctx context.Context) ([]uuid.UUID, error)
 }
 
 type postRepository struct {
-	db  *gorm.DB
-	log logger.Logger
+	db     *gorm.DB
+	client valkey.Client
+	log    logger.Logger
 }
 
 type PostFilter struct {
@@ -32,12 +45,12 @@ type PostFilter struct {
 	Offset               int
 }
 
-func NewPostRepository(db *gorm.DB, log logger.Logger) PostRepository {
+func NewPostRepository(db *gorm.DB, client valkey.Client, log logger.Logger) PostRepository {
 	if db == nil {
 		log.Error("DB is nil")
 		panic("DB is nil")
 	}
-	return &postRepository{db: db, log: log}
+	return &postRepository{db: db, client: client, log: log}
 }
 
 func (r *postRepository) FindAll(ctx context.Context, filter *PostFilter) ([]model.Post, error) {
@@ -138,4 +151,167 @@ func (r *postRepository) Delete(ctx context.Context, id *uuid.UUID) error {
 		return fmt.Errorf("post to delete was not found by id: %w", apperrors.ErrPostNotFound)
 	}
 	return nil
+}
+
+func (r *postRepository) FindSimilarByImageHashDistance(ctx context.Context, hash1 uint64, maxDistance uint16) ([]model.Post, error) {
+	var similarIDs []uuid.UUID
+	var cursor uint64 = 0
+	for {
+		// Execute command
+		res := r.client.Do(ctx, r.client.B().Scan().Cursor(cursor).Match("post:photo:hash:*").Count(1000).Build())
+		// Parse result
+		scanEntry, err := res.AsScanEntry()
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse result: %w", err)
+		}
+		for _, rawKey := range scanEntry.Elements {
+			keyString := strings.TrimPrefix(rawKey, "post:photo:hash:")
+			// Convert to UUID
+			key, err := uuid.Parse(keyString)
+			if err != nil {
+				r.log.Error("failed to convert post id to uuid", "post_id", keyString)
+				return nil, fmt.Errorf("failed to convert post id (%s) to uuid: %w", keyString, err)
+			}
+			// Get hash (value) by post id (the part of the key)
+			hash2, err := r.GetPhotoHash(ctx, key)
+			if err != nil {
+				r.log.Error("failed to get post photo hash", "error", err.Error())
+				return nil, fmt.Errorf("failed to get post photo hash: %w", err)
+			}
+			// Calculate the Hamming distance
+			if bits.OnesCount64(hash1^hash2) <= int(maxDistance) {
+				similarIDs = append(similarIDs, key)
+			}
+		}
+		cursor = scanEntry.Cursor
+		if cursor == 0 {
+			break
+		}
+	}
+	// Get similar posts
+	if len(similarIDs) == 0 {
+		return nil, nil
+	}
+	var similarPosts []model.Post
+	result := r.db.WithContext(ctx).Model(&model.Post{}).Where("posts.ID IN (?)", similarIDs).Order("created_at DESC").Find(&similarPosts)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to fetch list of similar posts: %w", result.Error)
+	}
+	return similarPosts, nil
+}
+
+func (r *postRepository) FindSimilarByName(ctx context.Context, name string) ([]model.Post, error) {
+	var posts []model.Post
+	result := r.db.WithContext(ctx).
+		Where("name % ?", name).
+		Preload("Author").
+		Preload("Author.Roles").
+		Find(&posts)
+	if result.Error != nil && !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, fmt.Errorf("failed to fetch list of posts similar by name: %w", result.Error)
+	}
+	return posts, nil
+}
+
+func (r *postRepository) FindSimilarByDescription(ctx context.Context, description string) ([]model.Post, error) {
+	var posts []model.Post
+	result := r.db.WithContext(ctx).
+		Where("description % ?", description).
+		Preload("Author").
+		Preload("Author.Roles").
+		Find(&posts)
+	if result.Error != nil && !errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, fmt.Errorf("failed to fetch list of posts similar by description: %w", result.Error)
+	}
+	return posts, nil
+}
+
+func (r *postRepository) GetPhotoHash(ctx context.Context, postID uuid.UUID) (uint64, error) {
+	// Get hash
+	hashString, err := r.client.Do(ctx, r.client.B().
+		Get().
+		Key(fmt.Sprintf("post:photo:hash:%s", postID.String())).
+		Build(),
+	).ToString()
+	if err != nil {
+		r.log.Error("failed to get photo hash by post id", "post_id", postID.String())
+		return 0, fmt.Errorf("failed to get photo hash by post id: %w", err)
+	}
+	// Convert to uint64
+	hash, err := strconv.ParseUint(hashString, 10, 64)
+	if err != nil {
+		r.log.Error("cannot convert post photo hash from string to uint64")
+		return 0, fmt.Errorf("cannot convert post photo hash from string to uint64")
+	}
+	return hash, nil
+}
+
+func (r *postRepository) UpdatePhotoHash(ctx context.Context, postID uuid.UUID, hash uint64) error {
+	if err := r.client.Do(ctx, r.client.B().
+		Set().
+		Key(fmt.Sprintf("post:photo:hash:%s", postID.String())).
+		Value(strconv.FormatUint(hash, 10)).
+		ExSeconds(60*60*24*365). // 1 year
+		Build(),
+	).Error(); err != nil {
+		r.log.Error("failed to update post photo hash", "error", err.Error())
+		return fmt.Errorf("failed to update post photo hash: %w", err)
+	}
+	r.log.Info("successfully updated post photo hash", "post_id", postID.String())
+	return nil
+}
+
+func (r *postRepository) DeletePhotoHash(ctx context.Context, postID uuid.UUID) error {
+	if err := r.client.Do(ctx, r.client.B().
+		Del().
+		Key(fmt.Sprintf("post:photo:hash:%s", postID.String())).
+		Build(),
+	).Error(); err != nil {
+		r.log.Error("failed to delete post photo hash", "error", err.Error())
+		return fmt.Errorf("failed to delete post photo hash: %w", err)
+	}
+	r.log.Info("successfully deleted post photo hash", "post_id", postID.String())
+	return nil
+}
+
+func (r *postRepository) FindPhotosWithoutHashes(ctx context.Context) ([]uuid.UUID, error) {
+	var idsWithoutHashes []uuid.UUID
+	var idsWithHashes []uuid.UUID
+	var cursor uint64 = 0
+	for {
+		// Execute command
+		res := r.client.Do(ctx, r.client.B().Scan().Cursor(cursor).Match("post:photo:hash:*").Count(1000).Build())
+		// Parse result
+		scanEntry, err := res.AsScanEntry()
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse result: %w", err)
+		}
+		for _, rawKey := range scanEntry.Elements {
+			keyString := strings.TrimPrefix(rawKey, "post:photo:hash:")
+			// Convert to UUID
+			key, err := uuid.Parse(keyString)
+			if err != nil {
+				r.log.Error("failed to convert post id to uuid", "post_id", keyString)
+				return nil, fmt.Errorf("failed to convert post id (%s) to uuid: %w", keyString, err)
+			}
+			idsWithHashes = append(idsWithHashes, key)
+		}
+		cursor = scanEntry.Cursor
+		if cursor == 0 {
+			break
+		}
+	}
+	// Get IDs of posts with photos
+	var postsWithPhotos []model.Post
+	result := r.db.WithContext(ctx).Model(&model.Post{}).Where("posts.has_photo = true").Order("created_at DESC").Find(&postsWithPhotos)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to fetch list of posts with photos: %w", result.Error)
+	}
+	// Collect ids
+	for _, p := range postsWithPhotos {
+		if !slices.Contains(idsWithHashes, p.ID) {
+			idsWithoutHashes = append(idsWithoutHashes, p.ID)
+		}
+	}
+	return idsWithoutHashes, nil
 }

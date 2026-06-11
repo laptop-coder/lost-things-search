@@ -280,8 +280,8 @@ func (s *authService) ForgotPassword(ctx context.Context, email string) error {
 		Build(),
 	).Error()
 	if err != nil {
-		s.log.Error("failed to reset password: %w", err)
-		return nil
+		s.log.Error("failed to reset password", "error", err.Error())
+		return nil // TODO: check if it is right
 	}
 	// Generate token
 	token := uuid.New().String()
@@ -294,7 +294,7 @@ func (s *authService) ForgotPassword(ctx context.Context, email string) error {
 		Build(),
 	).Error()
 	if err != nil {
-		s.log.Error("failed to reset password: %w", err)
+		s.log.Error("failed to reset password", "error", err.Error())
 		return nil
 	}
 	// Send email
