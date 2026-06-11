@@ -14,12 +14,14 @@ type UserServiceConfig struct {
 	BcryptCost             int
 	AvatarMaxSize          int64
 	AvatarUploadPath       string
+	AvatarDeletePath       string
 	AvatarAllowedMIMETypes []string
 }
 
 type PostServiceConfig struct {
 	PhotoMaxSize          int64
 	PhotoUploadPath       string
+	PhotoDeletePath       string
 	PhotoAllowedMIMETypes []string
 }
 

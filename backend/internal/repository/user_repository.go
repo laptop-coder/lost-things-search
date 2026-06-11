@@ -141,7 +141,7 @@ func (r *userRepository) Delete(ctx context.Context, id *uuid.UUID) error {
 	if id == nil {
 		return fmt.Errorf("id cannot be nil: %w", apperrors.ErrRequiredField)
 	}
-	result := r.db.WithContext(ctx).Unscoped().Delete(&model.User{}, *id)
+	result := r.db.WithContext(ctx).Delete(&model.User{}, *id)
 	if result.Error != nil {
 		return fmt.Errorf("failed to delete user with id %s: %w", *id, result.Error)
 	}

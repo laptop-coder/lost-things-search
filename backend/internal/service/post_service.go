@@ -137,8 +137,12 @@ func (s *postService) CreatePost(ctx context.Context, dto CreatePostDTO, canVeri
 		if err := txRepo.Create(ctx, post); err != nil {
 			// Delete the saved post photo, if the transaction is rolled back
 			if hasPhoto {
-				s.removePostPhoto(ctx, postID)
+				if err := s.removePostPhoto(ctx, postID); err != nil {
+					s.log.Error("failed to create post, the transaction is rolled back, and failed to delete saved post photo", "error", err.Error())
+					return fmt.Errorf("failed to create post, the transaction is rolled back, and failed to delete saved post photo: %w", err)
+				}
 			}
+			s.log.Error("failed to create post", "error", err.Error())
 			return fmt.Errorf("failed to create post: %w", err)
 		}
 		return nil
@@ -199,7 +203,10 @@ func (s *postService) DeletePost(ctx context.Context, id uuid.UUID) error {
 		txRepo := repository.NewPostRepository(tx, s.client, s.log)
 		if post.HasPhoto {
 			s.log.Info("removing post photo file...")
-			s.removePostPhoto(ctx, id)
+			if err := s.removePostPhoto(ctx, id); err != nil {
+				s.log.Error("failed to delete post photo file", "error", err.Error())
+				return fmt.Errorf("failed to delete post photo file: %w", err)
+			}
 		}
 		if err := txRepo.Delete(ctx, &id); err != nil {
 			s.log.Error("failed to delete the post")
@@ -229,7 +236,10 @@ func (s *postService) RemovePhoto(ctx context.Context, postID uuid.UUID) error {
 				return fmt.Errorf("failed to delete post photo: %w", err)
 			}
 			s.log.Info("removing post photo file...")
-			s.removePostPhoto(ctx, postID)
+			if err := s.removePostPhoto(ctx, postID); err != nil {
+				s.log.Error("failed to delete post photo file", "error", err.Error())
+				return fmt.Errorf("failed to delete post photo file: %w", err)
+			}
 		}
 		return nil
 	}); err != nil {
@@ -259,7 +269,10 @@ func (s *postService) UpdatePhoto(ctx context.Context, postID uuid.UUID, photo *
 	post.HasPhoto = true
 	if err := s.postRepo.Update(ctx, post); err != nil {
 		// Rollback file saving in the case of error
-		s.removePostPhoto(ctx, postID)
+		if err := s.removePostPhoto(ctx, postID); err != nil {
+			s.log.Error("failed to update post photo and failed to rollback file saving", "error", err.Error())
+			return fmt.Errorf("failed to update post photo and failed to rollback file saving: %w", err)
+		}
 		s.log.Error("failed to update post photo", "error", err.Error())
 		return fmt.Errorf("failed to update post photo: %w", err)
 	}
@@ -359,14 +372,19 @@ func (s *postService) savePostPhoto(ctx context.Context, postID uuid.UUID, fileH
 }
 
 func (s *postService) removePostPhoto(ctx context.Context, postID uuid.UUID) error {
-	// Remove photo
+	// Remove photo (soft-delete)
+	filename := fmt.Sprintf("%s.jpeg", postID.String())
 	filePath := filepath.Join(
 		s.config.PhotoUploadPath,
-		fmt.Sprintf("%s.jpeg", postID.String()),
+		filename,
 	)
-	if err := os.Remove(filePath); err != nil {
-		s.log.Error("failed to remove post photo", "error", err.Error())
-		return fmt.Errorf("failed to remove post photo: %w", err)
+	fileDeletePath := filepath.Join(
+		s.config.PhotoDeletePath,
+		filename,
+	)
+	if err := os.Rename(filePath, fileDeletePath); err != nil {
+		s.log.Error("failed to move post photo to trash", "error", err.Error())
+		return fmt.Errorf("failed to move post photo to trash: %w", err)
 	}
 	// Remove photo hash
 	if err := s.postRepo.DeletePhotoHash(ctx, postID); err != nil {
@@ -376,6 +394,7 @@ func (s *postService) removePostPhoto(ctx context.Context, postID uuid.UUID) err
 	return nil
 }
 
+// TODO: what is it? Does it duplicate UpdatePost?
 func (s *postService) UpdatePostPhoto(ctx context.Context, postID uuid.UUID, postPhoto *multipart.FileHeader) error {
 	post, err := s.postRepo.FindByID(ctx, &postID)
 	if err != nil {
@@ -393,7 +412,10 @@ func (s *postService) UpdatePostPhoto(ctx context.Context, postID uuid.UUID, pos
 	post.HasPhoto = true
 	if err := s.postRepo.Update(ctx, post); err != nil {
 		// Rollback file saving in the case of error
-		s.removePostPhoto(ctx, postID)
+		if err := s.removePostPhoto(ctx, postID); err != nil {
+			s.log.Error("failed to update post photo and failed to rollback file saving", "error", err.Error())
+			return fmt.Errorf("failed to update post photo and failed to rollback file saving: %w", err)
+		}
 		return fmt.Errorf("failed to update post photo: %w", err)
 	}
 	return nil
@@ -414,7 +436,10 @@ func (s *postService) RemovePostPhoto(ctx context.Context, postID uuid.UUID) err
 				return fmt.Errorf("failed to delete post photo: %w", err)
 			}
 			s.log.Info("removing post photos...")
-			s.removePostPhoto(ctx, postID)
+			if err := s.removePostPhoto(ctx, postID); err != nil {
+				s.log.Error("failed to delete post photo", "error", err.Error())
+				return fmt.Errorf("failed to delete post photo: %w", err)
+			}
 		}
 		return nil
 	}); err != nil {

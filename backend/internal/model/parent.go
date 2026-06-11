@@ -15,6 +15,7 @@ type Parent struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 
 	// many-to-many (parent-to-student)
 	Students *[]Student `gorm:"many2many:parent_students;foreignKey:UserID;joinForeignKey:ParentId;references:UserID;joinReferences:StudentID"`

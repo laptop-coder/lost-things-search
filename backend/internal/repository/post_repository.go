@@ -143,7 +143,7 @@ func (r *postRepository) Update(ctx context.Context, post *model.Post) error {
 }
 
 func (r *postRepository) Delete(ctx context.Context, id *uuid.UUID) error {
-	result := r.db.WithContext(ctx).Unscoped().Delete(&model.Post{}, *id)
+	result := r.db.WithContext(ctx).Delete(&model.Post{}, *id)
 	if result.Error != nil {
 		return fmt.Errorf("failed to delete post with id %s: %w", *id, result.Error)
 	}

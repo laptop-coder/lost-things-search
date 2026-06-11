@@ -111,7 +111,7 @@ func (r *roomRepository) Update(ctx context.Context, room *model.Room) error {
 }
 
 func (r *roomRepository) Delete(ctx context.Context, id *uint16) error {
-	result := r.db.WithContext(ctx).Unscoped().Delete(&model.Room{}, *id)
+	result := r.db.WithContext(ctx).Delete(&model.Room{}, *id)
 	if result.Error != nil {
 		return fmt.Errorf("failed to delete room with id %d: %w", *id, result.Error)
 	}

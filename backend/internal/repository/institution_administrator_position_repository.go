@@ -111,7 +111,7 @@ func (r *institutionAdministratorPositionRepository) Update(ctx context.Context,
 }
 
 func (r *institutionAdministratorPositionRepository) Delete(ctx context.Context, id *uint16) error {
-	result := r.db.WithContext(ctx).Unscoped().Delete(&model.InstitutionAdministratorPosition{}, *id)
+	result := r.db.WithContext(ctx).Delete(&model.InstitutionAdministratorPosition{}, *id)
 	if result.Error != nil {
 		return fmt.Errorf("failed to delete institutionAdministratorPosition with id %d: %w", *id, result.Error)
 	}

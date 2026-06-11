@@ -2,6 +2,7 @@ package model
 
 import (
 	"time"
+	"gorm.io/gorm"
 )
 
 // Subject provides model of table with list of subjects ("Русский язык",
@@ -10,6 +11,7 @@ type Subject struct {
 	ID        uint16 `gorm:"primaryKey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 	Name      string `gorm:"type:varchar(100);unique;check:length(trim(name)) >= 3"`
 	// many-to-many (teacher-to-subject)
 	Teachers []Teacher `gorm:"many2many:teacher_subjects;foreignKey:ID;joinForeignKey:SubjectID;references:UserID;joinReferences:TeacherId"`

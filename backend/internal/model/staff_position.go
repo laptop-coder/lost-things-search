@@ -2,12 +2,14 @@ package model
 
 import (
 	"time"
+	"gorm.io/gorm"
 )
 
 type StaffPosition struct {
 	ID        uint16 `gorm:"primaryKey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 	Name      string `gorm:"type:varchar(200);unique;check:length(trim(name)) >= 4"`
 	// 1. Can't remove position if there are at least one person with it
 	// 2. one-to-many (position-to-staff)

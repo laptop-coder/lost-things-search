@@ -30,6 +30,7 @@ func newUserServiceConfig(sharedConfig SharedConfig) service.UserServiceConfig {
 		BcryptCost:             sharedConfig.Security.BcryptCost,
 		AvatarMaxSize:          sharedConfig.Storage.Avatar.MaxSize,
 		AvatarUploadPath:       sharedConfig.Storage.Avatar.UploadPath,
+		AvatarDeletePath:       sharedConfig.Storage.Avatar.DeletePath,
 		AvatarAllowedMIMETypes: sharedConfig.Storage.Avatar.AllowedMIMETypes,
 	}
 }
@@ -38,6 +39,7 @@ func newPostServiceConfig(sharedConfig SharedConfig) service.PostServiceConfig {
 	return service.PostServiceConfig{
 		PhotoMaxSize:          sharedConfig.Storage.PostPhoto.MaxSize,
 		PhotoUploadPath:       sharedConfig.Storage.PostPhoto.UploadPath,
+		PhotoDeletePath:       sharedConfig.Storage.PostPhoto.DeletePath,
 		PhotoAllowedMIMETypes: sharedConfig.Storage.PostPhoto.AllowedMIMETypes,
 	}
 }

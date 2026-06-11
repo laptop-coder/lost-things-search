@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -13,6 +14,7 @@ type PostModeration struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 
 	Status           string     `gorm:"type:varchar(50)"`
 	ModeratorType    string     `gorm:"type:varchar(50)"`

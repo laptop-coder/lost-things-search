@@ -9,6 +9,7 @@ type Role struct {
 	ID        uint16 `gorm:"primaryKey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 	Name      string `gorm:"type:varchar(150);unique;check:length(trim(name)) >= 3"`
 
 	// many-to-many (role-to-permission)
