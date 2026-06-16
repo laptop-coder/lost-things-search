@@ -137,7 +137,7 @@ func (r *studentGroupRepository) Update(ctx context.Context, studentGroup *model
 }
 
 func (r *studentGroupRepository) Delete(ctx context.Context, id *uint16) error {
-	result := r.db.WithContext(ctx).Unscoped().Delete(&model.StudentGroup{}, *id)
+	result := r.db.WithContext(ctx).Delete(&model.StudentGroup{}, *id)
 	if result.Error != nil {
 		return fmt.Errorf("failed to delete student group with id %d: %w", *id, result.Error)
 	}

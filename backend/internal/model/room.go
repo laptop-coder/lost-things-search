@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -10,6 +11,7 @@ type Room struct {
 	ID        uint16 `gorm:"primaryKey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 	Name      string `gorm:"type:varchar(20);unique;check:length(trim(name)) >= 1"`
 	// one-to-one (room-to-teacher)
 	TeacherID *uuid.UUID `gorm:"type:uuid"`

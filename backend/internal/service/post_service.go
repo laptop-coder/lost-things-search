@@ -4,10 +4,12 @@ import (
 	"backend/internal/model"
 	"backend/internal/repository"
 	"backend/pkg/apperrors"
+	"backend/pkg/imghash"
 	"backend/pkg/logger"
 	"context"
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/valkey-io/valkey-go"
 	"golang.org/x/image/draw"
 	_ "golang.org/x/image/webp"
 	"gorm.io/gorm"
@@ -21,6 +23,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"sort"
 	"strconv"
 	"time"
 )
@@ -35,6 +38,8 @@ type PostService interface {
 	GetPosts(ctx context.Context, filter repository.PostFilter) ([]PostResponseDTO, error)
 	VerifyPost(ctx context.Context, id uuid.UUID) (*PostResponseDTO, error)
 	ReturnToOwner(ctx context.Context, id uuid.UUID) (*PostResponseDTO, error)
+	GetSimilar(ctx context.Context, dto *GetSimilarDTO) ([]PostResponseDTO, error)
+	CalcAllPhotosHashes(ctx context.Context) error
 }
 
 type CreatePostDTO struct {
@@ -61,22 +66,34 @@ type PostResponseDTO struct {
 	Author               UserResponseDTO `json:"author"`
 }
 
+type GetSimilarDTO struct {
+	ID          *uuid.UUID `json:"id,omitempty"` // to get photo
+	Name        *string    `json:"name,omitempty"`
+	Description *string    `json:"description,omitempty"`
+}
+
 type postService struct {
 	postRepo repository.PostRepository
+	hashCalc imghash.HashCalculator
 	db       *gorm.DB
+	client   valkey.Client
 	config   PostServiceConfig
 	log      logger.Logger
 }
 
 func NewPostService(
 	postRepo repository.PostRepository,
+	hashCalc imghash.HashCalculator,
 	db *gorm.DB,
+	client valkey.Client,
 	config PostServiceConfig,
 	log logger.Logger,
 ) PostService {
 	return &postService{
 		postRepo: postRepo,
+		hashCalc: hashCalc,
 		db:       db,
+		client:   client,
 		config:   config,
 		log:      log,
 	}
@@ -97,16 +114,13 @@ func (s *postService) CreatePost(ctx context.Context, dto CreatePostDTO, canVeri
 			return nil, fmt.Errorf("post photo validation failed: %w", err)
 		}
 		// Saving to storage
-		if err := s.savePostPhoto(postID, dto.Photo); err != nil {
+		if err := s.savePostPhoto(ctx, postID, dto.Photo); err != nil {
 			return nil, fmt.Errorf("failed to save post photo to storage: %w", err)
 		}
 		hasPhoto = true
 	}
 	// Automatically verify post if user has permission to verify posts
-	verified := false
-	if canVerifyPost {
-		verified = true
-	}
+	verified := canVerifyPost
 	// Creating model object
 	post := &model.Post{
 		ID:                   postID,
@@ -119,12 +133,16 @@ func (s *postService) CreatePost(ctx context.Context, dto CreatePostDTO, canVeri
 	}
 	// Transaction for creating post
 	err := s.db.Transaction(func(tx *gorm.DB) error {
-		txRepo := repository.NewPostRepository(tx, s.log)
+		txRepo := repository.NewPostRepository(tx, s.client, s.log)
 		if err := txRepo.Create(ctx, post); err != nil {
 			// Delete the saved post photo, if the transaction is rolled back
 			if hasPhoto {
-				s.removePostPhoto(postID)
+				if err := s.removePostPhoto(ctx, postID); err != nil {
+					s.log.Error("failed to create post, the transaction is rolled back, and failed to delete saved post photo", "error", err.Error())
+					return fmt.Errorf("failed to create post, the transaction is rolled back, and failed to delete saved post photo: %w", err)
+				}
 			}
+			s.log.Error("failed to create post", "error", err.Error())
 			return fmt.Errorf("failed to create post: %w", err)
 		}
 		return nil
@@ -182,10 +200,13 @@ func (s *postService) DeletePost(ctx context.Context, id uuid.UUID) error {
 	}
 	// Transaction for post deletion
 	err = s.db.Transaction(func(tx *gorm.DB) error {
-		txRepo := repository.NewPostRepository(tx, s.log)
+		txRepo := repository.NewPostRepository(tx, s.client, s.log)
 		if post.HasPhoto {
 			s.log.Info("removing post photo file...")
-			s.removePostPhoto(id)
+			if err := s.removePostPhoto(ctx, id); err != nil {
+				s.log.Error("failed to delete post photo file", "error", err.Error())
+				return fmt.Errorf("failed to delete post photo file: %w", err)
+			}
 		}
 		if err := txRepo.Delete(ctx, &id); err != nil {
 			s.log.Error("failed to delete the post")
@@ -215,7 +236,10 @@ func (s *postService) RemovePhoto(ctx context.Context, postID uuid.UUID) error {
 				return fmt.Errorf("failed to delete post photo: %w", err)
 			}
 			s.log.Info("removing post photo file...")
-			s.removePostPhoto(postID)
+			if err := s.removePostPhoto(ctx, postID); err != nil {
+				s.log.Error("failed to delete post photo file", "error", err.Error())
+				return fmt.Errorf("failed to delete post photo file: %w", err)
+			}
 		}
 		return nil
 	}); err != nil {
@@ -237,7 +261,7 @@ func (s *postService) UpdatePhoto(ctx context.Context, postID uuid.UUID, photo *
 		return err
 	}
 	// Saving new photo
-	if err := s.savePostPhoto(postID, photo); err != nil {
+	if err := s.savePostPhoto(ctx, postID, photo); err != nil {
 		s.log.Error("failed to save new photo", "error", err.Error())
 		return err
 	}
@@ -245,7 +269,10 @@ func (s *postService) UpdatePhoto(ctx context.Context, postID uuid.UUID, photo *
 	post.HasPhoto = true
 	if err := s.postRepo.Update(ctx, post); err != nil {
 		// Rollback file saving in the case of error
-		s.removePostPhoto(postID)
+		if err := s.removePostPhoto(ctx, postID); err != nil {
+			s.log.Error("failed to update post photo and failed to rollback file saving", "error", err.Error())
+			return fmt.Errorf("failed to update post photo and failed to rollback file saving: %w", err)
+		}
 		s.log.Error("failed to update post photo", "error", err.Error())
 		return fmt.Errorf("failed to update post photo: %w", err)
 	}
@@ -279,7 +306,7 @@ func (s *postService) validatePostPhoto(fileHeader *multipart.FileHeader) error 
 	return nil
 }
 
-func (s *postService) savePostPhoto(postID uuid.UUID, fileHeader *multipart.FileHeader) error {
+func (s *postService) savePostPhoto(ctx context.Context, postID uuid.UUID, fileHeader *multipart.FileHeader) error {
 	// Creating directory (if not exists)
 	if err := os.MkdirAll(s.config.PhotoUploadPath, 0755); err != nil {
 		return fmt.Errorf("failed to create upload directory for post photos: %w", err)
@@ -330,17 +357,44 @@ func (s *postService) savePostPhoto(postID uuid.UUID, fileHeader *multipart.File
 		os.Remove(filePath)
 		return fmt.Errorf("failed to encode image: %w", err)
 	}
+	// Calculate image hash
+	hash, err := s.hashCalc.PerceptualHash(dst)
+	if err != nil {
+		s.log.Error("failed to calculate image hash")
+		return fmt.Errorf("failed to calculate image hash: %w", err)
+	}
+	// Save hash
+	if err := s.postRepo.UpdatePhotoHash(ctx, postID, hash); err != nil {
+		s.log.Error("failed to save hash of the post photo", "error", err.Error())
+		return fmt.Errorf("failed to save hash of the post photo: %w", err)
+	}
 	return nil
 }
 
-func (s *postService) removePostPhoto(postID uuid.UUID) {
+func (s *postService) removePostPhoto(ctx context.Context, postID uuid.UUID) error {
+	// Remove photo (soft-delete)
+	filename := fmt.Sprintf("%s.jpeg", postID.String())
 	filePath := filepath.Join(
 		s.config.PhotoUploadPath,
-		fmt.Sprintf("%s.jpeg", postID.String()),
+		filename,
 	)
-	os.Remove(filePath)
+	fileDeletePath := filepath.Join(
+		s.config.PhotoDeletePath,
+		filename,
+	)
+	if err := os.Rename(filePath, fileDeletePath); err != nil {
+		s.log.Error("failed to move post photo to trash", "error", err.Error())
+		return fmt.Errorf("failed to move post photo to trash: %w", err)
+	}
+	// Remove photo hash
+	if err := s.postRepo.DeletePhotoHash(ctx, postID); err != nil {
+		s.log.Error("failed to delete post photo hash", "error", err.Error())
+		return fmt.Errorf("failed to delete post photo hash: %w", err)
+	}
+	return nil
 }
 
+// TODO: what is it? Does it duplicate UpdatePost?
 func (s *postService) UpdatePostPhoto(ctx context.Context, postID uuid.UUID, postPhoto *multipart.FileHeader) error {
 	post, err := s.postRepo.FindByID(ctx, &postID)
 	if err != nil {
@@ -351,14 +405,17 @@ func (s *postService) UpdatePostPhoto(ctx context.Context, postID uuid.UUID, pos
 		return err
 	}
 	// Saving the new photo
-	if err := s.savePostPhoto(postID, postPhoto); err != nil {
+	if err := s.savePostPhoto(ctx, postID, postPhoto); err != nil {
 		return err
 	}
 	// Mark existence of the photo in the database
 	post.HasPhoto = true
 	if err := s.postRepo.Update(ctx, post); err != nil {
 		// Rollback file saving in the case of error
-		s.removePostPhoto(postID)
+		if err := s.removePostPhoto(ctx, postID); err != nil {
+			s.log.Error("failed to update post photo and failed to rollback file saving", "error", err.Error())
+			return fmt.Errorf("failed to update post photo and failed to rollback file saving: %w", err)
+		}
 		return fmt.Errorf("failed to update post photo: %w", err)
 	}
 	return nil
@@ -379,7 +436,10 @@ func (s *postService) RemovePostPhoto(ctx context.Context, postID uuid.UUID) err
 				return fmt.Errorf("failed to delete post photo: %w", err)
 			}
 			s.log.Info("removing post photos...")
-			s.removePostPhoto(postID)
+			if err := s.removePostPhoto(ctx, postID); err != nil {
+				s.log.Error("failed to delete post photo", "error", err.Error())
+				return fmt.Errorf("failed to delete post photo: %w", err)
+			}
 		}
 		return nil
 	}); err != nil {
@@ -477,7 +537,7 @@ func (s *postService) ReturnToOwner(ctx context.Context, id uuid.UUID) (*PostRes
 		return nil, fmt.Errorf("failed to get post for changing thing returning status: %w", err)
 	}
 	// Check if the post verified
-	if post.Verified != true {
+	if !post.Verified {
 		s.log.Error("failed to mark thing as returned to owner for not verified post", "post id", id)
 		return nil, fmt.Errorf("failed to mark thing as returned to owner for not verified post: %w", apperrors.ErrForbidden)
 	}
@@ -494,6 +554,136 @@ func (s *postService) ReturnToOwner(ctx context.Context, id uuid.UUID) (*PostRes
 		return nil, fmt.Errorf("failed to fetch post with changed thing returning status: %w", err)
 	}
 	return PostToDTO(updatedPost), nil
+}
+
+func (s *postService) GetSimilar(ctx context.Context, dto *GetSimilarDTO) ([]PostResponseDTO, error) {
+	if dto.ID == nil && dto.Name == nil && dto.Description == nil {
+		s.log.Error("failed to get similar posts: at least one search parameter must be specified")
+		return nil, fmt.Errorf("at least one search parameter must be specified")
+	}
+	var (
+		imageMatches       []model.Post
+		nameMatches        []model.Post
+		descriptionMatches []model.Post
+		err                error
+	)
+	if dto.ID != nil {
+		// Read file
+		file, err := os.Open(filepath.Join(s.config.PhotoUploadPath, fmt.Sprintf("%s.jpeg", (*dto.ID).String())))
+		if err != nil || file == nil {
+			s.log.Error("failed to open file", "error", err.Error())
+			return nil, fmt.Errorf("failed to open file: %w", err)
+		}
+		// Decode as JPEG
+		img, err := jpeg.Decode(file)
+		if err != nil {
+			s.log.Error("failed to decode JPEG image")
+			return nil, fmt.Errorf("failed to decode JPEG image: %w", err)
+		}
+		// Calculate image hash
+		hash, err := s.hashCalc.PerceptualHash(img)
+		if err != nil {
+			s.log.Error("failed to calculate image hash")
+			return nil, fmt.Errorf("failed to calculate image hash: %w", err)
+		}
+		// Get matches
+		imageMatches, err = s.postRepo.FindSimilarByImageHashDistance(ctx, hash, 25)
+		if err != nil {
+			s.log.Error("failed to find image matches")
+			return nil, fmt.Errorf("failed to find image matches: %w", err)
+		}
+	}
+	if dto.Name != nil {
+		// Get matches
+		nameMatches, err = s.postRepo.FindSimilarByName(ctx, *dto.Name)
+		if err != nil {
+			s.log.Error("failed to find name matches")
+			return nil, fmt.Errorf("failed to find name matches: %w", err)
+		}
+	}
+	if dto.Description != nil {
+		// Get matches
+		descriptionMatches, err = s.postRepo.FindSimilarByDescription(ctx, *dto.Description)
+		if err != nil {
+			s.log.Error("failed to find description matches")
+			return nil, fmt.Errorf("failed to find description matches: %w", err)
+		}
+	}
+	// Collect all matches
+	scores := make(map[uuid.UUID]float64)
+	for _, p := range imageMatches {
+		scores[p.ID] += 0.5
+	}
+	for _, p := range nameMatches {
+		scores[p.ID] += 0.3
+	}
+	for _, p := range descriptionMatches {
+		scores[p.ID] += 0.2
+	}
+	// Sort by scores
+	type keyValue struct {
+		Key   uuid.UUID
+		Value float64
+	}
+	var sortedScores []keyValue
+	for key, value := range scores {
+		sortedScores = append(sortedScores, keyValue{key, value})
+	}
+	sort.Slice(sortedScores, func(i, j int) bool {
+		return sortedScores[i].Value > sortedScores[j].Value
+	})
+	// Get first 10 posts
+	if len(sortedScores) > 10 {
+		sortedScores = sortedScores[:10]
+	}
+	var postDTOs []PostResponseDTO
+	for _, kv := range sortedScores {
+		id := kv.Key
+		// Get post by ID
+		post, err := s.postRepo.FindByID(ctx, &id)
+		if err != nil || post == nil {
+			return nil, fmt.Errorf("failed to fetch matched post: %w", err)
+		}
+		// Convert to DTO
+		postDTOs = append(postDTOs, *PostToDTO(post))
+	}
+	s.log.Info("successfully received the list of similar posts")
+	return postDTOs, nil
+}
+
+func (s *postService) CalcAllPhotosHashes(ctx context.Context) error {
+	// Get photos for which to calculate hashes
+	photoIDs, err := s.postRepo.FindPhotosWithoutHashes(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to calculate hashes of photos for all posts: %w", err)
+	}
+	// Calculate hash for each photo and save it
+	for _, id := range photoIDs {
+		// Read file
+		file, err := os.Open(filepath.Join(s.config.PhotoUploadPath, fmt.Sprintf("%s.jpeg", id.String())))
+		if err != nil || file == nil {
+			s.log.Error("failed to open file", "error", err.Error())
+			return fmt.Errorf("failed to open file: %w", err)
+		}
+		// Decode as JPEG
+		img, err := jpeg.Decode(file)
+		if err != nil {
+			s.log.Error("failed to decode JPEG image")
+			return fmt.Errorf("failed to decode JPEG image: %w", err)
+		}
+		// Calculate image hash
+		hash, err := s.hashCalc.PerceptualHash(img)
+		if err != nil {
+			s.log.Error("failed to calculate image hash")
+			return fmt.Errorf("failed to calculate image hash: %w", err)
+		}
+		// Save it
+		if err := s.postRepo.UpdatePhotoHash(ctx, id, hash); err != nil {
+			s.log.Error("failed to save hash of the post photo", "error", err.Error())
+			return fmt.Errorf("failed to save hash of the post photo: %w", err)
+		}
+	}
+	return nil
 }
 
 func (s *postService) validateCreatePostDTO(dto *CreatePostDTO) error {

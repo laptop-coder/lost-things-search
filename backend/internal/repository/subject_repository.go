@@ -112,7 +112,7 @@ func (r *subjectRepository) Update(ctx context.Context, subject *model.Subject) 
 }
 
 func (r *subjectRepository) Delete(ctx context.Context, id *uint16) error {
-	result := r.db.WithContext(ctx).Unscoped().Delete(&model.Subject{}, *id)
+	result := r.db.WithContext(ctx).Delete(&model.Subject{}, *id)
 	if result.Error != nil {
 		return fmt.Errorf("failed to delete subject with id %d: %w", *id, result.Error)
 	}

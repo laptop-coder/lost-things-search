@@ -92,7 +92,7 @@ func (r *permissionRepository) Update(ctx context.Context, permission *model.Per
 }
 
 func (r *permissionRepository) Delete(ctx context.Context, id *uint16) error {
-	result := r.db.WithContext(ctx).Unscoped().Delete(&model.Permission{}, *id)
+	result := r.db.WithContext(ctx).Delete(&model.Permission{}, *id)
 	if result.Error != nil {
 		return fmt.Errorf("failed to delete permission with id %d: %w", *id, result.Error)
 	}

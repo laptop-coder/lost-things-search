@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -12,6 +13,7 @@ type Post struct {
 	ID          uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+	DeletedAt gorm.DeletedAt
 	Name        string `gorm:"type:varchar(50);check:length(trim(name)) >= 2"`
 	Description string `gorm:"type:varchar(1000)"`
 	// was the post verified by moderator (user with the role of service
@@ -23,4 +25,6 @@ type Post struct {
 	HasPhoto bool      `gorm:"type:boolean;default:false"`
 	AuthorID uuid.UUID `gorm:"type:uuid"`
 	Author   User      `gorm:"foreignKey:AuthorID;references:ID"`
+	// one-to-one (post-to-post_moderation)
+	PostModeration PostModeration `gorm:"foreignKey:PostID;references:ID;constraint:OnDelete:cascade,OnUpdate:restrict"`
 }

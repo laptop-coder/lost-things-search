@@ -15,6 +15,7 @@ type Teacher struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 
 	// 1. Classroom may not be specified
 	// 2. Unbind classroom after teacher remove

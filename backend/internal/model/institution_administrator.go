@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -14,6 +15,7 @@ type InstitutionAdministrator struct {
 
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 
 	PositionID uint16
 	Position   InstitutionAdministratorPosition `gorm:"foreignKey:PositionID;references:ID"`

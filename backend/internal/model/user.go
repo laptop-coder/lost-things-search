@@ -13,6 +13,7 @@ type User struct {
 	ID        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 	// Email will be used as login
 	Email string `gorm:"type:varchar(320);unique;check:length(trim(email)) >= 5 and email like '_%@_%._%'"`
 	// 60 bytes is the bcrypt hash length

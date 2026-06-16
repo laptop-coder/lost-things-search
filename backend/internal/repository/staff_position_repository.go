@@ -111,7 +111,7 @@ func (r *staffPositionRepository) Update(ctx context.Context, staffPosition *mod
 }
 
 func (r *staffPositionRepository) Delete(ctx context.Context, id *uint16) error {
-	result := r.db.WithContext(ctx).Unscoped().Delete(&model.StaffPosition{}, *id)
+	result := r.db.WithContext(ctx).Delete(&model.StaffPosition{}, *id)
 	if result.Error != nil {
 		return fmt.Errorf("failed to delete staffPosition with id %d: %w", *id, result.Error)
 	}

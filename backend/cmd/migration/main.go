@@ -5,8 +5,14 @@ import (
 	"backend/internal/database"
 	"backend/internal/model"
 	"backend/internal/permissions"
+	"backend/internal/repository"
+	"backend/internal/service"
+	"backend/internal/valkey"
 	"backend/pkg/env"
+	"backend/pkg/imghash"
 	"backend/pkg/logger"
+	"context"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -19,6 +25,7 @@ func main() {
 	log.Info("MIGRATION | Loading configurations...")
 	appMode := config.ParseAppMode(env.GetStringRequired("APP_MODE"))
 	appConfig := config.LoadAppConfig(appMode)
+	sharedConfig := config.LoadSharedConfig()
 
 	// Database
 	log.Info("MIGRATION | Initializing database...")
@@ -41,10 +48,30 @@ func main() {
 	)
 	if err != nil {
 		log.Error("MIGRATION | Cannot initialize database")
-		panic("Cannot initialize database")
+		panic("MIGRATION | Cannot initialize database")
 	}
 	defer database.Close(db)
 	log.Info("MIGRATION | Database connected successfully")
+
+	// Valkey
+	log.Info("MIGRATION | Initializing Valkey...")
+	businessClient := valkey.NewClient(valkey.ClientDBs.Business, log)
+	defer valkey.Close(businessClient)
+	log.Info("MIGRATION | Valkey client(-s) connected successfully")
+
+	// Packages (pkg)
+	log.Info("MIGRATION | Initializing packages (pkg)...")
+	hashCalc := imghash.NewHashCalculator()
+
+	// Repositories
+	log.Info("MIGRATION | Initializing repositories...")
+	postRepo := repository.NewPostRepository(db, businessClient, log)
+
+	// Services
+	log.Info("MIGRATION | Creating service configurations...")
+	serviceConfigs := config.NewServiceConfigs(sharedConfig, appConfig)
+	log.Info("MIGRATION | Initializing services...")
+	postService := service.NewPostService(postRepo, hashCalc, db, businessClient, serviceConfigs.Post, log)
 
 	if err := database.Migrate(
 		db,
@@ -68,7 +95,7 @@ func main() {
 		},
 	); err != nil {
 		log.Error("MIGRATION | Cannot make migration", "error", err.Error())
-		panic(err)
+		panic(fmt.Errorf("MIGRATION | %w", err))
 	}
 
 	// Add constraints (e.g., foreign key ON DELETE)
@@ -88,7 +115,7 @@ func main() {
 		return nil
 	}); err != nil {
 		log.Error("MIGRATION | Cannot add constraints")
-		panic("Cannot add constraints")
+		panic("MIGRATION | Cannot add constraints")
 	}
 
 	// Create roles
@@ -104,7 +131,7 @@ func main() {
 	for _, role := range roles {
 		if err := db.FirstOrCreate(&role, model.Role{ID: role.ID}).Error; err != nil {
 			log.Error("MIGRATION | Failed to create roles", "error", err.Error())
-			panic(err)
+			panic(fmt.Errorf("MIGRATION | %w", err))
 		}
 	}
 	log.Info("MIGRATION | Roles created successfully")
@@ -215,7 +242,7 @@ func main() {
 	for _, permission := range permissions {
 		if err := db.FirstOrCreate(&permission, model.Permission{ID: permission.ID}).Error; err != nil {
 			log.Error("MIGRATION | Failed to create permissions", "error", err.Error())
-			panic(err)
+			panic(fmt.Errorf("MIGRATION | %w", err))
 		}
 	}
 	log.Info("MIGRATION | Permissions created successfully")
@@ -257,7 +284,7 @@ func main() {
 		ON CONFLICT DO NOTHING;
 		`, name).Error; err != nil {
 			log.Error("MIGRATION | Failed to assign permissions to superadmin role", "error", err.Error())
-			panic(err)
+			panic(fmt.Errorf("MIGRATION | %w", err))
 		}
 	}
 
@@ -268,7 +295,7 @@ func main() {
 		ON CONFLICT DO NOTHING;
 		`, name).Error; err != nil {
 			log.Error("MIGRATION | Failed to assign permissions to admin role", "error", err.Error())
-			panic(err)
+			panic(fmt.Errorf("MIGRATION | %w", err))
 		}
 	}
 
@@ -279,7 +306,7 @@ func main() {
 		ON CONFLICT DO NOTHING;
 		`, name).Error; err != nil {
 			log.Error("MIGRATION | Failed to assign permissions to institution administrator role", "error", err.Error())
-			panic(err)
+			panic(fmt.Errorf("MIGRATION | %w", err))
 		}
 	}
 
@@ -290,7 +317,7 @@ func main() {
 		ON CONFLICT DO NOTHING;
 		`, name).Error; err != nil {
 			log.Error("MIGRATION | Failed to assign permissions to staff role", "error", err.Error())
-			panic(err)
+			panic(fmt.Errorf("MIGRATION | %w", err))
 		}
 	}
 
@@ -301,7 +328,7 @@ func main() {
 		ON CONFLICT DO NOTHING;
 		`, name).Error; err != nil {
 			log.Error("MIGRATION | Failed to assign permissions to teacher role", "error", err.Error())
-			panic(err)
+			panic(fmt.Errorf("MIGRATION | %w", err))
 		}
 	}
 
@@ -312,7 +339,7 @@ func main() {
 		ON CONFLICT DO NOTHING;
 		`, name).Error; err != nil {
 			log.Error("MIGRATION | Failed to assign permissions to parent role", "error", err.Error())
-			panic(err)
+			panic(fmt.Errorf("MIGRATION | %w", err))
 		}
 	}
 
@@ -323,7 +350,17 @@ func main() {
 		ON CONFLICT DO NOTHING;
 		`, name).Error; err != nil {
 			log.Error("MIGRATION | Failed to assign permissions to student role", "error", err.Error())
-			panic(err)
+			panic(fmt.Errorf("MIGRATION | %w", err))
 		}
+	}
+
+	// Set up pg_trgm
+	db.Exec("CREATE EXTENSION IF NOT EXISTS pg_trgm")
+	db.Exec("CREATE INDEX IF NOT EXISTS idx_name_trgm ON posts USING GIN (name gin_trgm_ops)")
+	db.Exec("CREATE INDEX IF NOT EXISTS idx_desc_trgm ON posts USING GIN (description gin_trgm_ops)")
+
+	// Calculate perceptual hashes for all saved posts photos
+	if err := postService.CalcAllPhotosHashes(context.Background()); err != nil {
+		panic(fmt.Errorf("MIGRATION | %w", err))
 	}
 }

@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -11,6 +12,7 @@ type StudentGroup struct {
 	ID        uint16 `gorm:"primaryKey"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	DeletedAt gorm.DeletedAt
 	Name      string `gorm:"type:varchar(20);unique;check:length(trim(name)) >= 1"`
 
 	GroupAdvisorID *uuid.UUID `gorm:"type:uuid;default:null"`

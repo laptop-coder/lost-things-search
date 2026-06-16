@@ -9,6 +9,7 @@ import (
 	"backend/internal/service"
 	"backend/internal/valkey"
 	"backend/pkg/env"
+	"backend/pkg/imghash"
 	"backend/pkg/logger"
 	"backend/pkg/middleware"
 	"context"
@@ -47,7 +48,7 @@ func main() {
 			}(),
 			TimeZone: env.GetStringRequired("POSTGRES_TIME_ZONE"),
 			User:     env.GetStringRequired("POSTGRES_USER"),
-			AppMode: appConfig.AppMode,
+			AppMode:  appConfig.AppMode,
 		},
 	)
 	if err != nil {
@@ -65,12 +66,16 @@ func main() {
 	defer valkey.Close(businessClient)
 	log.Info("Valkey client(-s) connected successfully")
 
+	// Packages (pkg)
+	log.Info("Initializing packages (pkg)...")
+	hashCalc := imghash.NewHashCalculator()
+
 	// Repositories
 	log.Info("Initializing repositories...")
 	userRepo := repository.NewUserRepository(db, log)
 	jwtRepo := repository.NewJWTRepository(jwtClient, log)
 	studentGroupRepo := repository.NewStudentGroupRepository(db, log)
-	postRepo := repository.NewPostRepository(db, log)
+	postRepo := repository.NewPostRepository(db, businessClient, log)
 	msgRepo := repository.NewMessageRepository(db, log)
 	convRepo := repository.NewConversationRepository(db, log)
 	roomRepo := repository.NewRoomRepository(db, log)
@@ -89,9 +94,12 @@ func main() {
 	serviceConfigs := config.NewServiceConfigs(sharedConfig, appConfig)
 	log.Info("Initializing services...")
 	emailService, err := service.NewEmailService(serviceConfigs.Email, log)
+	if err != nil {
+		panic(err)
+	}
 	authService := service.NewAuthService(emailService, userRepo, jwtRepo, db, businessClient, serviceConfigs.Auth, log)
 	userService := service.NewUserService(userRepo, studentRepo, roomRepo, db, serviceConfigs.User, log)
-	postService := service.NewPostService(postRepo, db, serviceConfigs.Post, log)
+	postService := service.NewPostService(postRepo, hashCalc, db, businessClient, serviceConfigs.Post, log)
 	conversationService := service.NewConversationService(convRepo, msgRepo, postRepo, userRepo, emailService, db, log)
 	studentGroupService := service.NewStudentGroupService(userRepo, studentGroupRepo, db, log)
 	roomService := service.NewRoomService(roomRepo, db, log)

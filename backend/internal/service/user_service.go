@@ -190,7 +190,10 @@ func (s *userService) CreateUser(ctx context.Context, createUserDTO CreateUserDT
 		if err := txRepo.Create(ctx, user); err != nil {
 			// Delete the saved avatar, if the transaction is rolled back
 			if hasAvatar {
-				s.removeAvatarFile(userID)
+				if err := s.removeAvatarFile(userID); err != nil {
+					s.log.Error("failed to create the user, the transaction is rolled back, and failed to delete saved avatar", "error", err.Error())
+					return fmt.Errorf("failed to create the user, the transaction is rolled back, and failed to delete saved avatar: %w", err)
+				}
 			}
 			s.log.Error("failed to create user", "error", err.Error())
 			return fmt.Errorf("failed to create user: %w", err)
@@ -268,7 +271,10 @@ func (s *userService) DeleteUser(ctx context.Context, id uuid.UUID) error {
 		txRepo := repository.NewUserRepository(tx, s.log)
 		if user.HasAvatar {
 			s.log.Info("Removing user avatar file...")
-			s.removeAvatarFile(id)
+			if err := s.removeAvatarFile(id); err != nil {
+				s.log.Error("Failed to delete user avatar file...", "error", err.Error())
+				return fmt.Errorf("failed to delete user avatar file: %w", err)
+			}
 		}
 		if err := txRepo.Delete(ctx, &id); err != nil {
 			s.log.Error("failed to delete the user")
@@ -616,12 +622,21 @@ func (s *userService) saveAvatarFile(userID uuid.UUID, fileHeader *multipart.Fil
 	return nil
 }
 
-func (s *userService) removeAvatarFile(userID uuid.UUID) {
+func (s *userService) removeAvatarFile(userID uuid.UUID) error {
+	filename := fmt.Sprintf("%s.jpeg", userID.String())
 	filePath := filepath.Join(
 		s.config.AvatarUploadPath,
-		fmt.Sprintf("%s.jpeg", userID.String()),
+		filename,
 	)
-	os.Remove(filePath)
+	fileDeletePath := filepath.Join(
+		s.config.AvatarDeletePath,
+		filename,
+	)
+	if err := os.Rename(filePath, fileDeletePath); err != nil {
+		s.log.Error("failed to move avatar to trash", "error", err.Error())
+		return fmt.Errorf("failed to move avatar to trash: %w", err)
+	}
+	return nil
 }
 
 func (s *userService) UpdateAvatar(ctx context.Context, userID uuid.UUID, avatar *multipart.FileHeader) error {
@@ -641,7 +656,10 @@ func (s *userService) UpdateAvatar(ctx context.Context, userID uuid.UUID, avatar
 	user.HasAvatar = true
 	if err := s.userRepo.Update(ctx, user); err != nil {
 		// Rollback file saving in the case of error
-		s.removeAvatarFile(userID)
+		if err := s.removeAvatarFile(userID); err != nil {
+			s.log.Error("failed to update user avatar and failed to rollback file saving", "error", err.Error())
+			return fmt.Errorf("failed to update user avatar and failed to rollback file saving: %w", err)
+		}
 		return fmt.Errorf("failed to update user avatar: %w", err)
 	}
 	return nil
@@ -662,7 +680,10 @@ func (s *userService) RemoveAvatar(ctx context.Context, userID uuid.UUID) error 
 				return fmt.Errorf("failed to delete user avatar: %w", err)
 			}
 			s.log.Info("removing user avatar file...")
-			s.removeAvatarFile(userID)
+			if err := s.removeAvatarFile(userID); err != nil {
+				s.log.Error("failed to delete user avatar file", "error", err.Error())
+				return fmt.Errorf("failed to delete user avatar file: %w", err)
+			}
 		}
 		return nil
 	}); err != nil {

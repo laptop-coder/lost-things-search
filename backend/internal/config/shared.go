@@ -26,6 +26,7 @@ type SecurityConfig struct {
 
 type ImageStorageConfig struct {
 	UploadPath       string
+	DeletePath       string
 	MaxSize          int64 // in bytes
 	AllowedMIMETypes []string
 }
@@ -57,11 +58,13 @@ func LoadSharedConfig() SharedConfig {
 		Storage: StorageConfig{
 			Avatar: ImageStorageConfig{
 				UploadPath:       filepath.Join(env.GetStringRequired("PATH_TO_STORAGE"), "avatars"),
+				DeletePath:       filepath.Join(env.GetStringRequired("PATH_TO_STORAGE"), "deleted", "avatars"),
 				MaxSize:          15 * 1024 * 1024, // 15 MB
 				AllowedMIMETypes: []string{"image/jpeg", "image/png", "image/webp", "image/gif"},
 			},
 			PostPhoto: ImageStorageConfig{
 				UploadPath:       filepath.Join(env.GetStringRequired("PATH_TO_STORAGE"), "post_photos"),
+				DeletePath:       filepath.Join(env.GetStringRequired("PATH_TO_STORAGE"), "deleted", "post_photos"),
 				MaxSize:          15 * 1024 * 1024, // 15 MB
 				AllowedMIMETypes: []string{"image/jpeg", "image/png", "image/webp", "image/gif"},
 			},
