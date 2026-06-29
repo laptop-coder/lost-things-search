@@ -2,6 +2,7 @@
 package main
 
 import (
+	"fmt"
 	"backend/internal/config"
 	"backend/internal/database"
 	"backend/internal/handler"
@@ -31,6 +32,29 @@ func main() {
 	appMode := config.ParseAppMode(env.GetStringRequired("APP_MODE"))
 	appConfig := config.LoadAppConfig(appMode)
 	sharedConfig := config.LoadSharedConfig()
+
+	// Create directories
+	log.Info("Creating directories (if not exist)...")
+	if err := os.MkdirAll(sharedConfig.Storage.Avatar.UploadPath, 0755); err != nil {
+		log.Error("failed to create upload directory for avatars", "error", err.Error())
+		panic(fmt.Errorf("failed to create upload directory for avatars: %w", err))
+	}
+	log.Info("Avatars upload directory... OK")
+	if err := os.MkdirAll(sharedConfig.Storage.PostPhoto.UploadPath, 0755); err != nil {
+		log.Error("failed to create upload directory for post photos", "error", err.Error())
+		panic(fmt.Errorf("failed to create upload directory for post photos: %w", err))
+	}
+	log.Info("Post photos upload directory... OK")
+	if err := os.MkdirAll(sharedConfig.Storage.Avatar.DeletePath, 0755); err != nil {
+		log.Error("failed to create delete directory (trash) for avatars", "error", err.Error())
+		panic(fmt.Errorf("failed to create delete directory (trash) for avatars: %w", err))
+	}
+	log.Info("Avatars trash... OK")
+	if err := os.MkdirAll(sharedConfig.Storage.PostPhoto.DeletePath, 0755); err != nil {
+		log.Error("failed to create delete directory (trash) for post photos", "error", err.Error())
+		panic(fmt.Errorf("failed to create delete directory (trash) for post photos: %w", err))
+	}
+	log.Info("Post photos trash... OK")
 
 	// Database
 	log.Info("Initializing database...")
