@@ -84,38 +84,6 @@ const CreatePost = () => {
             onSubmit={handleSubmit}
             class="bg-white rounded-2xl shadow-lg p-6 space-y-5"
           >
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
-                Название *
-              </label>
-              <input
-                ref={nameInputRef}
-                type="text"
-                value={name()}
-                onInput={(e) => setName(e.currentTarget.value)}
-                placeholder="Например: синяя шапка"
-                class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                required
-              />
-              <p class="text-xs text-gray-500 mt-1">
-                Коротко опишите, что потеряли или нашли
-              </p>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
-                Описание
-              </label>
-              <textarea
-                value={description()}
-                onInput={(e) => setDescription(e.currentTarget.value)}
-                placeholder="Где и когда, особые приметы..."
-                rows={5}
-                class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition min-h-[140px] max-h-[600px]"
-              />
-              <p class="text-xs text-gray-500 mt-1">Чем подробнее, тем лучше</p>
-            </div>
-
             {/* Photo upload */}
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -159,8 +127,40 @@ const CreatePost = () => {
                 </div>
               </Show>
               <p class="text-xs text-gray-500 mt-1">
-                Вы можете добавить одно фото
+                Вы можете добавить одно фото. Если найдутся похожие объявления, они будут отображены
               </p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Название *
+              </label>
+              <input
+                ref={nameInputRef}
+                type="text"
+                value={name()}
+                onInput={(e) => setName(e.currentTarget.value)}
+                placeholder="Например: синяя шапка"
+                class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                required
+              />
+              <p class="text-xs text-gray-500 mt-1">
+                Коротко опишите, что потеряли или нашли
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Описание
+              </label>
+              <textarea
+                value={description()}
+                onInput={(e) => setDescription(e.currentTarget.value)}
+                placeholder="Где и когда, особые приметы..."
+                rows={5}
+                class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition min-h-[140px] max-h-[600px]"
+              />
+              <p class="text-xs text-gray-500 mt-1">Чем подробнее, тем лучше</p>
             </div>
 
             {error() && (
