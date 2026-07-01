@@ -1,4 +1,4 @@
-import { ConversationListItem, Conversation, Message } from "./types";
+import { ConversationListItem, Conversation, Message, Post } from "./types";
 
 const getBackendURL = () => {
   const hostname = window.location.hostname;
@@ -101,4 +101,20 @@ export const conversationApi = {
     }),
   markAsRead: (convId: string) =>
     api.patch(`/conversations/${convId}/messages/read`),
+};
+
+export const postApi = {
+  getSimilar: (
+    name: string | null,
+    description: string | null,
+    id: string | null,
+    photo: File | null,
+  ) => {
+    const formData = new FormData();
+    if (name?.trim()) formData.append("name", name);
+    if (description?.trim()) formData.append("description", description);
+    if (id?.trim()) formData.append("id", id);
+    if (photo) formData.append("photo", photo);
+    return api.post<{ posts: Post[] }>("/posts/similar", formData);
+  },
 };
