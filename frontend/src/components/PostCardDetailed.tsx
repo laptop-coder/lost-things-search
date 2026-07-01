@@ -1,7 +1,14 @@
-import { Show, createSignal, onMount, onCleanup, createEffect } from "solid-js";
+import {
+  Show,
+  createSignal,
+  onMount,
+  onCleanup,
+  createEffect,
+  Index,
+} from "solid-js";
 import type { Post } from "../lib/types";
 import { usePermissions, PERMISSIONS } from "../lib/permissions";
-import { api, conversationApi } from "../lib/api";
+import { api, conversationApi, postApi } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { formatDate } from "../lib/utils";
 import { A, useNavigate } from "@solidjs/router";
@@ -22,6 +29,7 @@ const PostCardDetailed = (props: Props) => {
   const [contactMessage, setContactMessage] = createSignal("");
   const [showModal, setShowModal] = createSignal(false);
   const navigate = useNavigate();
+  const [similarPosts, setSimilarPosts] = createSignal<Post[]>([]);
 
   const openModal = async () => {
     setShowModal(true);
@@ -46,6 +54,15 @@ const PostCardDetailed = (props: Props) => {
     onCleanup(() => {
       window.removeEventListener("keydown", handleKeyDown);
     });
+
+    postApi
+      .getSimilar(
+        props.post.name,
+        props.post.description ?? null,
+        props.post.id,
+        null,
+      )
+      .then((r) => setSimilarPosts(r.posts));
   });
 
   const contactAuthor = async () => {
@@ -203,6 +220,33 @@ const PostCardDetailed = (props: Props) => {
               <p class="mt-2 text-sm text-gray-600 whitespace-pre-wrap">
                 {props.post.description}
               </p>
+            </Show>
+
+            <Show when={similarPosts()?.length > 0}>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Похожие объявления
+                </label>
+                <div class="flex gap-3 overflow-x-auto">
+                  <Index each={similarPosts()}>
+                    {(post) => (
+                      <A
+                        class="flex aspect-square h-30 rounded-xl cursor-pointer"
+                        target="_blank"
+                        href={`/posts/${post().id}`}
+                      >
+                        <Show when={post().hasPhoto}>
+                          <img
+                            src={`/storage/storage/post_photos/${post().id}.jpeg`}
+                            alt={post().name}
+                            class="object-cover rounded-xl border-2 border-gray-300"
+                          />
+                        </Show>
+                      </A>
+                    )}
+                  </Index>
+                </div>
+              </div>
             </Show>
 
             <div class="mt-4 flex flex-col sm:flex-row justify-between gap-3">

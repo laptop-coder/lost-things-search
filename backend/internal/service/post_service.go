@@ -67,9 +67,10 @@ type PostResponseDTO struct {
 }
 
 type GetSimilarDTO struct {
-	ID          *uuid.UUID `json:"id,omitempty"` // to get photo
-	Name        *string    `json:"name,omitempty"`
-	Description *string    `json:"description,omitempty"`
+	ID          *uuid.UUID            `json:"id,omitempty"` // to get photo
+	Name        *string               `json:"name,omitempty"`
+	Description *string               `json:"description,omitempty"`
+	Photo       *multipart.FileHeader `form:"photo,omitempty"` // post photo file
 }
 
 type postService struct {
@@ -557,7 +558,7 @@ func (s *postService) ReturnToOwner(ctx context.Context, id uuid.UUID) (*PostRes
 }
 
 func (s *postService) GetSimilar(ctx context.Context, dto *GetSimilarDTO) ([]PostResponseDTO, error) {
-	if dto.ID == nil && dto.Name == nil && dto.Description == nil {
+	if dto.ID == nil && dto.Name == nil && dto.Description == nil && dto.Photo == nil {
 		s.log.Error("failed to get similar posts: at least one search parameter must be specified")
 		return nil, fmt.Errorf("at least one search parameter must be specified")
 	}
@@ -567,6 +568,7 @@ func (s *postService) GetSimilar(ctx context.Context, dto *GetSimilarDTO) ([]Pos
 		descriptionMatches []model.Post
 		err                error
 	)
+	// If post ID is passed, the photo by ID has the priority over the passed file
 	if dto.ID != nil {
 		// Read file
 		file, err := os.Open(filepath.Join(s.config.PhotoUploadPath, fmt.Sprintf("%s.jpeg", (*dto.ID).String())))
@@ -580,6 +582,37 @@ func (s *postService) GetSimilar(ctx context.Context, dto *GetSimilarDTO) ([]Pos
 			s.log.Error("failed to decode JPEG image")
 			return nil, fmt.Errorf("failed to decode JPEG image: %w", err)
 		}
+		// Calculate image hash
+		hash, err := s.hashCalc.PerceptualHash(img)
+		if err != nil {
+			s.log.Error("failed to calculate image hash")
+			return nil, fmt.Errorf("failed to calculate image hash: %w", err)
+		}
+		// Get matches
+		imageMatches, err = s.postRepo.FindSimilarByImageHashDistance(ctx, hash, 25)
+		if err != nil {
+			s.log.Error("failed to find image matches")
+			return nil, fmt.Errorf("failed to find image matches: %w", err)
+		}
+	} else if dto.Photo != nil {
+		// Check file size
+		if err := s.validatePostPhoto(dto.Photo); err != nil {
+			return nil, fmt.Errorf("failed to validate post photo: %w", err)
+		}
+		// read info
+		file, err := dto.Photo.Open()
+		if err != nil {
+			return nil, fmt.Errorf("failed to open file: %w", err)
+		}
+		defer file.Close()
+		// Decode image
+		img, format, err := image.Decode(file)
+		if err != nil {
+			s.log.Error("failed to decode image", "format", format, "error", err.Error())
+			return nil, fmt.Errorf("failed to decode image (format: %s): %w", format, err)
+		}
+		s.log.Info("decoded image (post photo)", "format", format)
+		// TODO: refactor (the code is duplicated)
 		// Calculate image hash
 		hash, err := s.hashCalc.PerceptualHash(img)
 		if err != nil {
@@ -609,9 +642,20 @@ func (s *postService) GetSimilar(ctx context.Context, dto *GetSimilarDTO) ([]Pos
 			return nil, fmt.Errorf("failed to find description matches: %w", err)
 		}
 	}
+	// Cannot compare post with itself
+	var imageMatchesFiltered []model.Post
+	if dto.ID != nil {
+		for _, p := range imageMatches {
+			if *dto.ID != p.ID {
+				imageMatchesFiltered = append(imageMatchesFiltered, p)
+			}
+		}
+	} else {
+		imageMatchesFiltered = imageMatches
+	}
 	// Collect all matches
 	scores := make(map[uuid.UUID]float64)
-	for _, p := range imageMatches {
+	for _, p := range imageMatchesFiltered {
 		scores[p.ID] += 0.5
 	}
 	for _, p := range nameMatches {

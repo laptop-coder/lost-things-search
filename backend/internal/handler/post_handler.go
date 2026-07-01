@@ -892,3 +892,68 @@ func (h *PostHandler) ReturnToOwner(w http.ResponseWriter, r *http.Request) {
 		"post": postResponse,
 	})
 }
+
+func (h *PostHandler) GetSimilar(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		helpers.MethodNotAllowedError(h.log, w)
+		return
+	}
+	r.Body = http.MaxBytesReader(w, r.Body, 15<<20) // 15 MB
+	if err := r.ParseMultipartForm(15 << 20); err != nil {
+		h.log.Error("failed to parse multipart/formdata form")
+		helpers.BadRequestError(h.log, w)
+		return
+	}
+	// All fields are optional
+	dto := service.GetSimilarDTO{}
+	// Get name
+	if nameFields := r.PostForm["name"]; len(nameFields) == 1 {
+		dto.Name = &nameFields[0]
+	} else if len(nameFields) != 0 {
+		h.log.Error("failed to parse form: too many name values")
+		helpers.TooManyFieldsError(h.log, w, "name")
+		return
+	}
+	// Get description
+	if descriptionFields := r.PostForm["description"]; len(descriptionFields) == 1 {
+		dto.Description = &descriptionFields[0]
+	} else if len(descriptionFields) != 0 {
+		h.log.Error("failed to parse form: too many description values")
+		helpers.TooManyFieldsError(h.log, w, "description")
+		return
+	}
+	// Get post ID
+	if idFields := r.PostForm["id"]; len(idFields) == 1 {
+		postID, err := uuid.Parse(idFields[0])
+		if err != nil {
+			h.log.Error("cannot convert post id to uuid")
+			helpers.BadRequestFieldError(h.log, w, "id")
+			return
+		}
+		dto.ID = &postID
+	} else if len(idFields) != 0 {
+		h.log.Error("failed to parse form: too many id values")
+		helpers.TooManyFieldsError(h.log, w, "id")
+		return
+	}
+	// Get photo file
+	formFiles := r.MultipartForm.File["photo"]
+	if len(formFiles) == 1 {
+		dto.Photo = formFiles[0]
+	} else if len(formFiles) != 0 {
+		h.log.Error("failed to parse form: too many photo files")
+		helpers.TooManyFieldsError(h.log, w, "photo")
+		return
+	}
+	// Get similar posts (if post ID is passed, the photo by ID has the priority
+	// over the passed file)
+	posts, err := h.postService.GetSimilar(r.Context(), &dto)
+	if err != nil {
+		helpers.HandleServiceError(h.log, w, fmt.Errorf("failed to get similar posts: %w", err))
+		return
+	}
+	// Return response
+	helpers.SuccessResponse(w, map[string]interface{}{
+		"posts": posts,
+	})
+}
