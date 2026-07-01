@@ -59,7 +59,7 @@ const PostCardDetailed = (props: Props) => {
       .getSimilar(
         props.post.name,
         props.post.description ?? null,
-        props.post.id,
+        props.post.hasPhoto ? props.post.id : null,
         null,
       )
       .then((r) => setSimilarPosts(r.posts));
