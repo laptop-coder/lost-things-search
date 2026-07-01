@@ -594,7 +594,7 @@ func (s *postService) GetSimilar(ctx context.Context, dto *GetSimilarDTO) ([]Pos
 			s.log.Error("failed to find image matches")
 			return nil, fmt.Errorf("failed to find image matches: %w", err)
 		}
-	} else {
+	} else if dto.Photo != nil {
 		// Check file size
 		if err := s.validatePostPhoto(dto.Photo); err != nil {
 			return nil, fmt.Errorf("failed to validate post photo: %w", err)
