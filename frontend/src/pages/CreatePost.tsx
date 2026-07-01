@@ -1,7 +1,7 @@
-import { createSignal, createEffect, Show } from "solid-js";
+import { createSignal, createEffect, Show, Index } from "solid-js";
 import { usePermissions, PERMISSIONS } from "../lib/permissions";
-import { api } from "../lib/api";
-import { useNavigate } from "@solidjs/router";
+import { postApi, api } from "../lib/api";
+import { useNavigate, A } from "@solidjs/router";
 import type { Post } from "../lib/types";
 import { X, Image } from "lucide-solid";
 
@@ -14,6 +14,7 @@ const CreatePost = () => {
   const [loading, setLoading] = createSignal(false);
   const { hasPermission } = usePermissions();
   const navigate = useNavigate();
+  const [similarPosts, setSimilarPosts] = createSignal<Post[]>([]);
 
   let nameInputRef: HTMLInputElement | undefined;
   const focusNameInput = () => {
@@ -52,9 +53,20 @@ const CreatePost = () => {
     const file = input.files?.[0];
     if (file) {
       setPhoto(file);
+      refreshSimilarPosts();
       const preview = URL.createObjectURL(file);
       setPhotoPreview(preview);
     }
+  };
+
+  const refreshSimilarPosts = () => {
+    if (name().trim() == "" && description().trim() == "" && photo() == null) {
+      setSimilarPosts([]);
+      return;
+    }
+    postApi
+      .getSimilar(name(), description(), null, photo())
+      .then((r) => setSimilarPosts(r.posts));
   };
 
   const removePhoto = () => {
@@ -63,6 +75,7 @@ const CreatePost = () => {
       URL.revokeObjectURL(photoPreview()!);
       setPhotoPreview(null);
     }
+    refreshSimilarPosts();
   };
 
   return (
@@ -127,9 +140,36 @@ const CreatePost = () => {
                 </div>
               </Show>
               <p class="text-xs text-gray-500 mt-1">
-                Вы можете добавить одно фото. Если найдутся похожие объявления, они будут отображены
+                Вы можете добавить одно фото
               </p>
             </div>
+
+            <Show when={similarPosts()?.length > 0}>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Похожие объявления
+                </label>
+                <div class="flex gap-3 overflow-x-auto">
+                  <Index each={similarPosts()}>
+                    {(post) => (
+                      <A
+                        class="flex aspect-square h-30 rounded-xl cursor-pointer"
+                        target="_blank"
+                        href={`/posts/${post().id}`}
+                      >
+                        <Show when={post().hasPhoto}>
+                          <img
+                            src={`/storage/storage/post_photos/${post().id}.jpeg`}
+                            alt={post().name}
+                            class="object-cover rounded-xl border-2 border-gray-300"
+                          />
+                        </Show>
+                      </A>
+                    )}
+                  </Index>
+                </div>
+              </div>
+            </Show>
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -139,7 +179,10 @@ const CreatePost = () => {
                 ref={nameInputRef}
                 type="text"
                 value={name()}
-                onInput={(e) => setName(e.currentTarget.value)}
+                onInput={(e) => {
+                  setName(e.currentTarget.value);
+                  refreshSimilarPosts();
+                }}
                 placeholder="Например: синяя шапка"
                 class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                 required
@@ -155,7 +198,10 @@ const CreatePost = () => {
               </label>
               <textarea
                 value={description()}
-                onInput={(e) => setDescription(e.currentTarget.value)}
+                onInput={(e) => {
+                  setDescription(e.currentTarget.value);
+                  refreshSimilarPosts();
+                }}
                 placeholder="Где и когда, особые приметы..."
                 rows={5}
                 class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition min-h-[140px] max-h-[600px]"
