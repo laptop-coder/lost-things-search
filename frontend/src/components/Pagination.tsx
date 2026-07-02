@@ -1,4 +1,5 @@
 import { Show } from "solid-js";
+import { ChevronLeft, ChevronRight } from "lucide-solid";
 
 interface PaginationProps {
   page: number;
@@ -16,7 +17,7 @@ const Pagination = (props: PaginationProps) => {
           disabled={props.page === 0}
           class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
-          ← Назад
+          <ChevronLeft /> Назад
         </button>
         <span class="text-sm text-gray-500">Страница {props.page + 1}</span>
         <button
@@ -24,7 +25,7 @@ const Pagination = (props: PaginationProps) => {
           disabled={!props.hasMore}
           class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
-          Вперёд →
+          Вперёд <ChevronRight />
         </button>
       </div>
     </Show>
