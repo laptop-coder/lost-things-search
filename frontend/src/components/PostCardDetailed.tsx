@@ -12,7 +12,7 @@ import { api, conversationApi, postApi } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { formatDate } from "../lib/utils";
 import { A, useNavigate } from "@solidjs/router";
-import { ChevronLeft } from "lucide-solid";
+import { ChevronLeft, ImageOff } from "lucide-solid";
 import { Motion, Presence } from "solid-motionone";
 
 interface Props {
@@ -56,12 +56,13 @@ const PostCardDetailed = (props: Props) => {
     });
 
     postApi
-      .getSimilar(
-        props.post.name,
-        props.post.description ?? null,
-        props.post.id,
-        null,
-      )
+      .getSimilar({
+        id: props.post.id,
+        hasPhoto: props.post.hasPhoto,
+        photo: null,
+        name: props.post.name,
+        description: props.post.description ?? null,
+      })
       .then((r) => setSimilarPosts(r.posts));
   });
 
@@ -231,16 +232,29 @@ const PostCardDetailed = (props: Props) => {
                   <Index each={similarPosts()}>
                     {(post) => (
                       <A
-                        class="flex aspect-square h-30 rounded-xl cursor-pointer"
+                        class="flex max-w-30 h-30 rounded-xl cursor-pointer relative"
                         target="_blank"
                         href={`/posts/${post().id}`}
                       >
+                        <Show when={post().thingReturnedToOwner}>
+                          <span class="absolute top-1 right-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
+                            Найдено
+                          </span>
+                        </Show>
                         <Show when={post().hasPhoto}>
                           <img
                             src={`/storage/storage/post_photos/${post().id}.jpeg`}
                             alt={post().name}
-                            class="object-cover rounded-xl border-2 border-gray-300"
+                            class="object-cover rounded-xl border-2 border-gray-300 hover:border-blue-500 transition"
                           />
+                        </Show>
+                        <Show when={!post().hasPhoto}>
+                          <div class="flex w-30 h-full justify-center items-center rounded-xl border-2 border-gray-300 hover:border-blue-500 transition flex-col gap-3 p-2">
+                            <ImageOff />
+                            <span class="truncate max-w-full">
+                              {post().name}
+                            </span>
+                          </div>
                         </Show>
                       </A>
                     )}
@@ -317,13 +331,15 @@ const PostCardDetailed = (props: Props) => {
                       Отметить найденным
                     </button>
                   )}
-                <button
-                  onClick={() => history.back()}
-                  type="button"
-                  class="w-full sm:w-auto px-3 h-10 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition font-medium cursor-pointer inline-flex items-center justify-center"
-                >
-                  <ChevronLeft /> Назад
-                </button>
+                <Show when={history.length > 1}>
+                  <button
+                    onClick={() => history.back()}
+                    type="button"
+                    class="w-full sm:w-auto px-3 h-10 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition font-medium cursor-pointer inline-flex items-center justify-center"
+                  >
+                    <ChevronLeft /> Назад
+                  </button>
+                </Show>
               </div>
             </div>
 

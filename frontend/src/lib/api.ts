@@ -104,16 +104,24 @@ export const conversationApi = {
 };
 
 export const postApi = {
-  getSimilar: (
-    name: string | null,
-    description: string | null,
-    id: string | null,
-    photo: File | null,
-  ) => {
+  getSimilar: ({
+    id,
+    hasPhoto,
+    photo,
+    name,
+    description,
+  }: {
+    id: string | null;
+    hasPhoto: boolean;
+    photo: File | null;
+    name: string | null;
+    description: string | null;
+  }) => {
     const formData = new FormData();
+    if (id?.trim()) formData.append("id", id);
+    formData.append("hasPhoto", hasPhoto.toString());
     if (name?.trim()) formData.append("name", name);
     if (description?.trim()) formData.append("description", description);
-    if (id?.trim()) formData.append("id", id);
     if (photo) formData.append("photo", photo);
     return api.post<{ posts: Post[] }>("/posts/similar", formData);
   },

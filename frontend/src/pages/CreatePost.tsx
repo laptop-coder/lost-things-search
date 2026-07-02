@@ -3,7 +3,7 @@ import { usePermissions, PERMISSIONS } from "../lib/permissions";
 import { postApi, api } from "../lib/api";
 import { useNavigate, A } from "@solidjs/router";
 import type { Post } from "../lib/types";
-import { X, Image } from "lucide-solid";
+import { X, Image, ImageOff } from "lucide-solid";
 
 const CreatePost = () => {
   const [name, setName] = createSignal("");
@@ -65,7 +65,13 @@ const CreatePost = () => {
       return;
     }
     postApi
-      .getSimilar(name(), description(), null, photo())
+      .getSimilar({
+        id: null,
+        hasPhoto: false,
+        photo: photo(),
+        name: name(),
+        description: description(),
+      })
       .then((r) => setSimilarPosts(r.posts));
   };
 
@@ -153,16 +159,29 @@ const CreatePost = () => {
                   <Index each={similarPosts()}>
                     {(post) => (
                       <A
-                        class="flex aspect-square h-30 rounded-xl cursor-pointer"
+                        class="flex max-w-30 h-30 rounded-xl cursor-pointer relative"
                         target="_blank"
                         href={`/posts/${post().id}`}
                       >
+                        <Show when={post().thingReturnedToOwner}>
+                          <span class="absolute top-1 right-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
+                            Найдено
+                          </span>
+                        </Show>
                         <Show when={post().hasPhoto}>
                           <img
                             src={`/storage/storage/post_photos/${post().id}.jpeg`}
                             alt={post().name}
-                            class="object-cover rounded-xl border-2 border-gray-300"
+                            class="object-cover rounded-xl border-2 border-gray-300 hover:border-blue-500 transition"
                           />
+                        </Show>
+                        <Show when={!post().hasPhoto}>
+                          <div class="flex w-30 h-full justify-center items-center rounded-xl border-2 border-gray-300 hover:border-blue-500 transition flex-col gap-3 p-2">
+                            <ImageOff />
+                            <span class="truncate max-w-full">
+                              {post().name}
+                            </span>
+                          </div>
                         </Show>
                       </A>
                     )}
