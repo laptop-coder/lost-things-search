@@ -50,3 +50,6 @@ make first-run
 | `down` | Stop the app |
 | `dev` | Run app in the development mode (with migrations) |
 | `help` | Display available `make` commands |
+
+## Contributing
+Please read [CONTRIBUTING.md](https://github.com/laptop-coder/lost-things-search/blob/main/CONTRIBUTING.md) before submitting a Pull Request.
