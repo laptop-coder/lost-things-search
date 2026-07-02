@@ -159,10 +159,15 @@ const CreatePost = () => {
                   <Index each={similarPosts()}>
                     {(post) => (
                       <A
-                        class="flex max-w-30 h-30 rounded-xl cursor-pointer"
+                        class="flex max-w-30 h-30 rounded-xl cursor-pointer relative"
                         target="_blank"
                         href={`/posts/${post().id}`}
                       >
+                        <Show when={post().thingReturnedToOwner}>
+                          <span class="absolute top-1 right-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
+                            Найдено
+                          </span>
+                        </Show>
                         <Show when={post().hasPhoto}>
                           <img
                             src={`/storage/storage/post_photos/${post().id}.jpeg`}
