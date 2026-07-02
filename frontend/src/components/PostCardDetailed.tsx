@@ -326,13 +326,15 @@ const PostCardDetailed = (props: Props) => {
                       Отметить найденным
                     </button>
                   )}
-                <button
-                  onClick={() => history.back()}
-                  type="button"
-                  class="w-full sm:w-auto px-3 h-10 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition font-medium cursor-pointer inline-flex items-center justify-center"
-                >
-                  <ChevronLeft /> Назад
-                </button>
+                <Show when={history.length > 1}>
+                  <button
+                    onClick={() => history.back()}
+                    type="button"
+                    class="w-full sm:w-auto px-3 h-10 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition font-medium cursor-pointer inline-flex items-center justify-center"
+                  >
+                    <ChevronLeft /> Назад
+                  </button>
+                </Show>
               </div>
             </div>
 
