@@ -133,7 +133,7 @@ func (r *postRepository) Update(ctx context.Context, post *model.Post) error {
 		return fmt.Errorf("failed to check post existence: %w", err)
 	}
 	if count == 0 {
-		return fmt.Errorf("post with id %d was not found: %w", post.ID, apperrors.ErrPostNotFound)
+		return fmt.Errorf("post with id %s was not found: %w", post.ID.String(), apperrors.ErrPostNotFound)
 	}
 	result := r.db.WithContext(ctx).Save(post)
 	if result.Error != nil {
