@@ -67,10 +67,11 @@ type PostResponseDTO struct {
 }
 
 type GetSimilarDTO struct {
-	ID          *uuid.UUID            `json:"id,omitempty"` // to get photo
+	ID          *uuid.UUID            `json:"id,omitempty"`
 	Name        *string               `json:"name,omitempty"`
 	Description *string               `json:"description,omitempty"`
 	Photo       *multipart.FileHeader `form:"photo,omitempty"` // post photo file
+	HasPhoto    bool                  `form:"hasPhoto"`
 }
 
 type postService struct {
@@ -558,9 +559,13 @@ func (s *postService) ReturnToOwner(ctx context.Context, id uuid.UUID) (*PostRes
 }
 
 func (s *postService) GetSimilar(ctx context.Context, dto *GetSimilarDTO) ([]PostResponseDTO, error) {
-	if dto.ID == nil && dto.Name == nil && dto.Description == nil && dto.Photo == nil {
+	if dto.ID == nil && dto.Name == nil && dto.Description == nil && dto.Photo == nil && !dto.HasPhoto {
 		s.log.Error("failed to get similar posts: at least one search parameter must be specified")
 		return nil, fmt.Errorf("at least one search parameter must be specified")
+	}
+	if dto.HasPhoto && dto.ID == nil {
+		s.log.Error("failed to get similar posts: the ID must be specified if HasPhoto is true")
+		return nil, fmt.Errorf("failed to get similar posts: the ID must be specified if HasPhoto is true")
 	}
 	var (
 		imageMatches       []model.Post
@@ -568,8 +573,8 @@ func (s *postService) GetSimilar(ctx context.Context, dto *GetSimilarDTO) ([]Pos
 		descriptionMatches []model.Post
 		err                error
 	)
-	// If post ID is passed, the photo by ID has the priority over the passed file
-	if dto.ID != nil {
+	// If post has photo, the photo by ID has the priority over the passed file
+	if dto.HasPhoto && dto.ID != nil {
 		// Read file
 		file, err := os.Open(filepath.Join(s.config.PhotoUploadPath, fmt.Sprintf("%s.jpeg", (*dto.ID).String())))
 		if err != nil || file == nil {
@@ -642,20 +647,9 @@ func (s *postService) GetSimilar(ctx context.Context, dto *GetSimilarDTO) ([]Pos
 			return nil, fmt.Errorf("failed to find description matches: %w", err)
 		}
 	}
-	// Cannot compare post with itself
-	var imageMatchesFiltered []model.Post
-	if dto.ID != nil {
-		for _, p := range imageMatches {
-			if *dto.ID != p.ID {
-				imageMatchesFiltered = append(imageMatchesFiltered, p)
-			}
-		}
-	} else {
-		imageMatchesFiltered = imageMatches
-	}
 	// Collect all matches
 	scores := make(map[uuid.UUID]float64)
-	for _, p := range imageMatchesFiltered {
+	for _, p := range imageMatches {
 		scores[p.ID] += 0.5
 	}
 	for _, p := range nameMatches {
@@ -671,6 +665,9 @@ func (s *postService) GetSimilar(ctx context.Context, dto *GetSimilarDTO) ([]Pos
 	}
 	var sortedScores []keyValue
 	for key, value := range scores {
+		if dto.ID != nil && *dto.ID == key {
+			continue
+		}
 		sortedScores = append(sortedScores, keyValue{key, value})
 	}
 	sort.Slice(sortedScores, func(i, j int) bool {

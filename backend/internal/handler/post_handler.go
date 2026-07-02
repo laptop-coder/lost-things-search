@@ -906,6 +906,43 @@ func (h *PostHandler) GetSimilar(w http.ResponseWriter, r *http.Request) {
 	}
 	// All fields are optional
 	dto := service.GetSimilarDTO{}
+	// Get post ID
+	if idFields := r.PostForm["id"]; len(idFields) == 1 {
+		postID, err := uuid.Parse(idFields[0])
+		if err != nil {
+			h.log.Error("cannot convert post id to uuid")
+			helpers.BadRequestFieldError(h.log, w, "id")
+			return
+		}
+		dto.ID = &postID
+	} else if len(idFields) != 0 {
+		h.log.Error("failed to parse form: too many id values")
+		helpers.TooManyFieldsError(h.log, w, "id")
+		return
+	}
+	// Get hasPhoto
+	if hasPhotoFields := r.PostForm["hasPhoto"]; len(hasPhotoFields) == 1 {
+		hasPhoto, err := strconv.ParseBool(hasPhotoFields[0])
+		if err != nil {
+			h.log.Error("cannot convert hasPhoto from string to boolean")
+			helpers.BadRequestFieldError(h.log, w, "hasPhoto")
+			return
+		}
+		dto.HasPhoto = hasPhoto
+	} else {
+		h.log.Error("failed to parse form: hasPhoto must be specified exactly once")
+		helpers.FieldExactlyOneError(h.log, w, "hasPhoto")
+		return
+	}
+	// Get photo file
+	formFiles := r.MultipartForm.File["photo"]
+	if len(formFiles) == 1 {
+		dto.Photo = formFiles[0]
+	} else if len(formFiles) != 0 {
+		h.log.Error("failed to parse form: too many photo files")
+		helpers.TooManyFieldsError(h.log, w, "photo")
+		return
+	}
 	// Get name
 	if nameFields := r.PostForm["name"]; len(nameFields) == 1 {
 		dto.Name = &nameFields[0]
@@ -922,30 +959,7 @@ func (h *PostHandler) GetSimilar(w http.ResponseWriter, r *http.Request) {
 		helpers.TooManyFieldsError(h.log, w, "description")
 		return
 	}
-	// Get post ID
-	if idFields := r.PostForm["id"]; len(idFields) == 1 {
-		postID, err := uuid.Parse(idFields[0])
-		if err != nil {
-			h.log.Error("cannot convert post id to uuid")
-			helpers.BadRequestFieldError(h.log, w, "id")
-			return
-		}
-		dto.ID = &postID
-	} else if len(idFields) != 0 {
-		h.log.Error("failed to parse form: too many id values")
-		helpers.TooManyFieldsError(h.log, w, "id")
-		return
-	}
-	// Get photo file
-	formFiles := r.MultipartForm.File["photo"]
-	if len(formFiles) == 1 {
-		dto.Photo = formFiles[0]
-	} else if len(formFiles) != 0 {
-		h.log.Error("failed to parse form: too many photo files")
-		helpers.TooManyFieldsError(h.log, w, "photo")
-		return
-	}
-	// Get similar posts (if post ID is passed, the photo by ID has the priority
+	// Get similar posts (if post has photo, the photo by ID has the priority
 	// over the passed file)
 	posts, err := h.postService.GetSimilar(r.Context(), &dto)
 	if err != nil {
