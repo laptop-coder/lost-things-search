@@ -53,3 +53,24 @@ make first-run
 
 ## Contributing
 Please read [CONTRIBUTING.md](https://github.com/laptop-coder/lost-things-search/blob/main/CONTRIBUTING.md) before submitting a Pull Request.
+
+## More information
+
+### User types
+
+| Type  | Description                                |
+| ----- | ------------------------------------------ |
+| human | A regular account belonging to a person    |
+| bot   | Used to automatically moderate posts, e.g. |
+
+### Posts moderation statuses
+
+| Status        | Description                                                                                    |
+| ------------- | ---------------------------------------------------------------------------------------------- |
+| pending       | Awaiting verification                                                                          |
+| in_progress   | Currently being checked                                                                        |
+| auto_approved | Automatically approved by a bot                                                                |
+| auto_rejected | Automatically rejected by a bot                                                                |
+| approved      | Approved by a human                                                                            |
+| rejected      | Rejected by a human                                                                            |
+| needs_review  | The bot does not know whether to approve or reject the post, verification by human is required |
