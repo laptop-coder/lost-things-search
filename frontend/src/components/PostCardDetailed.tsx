@@ -6,7 +6,7 @@ import {
   createEffect,
   Index,
 } from "solid-js";
-import type { Post } from "../lib/types";
+import { type Post, PostModerationStatus } from "../lib/types";
 import { usePermissions, PERMISSIONS } from "../lib/permissions";
 import { api, conversationApi, postApi } from "../lib/api";
 import { useAuth } from "../lib/auth";
@@ -14,6 +14,7 @@ import { formatDate } from "../lib/utils";
 import { A, useNavigate } from "@solidjs/router";
 import { ChevronLeft, ImageOff } from "lucide-solid";
 import { Motion, Presence } from "solid-motionone";
+import PostStatusBadge from "./PostStatusBadge";
 
 interface Props {
   post: Post;
@@ -87,16 +88,23 @@ const PostCardDetailed = (props: Props) => {
     }
   };
 
-  const verifyPost = async () => {
+  const changePostModerationStatus = async (
+    newStatus: PostModerationStatus,
+  ) => {
     try {
       setLoading(true);
-      await api.patch<{ posts: Post[] }>(`/posts/${props.post.id}/verify`);
+      const formData = new URLSearchParams();
+      formData.append("moderationStatus", newStatus);
+      await api.patch<{ posts: Post[] }>(
+        `/posts/${props.post.id}/moderation`,
+        formData,
+      );
       props.onChange?.();
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Не удалось верифицировать объявление",
+          : "Не удалось изменить статус модерации объявления",
       );
     } finally {
       setLoading(false);
@@ -158,7 +166,7 @@ const PostCardDetailed = (props: Props) => {
       transition={{ duration: 0.2 }}
     >
       <div class="p-5 relative">
-        <div class="flex flex-col md:flex-row items-center md:items-start gap-4">
+        <div class="flex flex-col md:flex-row items-center md:items-start gap-4 mt-8 md:mt-0">
           <A
             href={`/users/${props.post.author.id}`}
             class="w-10 h-10 flex bg-gray-100 rounded-full hover:bg-gray-200 transition"
@@ -179,21 +187,10 @@ const PostCardDetailed = (props: Props) => {
                 {props.post.name}
               </h3>
               <div class="flex items-center gap-2 max-md:absolute max-md:right-4 max-md:top-4">
-                {props.post.verified ? (
-                  props.post.thingReturnedToOwner ? (
-                    <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
-                      Найдено
-                    </span>
-                  ) : (
-                    <span class="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">
-                      Не найдено
-                    </span>
-                  )
-                ) : (
-                  <span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full">
-                    На модерации
-                  </span>
-                )}
+                <PostStatusBadge
+                  moderationStatus={props.post.moderation.status}
+                  thingReturnedToOwner={props.post.thingReturnedToOwner}
+                />
               </div>
             </div>
 
@@ -237,8 +234,11 @@ const PostCardDetailed = (props: Props) => {
                         href={`/posts/${post().id}`}
                       >
                         <Show when={post().thingReturnedToOwner}>
-                          <span class="absolute top-1 right-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
-                            Найдено
+                          <span class="absolute top-[5px] right-[5px]">
+                            <PostStatusBadge
+                              moderationStatus={post().moderation.status}
+                              thingReturnedToOwner={post().thingReturnedToOwner}
+                            />
                           </span>
                         </Show>
                         <Show when={post().hasPhoto}>
@@ -268,7 +268,10 @@ const PostCardDetailed = (props: Props) => {
                 {(hasPermission(PERMISSIONS.POST_UPDATE_ANY) ||
                   (hasPermission(PERMISSIONS.POST_UPDATE_OWN) &&
                     props.post.author.id === auth.user()?.id &&
-                    !props.post.verified)) &&
+                    ![
+                      PostModerationStatus.Approved,
+                      PostModerationStatus.AutoApproved,
+                    ].includes(props.post.moderation.status))) &&
                   !props.post.thingReturnedToOwner && (
                     <button
                       onClick={() =>
@@ -307,20 +310,44 @@ const PostCardDetailed = (props: Props) => {
               </div>
               <div class="flex gap-3 flex-wrap">
                 {hasPermission(PERMISSIONS.POST_VERIFY) &&
-                  !props.post.verified && (
-                    <button
-                      onClick={verifyPost}
-                      disabled={loading()}
-                      type="button"
-                      class="w-full sm:w-auto px-3 h-10 bg-green-100 text-green-700 text-sm rounded-lg hover:bg-green-200 transition font-medium cursor-pointer"
-                    >
-                      Верифицировать
-                    </button>
+                  ![
+                    PostModerationStatus.Approved,
+                    PostModerationStatus.AutoApproved,
+                  ].includes(props.post.moderation.status) && (
+                    <>
+                      <button
+                        onClick={() =>
+                          changePostModerationStatus(
+                            PostModerationStatus.Approved,
+                          )
+                        }
+                        disabled={loading()}
+                        type="button"
+                        class="w-full sm:w-auto px-3 h-10 bg-green-100 text-green-700 text-sm rounded-lg hover:bg-green-200 transition font-medium cursor-pointer"
+                      >
+                        Опубликовать
+                      </button>
+                      <button
+                        onClick={() =>
+                          changePostModerationStatus(
+                            PostModerationStatus.Rejected,
+                          )
+                        }
+                        disabled={loading()}
+                        type="button"
+                        class="w-full sm:w-auto px-3 h-10 bg-red-100 text-red-700 text-sm rounded-lg hover:bg-red-200 transition font-medium cursor-pointer"
+                      >
+                        Отклонить
+                      </button>
+                    </>
                   )}
                 {(hasPermission(PERMISSIONS.POST_MARK_RETURNED_ANY) ||
                   (hasPermission(PERMISSIONS.POST_MARK_RETURNED_OWN) &&
                     props.post.author.id === auth.user()?.id)) &&
-                  props.post.verified &&
+                  [
+                    PostModerationStatus.Approved,
+                    PostModerationStatus.AutoApproved,
+                  ].includes(props.post.moderation.status) &&
                   !props.post.thingReturnedToOwner && (
                     <button
                       onClick={markReturned}

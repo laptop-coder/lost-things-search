@@ -58,16 +58,35 @@ export interface Permission {
   name: string;
 }
 
+export enum PostModerationStatus {
+  Pending = "pending",
+  InProgress = "in_progress",
+  AutoApproved = "auto_approved",
+  AutoRejected = "auto_rejected",
+  Approved = "approved",
+  Rejected = "rejected",
+  NeedsReview = "needs_review",
+}
+
+export interface PostModeration {
+  postId: string;
+  createdAt: string;
+  updatedAt: string;
+  status: PostModerationStatus;
+  moderatorUser?: User;
+  rejectReason?: string;
+}
+
 export interface Post {
   id: string;
   createdAt: string;
   updatedAt: string;
   name: string;
   description?: string;
-  verified: boolean;
   thingReturnedToOwner: boolean;
   hasPhoto: boolean;
   author: User;
+  moderation: PostModeration;
 }
 
 export interface Room {
@@ -75,7 +94,7 @@ export interface Room {
   createdAt: string;
   updatedAt: string;
   name: string;
-  teacherId: string | null;
+  teacherId: string | null; // TODO: maybe "?" instead of "| null"?
 }
 
 export interface Subject {

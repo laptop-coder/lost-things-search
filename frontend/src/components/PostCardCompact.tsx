@@ -1,5 +1,5 @@
 import { Show, createSignal, onMount, onCleanup, createEffect } from "solid-js";
-import type { Post } from "../lib/types";
+import { type Post, PostModerationStatus } from "../lib/types";
 import { usePermissions, PERMISSIONS } from "../lib/permissions";
 import { api, conversationApi } from "../lib/api";
 import { useAuth } from "../lib/auth";
@@ -7,6 +7,7 @@ import { formatDate } from "../lib/utils";
 import { A, useNavigate } from "@solidjs/router";
 import { ChevronRight } from "lucide-solid";
 import { Motion, Presence } from "solid-motionone";
+import PostStatusBadge from "./PostStatusBadge";
 
 interface Props {
   post: Post;
@@ -69,16 +70,23 @@ const PostCardCompact = (props: Props) => {
     }
   };
 
-  const verifyPost = async () => {
+  const changePostModerationStatus = async (
+    newStatus: PostModerationStatus,
+  ) => {
     try {
       setLoading(true);
-      await api.patch<{ posts: Post[] }>(`/posts/${props.post.id}/verify`);
+      const formData = new URLSearchParams();
+      formData.append("moderationStatus", newStatus);
+      await api.patch<{ posts: Post[] }>(
+        `/posts/${props.post.id}/moderation`,
+        formData,
+      );
       props.onChange?.();
     } catch (err) {
       setError(
         err instanceof Error
           ? err.message
-          : "Не удалось верифицировать объявление",
+          : "Не удалось изменить статус модерации объявления",
       );
     } finally {
       setLoading(false);
@@ -160,11 +168,12 @@ const PostCardCompact = (props: Props) => {
                 {props.post.name}
               </h3>
               <div class="flex items-center gap-2">
-                {props.post.thingReturnedToOwner && (
-                  <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
-                    Найдено
-                  </span>
-                )}
+                <Show when={props.post.thingReturnedToOwner}>
+                  <PostStatusBadge
+                    moderationStatus={props.post.moderation.status}
+                    thingReturnedToOwner={props.post.thingReturnedToOwner}
+                  />
+                </Show>
               </div>
             </div>
 
@@ -198,56 +207,96 @@ const PostCardCompact = (props: Props) => {
 
             <div class="mt-4 flex flex-col sm:flex-row justify-between gap-3 w-full">
               <div class="flex gap-3 flex-wrap">
-                {auth.user() &&
-                  auth.user()?.id !== props.post.author.id &&
-                  hasPermission(PERMISSIONS.CONVERSATION_MESSAGE_SEND) && (
+                <Show
+                  when={
+                    auth.user() &&
+                    auth.user()?.id !== props.post.author.id &&
+                    hasPermission(PERMISSIONS.CONVERSATION_MESSAGE_SEND)
+                  }
+                >
+                  <button
+                    onClick={openModal}
+                    disabled={contactLoading()}
+                    type="button"
+                    class="w-full sm:w-auto px-3 h-10 bg-blue-100 text-blue-700 text-sm rounded-lg hover:bg-blue-200 transition font-medium cursor-pointer"
+                  >
+                    Связаться с автором
+                  </button>
+                </Show>
+                <Show
+                  when={
+                    hasPermission(PERMISSIONS.POST_VERIFY) &&
+                    ![
+                      PostModerationStatus.Approved,
+                      PostModerationStatus.AutoApproved,
+                    ].includes(props.post.moderation.status)
+                  }
+                >
+                  <>
                     <button
-                      onClick={openModal}
-                      disabled={contactLoading()}
-                      type="button"
-                      class="w-full sm:w-auto px-3 h-10 bg-blue-100 text-blue-700 text-sm rounded-lg hover:bg-blue-200 transition font-medium cursor-pointer"
-                    >
-                      Связаться с автором
-                    </button>
-                  )}
-                {hasPermission(PERMISSIONS.POST_VERIFY) &&
-                  !props.post.verified && (
-                    <button
-                      onClick={verifyPost}
+                      onClick={() =>
+                        changePostModerationStatus(
+                          PostModerationStatus.Approved,
+                        )
+                      }
                       disabled={loading()}
                       type="button"
                       class="w-full sm:w-auto px-3 h-10 bg-green-100 text-green-700 text-sm rounded-lg hover:bg-green-200 transition font-medium cursor-pointer"
                     >
-                      Верифицировать
+                      Опубликовать
                     </button>
-                  )}
-                {(hasPermission(PERMISSIONS.POST_MARK_RETURNED_ANY) ||
-                  (hasPermission(PERMISSIONS.POST_MARK_RETURNED_OWN) &&
-                    props.post.author.id === auth.user()?.id)) &&
-                  props.post.verified &&
-                  !props.post.thingReturnedToOwner && (
                     <button
-                      onClick={markReturned}
-                      disabled={loading()}
-                      type="button"
-                      class="w-full sm:w-auto px-3 h-10 bg-green-100 text-green-700 text-sm rounded-lg hover:bg-green-200 transition font-medium cursor-pointer"
-                    >
-                      Отметить найденным
-                    </button>
-                  )}
-                {(hasPermission(PERMISSIONS.POST_DELETE_ANY) ||
-                  (hasPermission(PERMISSIONS.POST_DELETE_OWN) &&
-                    props.post.author.id === auth.user()?.id)) &&
-                  props.post.thingReturnedToOwner && (
-                    <button
-                      onClick={deletePost}
+                      onClick={() =>
+                        changePostModerationStatus(
+                          PostModerationStatus.Rejected,
+                        )
+                      }
                       disabled={loading()}
                       type="button"
                       class="w-full sm:w-auto px-3 h-10 bg-red-100 text-red-700 text-sm rounded-lg hover:bg-red-200 transition font-medium cursor-pointer"
                     >
-                      Удалить
+                      Отклонить
                     </button>
-                  )}
+                  </>
+                </Show>
+                <Show
+                  when={
+                    (hasPermission(PERMISSIONS.POST_MARK_RETURNED_ANY) ||
+                      (hasPermission(PERMISSIONS.POST_MARK_RETURNED_OWN) &&
+                        props.post.author.id === auth.user()?.id)) &&
+                    [
+                      PostModerationStatus.Approved,
+                      PostModerationStatus.AutoApproved,
+                    ].includes(props.post.moderation.status) &&
+                    !props.post.thingReturnedToOwner
+                  }
+                >
+                  <button
+                    onClick={markReturned}
+                    disabled={loading()}
+                    type="button"
+                    class="w-full sm:w-auto px-3 h-10 bg-green-100 text-green-700 text-sm rounded-lg hover:bg-green-200 transition font-medium cursor-pointer"
+                  >
+                    Отметить найденным
+                  </button>
+                </Show>
+                <Show
+                  when={
+                    (hasPermission(PERMISSIONS.POST_DELETE_ANY) ||
+                      (hasPermission(PERMISSIONS.POST_DELETE_OWN) &&
+                        props.post.author.id === auth.user()?.id)) &&
+                    props.post.thingReturnedToOwner
+                  }
+                >
+                  <button
+                    onClick={deletePost}
+                    disabled={loading()}
+                    type="button"
+                    class="w-full sm:w-auto px-3 h-10 bg-red-100 text-red-700 text-sm rounded-lg hover:bg-red-200 transition font-medium cursor-pointer"
+                  >
+                    Удалить
+                  </button>
+                </Show>
               </div>
               <div class="flex gap-3 flex-wrap">
                 <button

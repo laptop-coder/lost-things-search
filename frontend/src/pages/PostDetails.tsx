@@ -3,7 +3,7 @@ import { usePermissions, PERMISSIONS } from "../lib/permissions";
 import { api } from "../lib/api";
 import { useAuth } from "../lib/auth";
 import { useParams } from "@solidjs/router";
-import type { Post } from "../lib/types";
+import { type Post, PostModerationStatus } from "../lib/types";
 import PostCardDetailed from "../components/PostCardDetailed";
 import Skeleton from "../components/Skeleton";
 
@@ -55,7 +55,8 @@ const PostDetails = () => {
       <Show when={!loading() && post()}>
         <Show
           when={
-            post()!.verified ||
+            post()!.moderation.status === PostModerationStatus.Approved ||
+            post()!.moderation.status === PostModerationStatus.AutoApproved ||
             hasPermission(PERMISSIONS.POST_READ_ANY) ||
             (hasPermission(PERMISSIONS.POST_READ_OWN) &&
               post()!.author.id === auth.user()?.id)
