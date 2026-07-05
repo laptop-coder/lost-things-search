@@ -18,8 +18,8 @@ type PostModerationRepository interface {
 }
 
 type postModerationRepository struct {
-	db     *gorm.DB
-	log    logger.Logger
+	db  *gorm.DB
+	log logger.Logger
 }
 
 func NewPostModerationRepository(db *gorm.DB, log logger.Logger) PostModerationRepository {

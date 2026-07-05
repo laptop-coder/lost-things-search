@@ -1,8 +1,8 @@
 package model
 
 import (
-	"time"
 	"gorm.io/gorm"
+	"time"
 )
 
 type InstitutionAdministratorPosition struct {

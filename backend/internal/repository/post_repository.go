@@ -39,7 +39,7 @@ type postRepository struct {
 
 type PostFilter struct {
 	AuthorIDs            []uuid.UUID
-	ModerationStatuses     []model.ModerationStatus
+	ModerationStatuses   []model.ModerationStatus
 	ThingReturnedToOwner *bool
 	Limit                int
 	Offset               int

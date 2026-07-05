@@ -57,7 +57,7 @@ type PostModeration struct {
 	DeletedAt gorm.DeletedAt
 
 	Status        ModerationStatus `gorm:"type:varchar(50);default:pending"`
-	ModeratorID   *uuid.UUID        `gorm:"type:uuid;default:null"`
-	ModeratorUser *User             `gorm:"foreignKey:ModeratorID;references:ID"`
+	ModeratorID   *uuid.UUID       `gorm:"type:uuid;default:null"`
+	ModeratorUser *User            `gorm:"foreignKey:ModeratorID;references:ID"`
 	RejectReason  *string          `gorm:"type:varchar(100)"`
 }
