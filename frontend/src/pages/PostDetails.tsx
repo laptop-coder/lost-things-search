@@ -55,8 +55,10 @@ const PostDetails = () => {
       <Show when={!loading() && post()}>
         <Show
           when={
-            post()!.moderation.status === PostModerationStatus.Approved ||
-            post()!.moderation.status === PostModerationStatus.AutoApproved ||
+            [
+              PostModerationStatus.Approved,
+              PostModerationStatus.AutoApproved,
+            ].includes(post()!.moderation.status) ||
             hasPermission(PERMISSIONS.POST_READ_ANY) ||
             (hasPermission(PERMISSIONS.POST_READ_OWN) &&
               post()!.author.id === auth.user()?.id)

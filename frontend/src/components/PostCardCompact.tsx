@@ -226,10 +226,8 @@ const PostCardCompact = (props: Props) => {
                 <Show
                   when={
                     hasPermission(PERMISSIONS.POST_VERIFY) &&
-                    ![
-                      PostModerationStatus.Approved,
-                      PostModerationStatus.AutoApproved,
-                    ].includes(props.post.moderation.status)
+                    props.post.moderation.status ===
+                      PostModerationStatus.NeedsReview
                   }
                 >
                   <>

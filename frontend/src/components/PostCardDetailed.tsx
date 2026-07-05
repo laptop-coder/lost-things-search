@@ -268,9 +268,11 @@ const PostCardDetailed = (props: Props) => {
                 {(hasPermission(PERMISSIONS.POST_UPDATE_ANY) ||
                   (hasPermission(PERMISSIONS.POST_UPDATE_OWN) &&
                     props.post.author.id === auth.user()?.id &&
-                    ![
-                      PostModerationStatus.Approved,
-                      PostModerationStatus.AutoApproved,
+                    [
+                      PostModerationStatus.Pending,
+                      PostModerationStatus.Rejected,
+                      PostModerationStatus.AutoRejected,
+                      PostModerationStatus.NeedsReview,
                     ].includes(props.post.moderation.status))) &&
                   !props.post.thingReturnedToOwner && (
                     <button
@@ -310,10 +312,8 @@ const PostCardDetailed = (props: Props) => {
               </div>
               <div class="flex gap-3 flex-wrap">
                 {hasPermission(PERMISSIONS.POST_VERIFY) &&
-                  ![
-                    PostModerationStatus.Approved,
-                    PostModerationStatus.AutoApproved,
-                  ].includes(props.post.moderation.status) && (
+                  props.post.moderation.status ===
+                    PostModerationStatus.NeedsReview && (
                     <>
                       <button
                         onClick={() =>
