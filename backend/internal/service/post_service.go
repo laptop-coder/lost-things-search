@@ -36,7 +36,7 @@ type PostService interface {
 	UpdatePhoto(ctx context.Context, postID uuid.UUID, dto *multipart.FileHeader) error
 	GetPostByID(ctx context.Context, id uuid.UUID) (*PostResponseDTO, error)
 	GetPosts(ctx context.Context, filter repository.PostFilter) ([]PostResponseDTO, error)
-	VerifyPost(ctx context.Context, id uuid.UUID) (*PostResponseDTO, error)
+	ChangePostModerationStatus(ctx context.Context, id uuid.UUID, newStatus model.ModerationStatus, moderatorID *uuid.UUID, rejectReason *string) (*PostModerationResponseDTO, error)
 	ReturnToOwner(ctx context.Context, id uuid.UUID) (*PostResponseDTO, error)
 	GetSimilar(ctx context.Context, dto *GetSimilarDTO) ([]PostResponseDTO, error)
 	CalcAllPhotosHashes(ctx context.Context) error
@@ -55,15 +55,26 @@ type UpdatePostDTO struct {
 }
 
 type PostResponseDTO struct {
-	ID                   uuid.UUID       `json:"id"`
-	CreatedAt            string          `json:"createdAt"`
-	UpdatedAt            string          `json:"updatedAt"`
-	Name                 string          `json:"name"`
-	Description          string          `json:"description,omitempty"`
-	Verified             bool            `json:"verified"`
-	ThingReturnedToOwner bool            `json:"thingReturnedToOwner"`
-	HasPhoto             bool            `json:"hasPhoto"`
-	Author               UserResponseDTO `json:"author"`
+	ID                   uuid.UUID                 `json:"id"`
+	CreatedAt            string                    `json:"createdAt"`
+	UpdatedAt            string                    `json:"updatedAt"`
+	Name                 string                    `json:"name"`
+	Description          string                    `json:"description,omitempty"`
+	ThingReturnedToOwner bool                      `json:"thingReturnedToOwner"`
+	HasPhoto             bool                      `json:"hasPhoto"`
+	Author               UserResponseDTO           `json:"author"`
+	Moderation           PostModerationResponseDTO `json:"moderation"`
+}
+
+type PostModerationResponseDTO struct {
+	PostID    uuid.UUID `json:"postId"`
+	CreatedAt string    `json:"createdAt"`
+	UpdatedAt string    `json:"updatedAt"`
+
+	Status        model.ModerationStatus `json:"status"`
+	ModeratorID   *uuid.UUID             `json:"moderatorId,omitempty"`
+	ModeratorUser *UserResponseDTO       `json:"moderatorUser,omitempty"`
+	RejectReason  *string                `json:"rejectReason,omitempty"`
 }
 
 type GetSimilarDTO struct {
@@ -75,16 +86,18 @@ type GetSimilarDTO struct {
 }
 
 type postService struct {
-	postRepo repository.PostRepository
-	hashCalc imghash.HashCalculator
-	db       *gorm.DB
-	client   valkey.Client
-	config   PostServiceConfig
-	log      logger.Logger
+	postRepo           repository.PostRepository
+	postModerationRepo repository.PostModerationRepository
+	hashCalc           imghash.HashCalculator
+	db                 *gorm.DB
+	client             valkey.Client
+	config             PostServiceConfig
+	log                logger.Logger
 }
 
 func NewPostService(
 	postRepo repository.PostRepository,
+	postModerationRepo repository.PostModerationRepository,
 	hashCalc imghash.HashCalculator,
 	db *gorm.DB,
 	client valkey.Client,
@@ -92,12 +105,13 @@ func NewPostService(
 	log logger.Logger,
 ) PostService {
 	return &postService{
-		postRepo: postRepo,
-		hashCalc: hashCalc,
-		db:       db,
-		client:   client,
-		config:   config,
-		log:      log,
+		postRepo:           postRepo,
+		postModerationRepo: postModerationRepo,
+		hashCalc:           hashCalc,
+		db:                 db,
+		client:             client,
+		config:             config,
+		log:                log,
 	}
 }
 
@@ -121,22 +135,37 @@ func (s *postService) CreatePost(ctx context.Context, dto CreatePostDTO, canVeri
 		}
 		hasPhoto = true
 	}
-	// Automatically verify post if user has permission to verify posts
-	verified := canVerifyPost
-	// Creating model object
+	// Creating post model object
 	post := &model.Post{
 		ID:                   postID,
 		Name:                 dto.Name,
 		Description:          dto.Description,
-		Verified:             verified,
 		ThingReturnedToOwner: false,
 		HasPhoto:             hasPhoto,
 		AuthorID:             dto.AuthorID,
 	}
+	// Automatically verify post if user has permission to verify posts
+	verified := canVerifyPost
+	// Creating moderation model object
+	moderation := &model.PostModeration{
+		PostID: postID,
+		Status: func() model.ModerationStatus {
+			if verified {
+				return model.ModerationStatusApproved
+			}
+			return model.ModerationStatusPending
+		}(),
+		ModeratorID: func() *uuid.UUID {
+			if verified {
+				return &(dto.AuthorID)
+			}
+			return nil
+		}(),
+	}
 	// Transaction for creating post
 	err := s.db.Transaction(func(tx *gorm.DB) error {
-		txRepo := repository.NewPostRepository(tx, s.client, s.log)
-		if err := txRepo.Create(ctx, post); err != nil {
+		txPostRepo := repository.NewPostRepository(tx, s.client, s.log)
+		if err := txPostRepo.Create(ctx, post); err != nil {
 			// Delete the saved post photo, if the transaction is rolled back
 			if hasPhoto {
 				if err := s.removePostPhoto(ctx, postID); err != nil {
@@ -146,6 +175,11 @@ func (s *postService) CreatePost(ctx context.Context, dto CreatePostDTO, canVeri
 			}
 			s.log.Error("failed to create post", "error", err.Error())
 			return fmt.Errorf("failed to create post: %w", err)
+		}
+		txModerationRepo := repository.NewPostModerationRepository(tx, s.log)
+		if err := txModerationRepo.Create(ctx, moderation); err != nil {
+			s.log.Error("failed to create post moderation", "error", err.Error())
+			return fmt.Errorf("failed to create post moderation: %w", err)
 		}
 		return nil
 	})
@@ -468,10 +502,6 @@ func (s *postService) GetPosts(ctx context.Context, filter repository.PostFilter
 				authorIDs = append(authorIDs, id.String())
 			}
 		}
-		verified := ""
-		if filter.Verified != nil {
-			verified = strconv.FormatBool(*filter.Verified)
-		}
 		thingReturnedToOwner := ""
 		if filter.ThingReturnedToOwner != nil {
 			thingReturnedToOwner = strconv.FormatBool(*filter.ThingReturnedToOwner)
@@ -480,8 +510,8 @@ func (s *postService) GetPosts(ctx context.Context, filter repository.PostFilter
 			"failed to get posts from repository",
 			"author ids",
 			authorIDs,
-			"verified",
-			verified,
+			"moderation_statuses",
+			fmt.Sprintf("%v", filter.ModerationStatuses),
 			"thing returned to owner",
 			thingReturnedToOwner,
 			"limit",
@@ -492,9 +522,9 @@ func (s *postService) GetPosts(ctx context.Context, filter repository.PostFilter
 			err,
 		)
 		return nil, fmt.Errorf(
-			"failed to get posts from repository (author ids: %v, verified: %s, thing returned to owner: %s, limit: %d, offset: %d): %w",
+			"failed to get posts from repository (author ids: %v, moderation_statuses: %v, thing returned to owner: %s, limit: %d, offset: %d): %w",
 			authorIDs,
-			verified,
+			filter.ModerationStatuses,
 			thingReturnedToOwner,
 			filter.Limit,
 			filter.Offset,
@@ -509,27 +539,34 @@ func (s *postService) GetPosts(ctx context.Context, filter repository.PostFilter
 	return postDTOs, nil
 }
 
-func (s *postService) VerifyPost(ctx context.Context, id uuid.UUID) (*PostResponseDTO, error) {
-	// Getting existing post
-	post, err := s.postRepo.FindByID(ctx, &id)
+func (s *postService) ChangePostModerationStatus(ctx context.Context, postID uuid.UUID, newStatus model.ModerationStatus, moderatorID *uuid.UUID, rejectReason *string) (*PostModerationResponseDTO, error) {
+	// If reject reason is specified, check that new post status is "rejected"
+	if newStatus != model.ModerationStatusRejected && rejectReason != nil {
+		s.log.Error("cannot specify reject reason for not rejected post", "current_new_status", string(newStatus), "required_new_status", string(model.ModerationStatusRejected))
+		return nil, fmt.Errorf("cannot specify reject reason for not rejected post (current new status is %s, but required %s)", string(newStatus), string(model.ModerationStatusRejected)) // TODO: return Bad Request
+	}
+	// Getting existing post moderation
+	moderation, err := s.postModerationRepo.FindByID(ctx, &postID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get post for verification: %w", err)
+		return nil, fmt.Errorf("failed to get post moderation for changing moderation status: %w", err)
 	}
-	// Updating field
-	post.Verified = true
-	// Updating post in DB
-	if err := s.postRepo.Update(ctx, post); err != nil {
-		s.log.Error("failed to change post verification status")
-		return nil, fmt.Errorf("failed to change post verification status: %w", err)
+	// Updating fields
+	moderation.Status = newStatus
+	moderation.ModeratorID = moderatorID
+	moderation.RejectReason = rejectReason
+	// Updating post moderation in DB
+	if err := s.postModerationRepo.Update(ctx, moderation); err != nil {
+		s.log.Error("failed to change post moderation status")
+		return nil, fmt.Errorf("failed to change post moderation status: %w", err)
 	}
-	// Get verified post for response
-	// TODO: refactor in the whole code, maybe re-use "post" variable instead
+	// Get post moderation for response
+	// TODO: refactor in the whole code, maybe re-use "moderation" variable instead
 	//of using FindByID twice
-	verifiedPost, err := s.postRepo.FindByID(ctx, &post.ID)
+	changedModeration, err := s.postModerationRepo.FindByID(ctx, &moderation.PostID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch verified post: %w", err)
+		return nil, fmt.Errorf("failed to fetch changed post moderation: %w", err)
 	}
-	return PostToDTO(verifiedPost), nil
+	return ModerationToDTO(changedModeration), nil
 }
 
 func (s *postService) ReturnToOwner(ctx context.Context, id uuid.UUID) (*PostResponseDTO, error) {
@@ -538,10 +575,10 @@ func (s *postService) ReturnToOwner(ctx context.Context, id uuid.UUID) (*PostRes
 	if err != nil || post == nil {
 		return nil, fmt.Errorf("failed to get post for changing thing returning status: %w", err)
 	}
-	// Check if the post verified
-	if !post.Verified {
-		s.log.Error("failed to mark thing as returned to owner for not verified post", "post id", id)
-		return nil, fmt.Errorf("failed to mark thing as returned to owner for not verified post: %w", apperrors.ErrForbidden)
+	// Check if the post approved
+	if post.Moderation.Status != model.ModerationStatusAutoApproved && post.Moderation.Status != model.ModerationStatusApproved {
+		s.log.Error("failed to mark thing as returned to owner for not approved post", "post id", id)
+		return nil, fmt.Errorf("failed to mark thing as returned to owner for not approved post: %w", apperrors.ErrForbidden)
 	}
 	// Updating field
 	post.ThingReturnedToOwner = true
@@ -737,6 +774,18 @@ func (s *postService) validateUpdatePostDTO(dto *UpdatePostDTO) error {
 	return nil
 }
 
+func ModerationToDTO(moderation *model.PostModeration) *PostModerationResponseDTO {
+	return &PostModerationResponseDTO{
+		PostID:        moderation.PostID,
+		CreatedAt:     moderation.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:     moderation.UpdatedAt.Format(time.RFC3339),
+		Status:        moderation.Status,
+		ModeratorID:   moderation.ModeratorID,
+		ModeratorUser: UserToDTO(moderation.ModeratorUser),
+		RejectReason:  moderation.RejectReason,
+	}
+}
+
 func PostToDTO(post *model.Post) *PostResponseDTO {
 	return &PostResponseDTO{
 		ID:                   post.ID,
@@ -744,9 +793,9 @@ func PostToDTO(post *model.Post) *PostResponseDTO {
 		UpdatedAt:            post.UpdatedAt.Format(time.RFC3339),
 		Name:                 post.Name,
 		Description:          post.Description,
-		Verified:             post.Verified,
 		ThingReturnedToOwner: post.ThingReturnedToOwner,
 		HasPhoto:             post.HasPhoto,
 		Author:               *UserToDTO(&post.Author),
+		Moderation:           *ModerationToDTO(&post.Moderation),
 	}
 }

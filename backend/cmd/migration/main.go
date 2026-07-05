@@ -66,12 +66,13 @@ func main() {
 	// Repositories
 	log.Info("MIGRATION | Initializing repositories...")
 	postRepo := repository.NewPostRepository(db, businessClient, log)
+	postModerationRepo := repository.NewPostModerationRepository(db, log)
 
 	// Services
 	log.Info("MIGRATION | Creating service configurations...")
 	serviceConfigs := config.NewServiceConfigs(sharedConfig, appConfig)
 	log.Info("MIGRATION | Initializing services...")
-	postService := service.NewPostService(postRepo, hashCalc, db, businessClient, serviceConfigs.Post, log)
+	postService := service.NewPostService(postRepo, postModerationRepo, hashCalc, db, businessClient, serviceConfigs.Post, log)
 
 	if err := database.Migrate(
 		db,
@@ -90,6 +91,7 @@ func main() {
 			&model.Student{},
 			&model.Parent{},
 			&model.Post{},
+			&model.PostModeration{},
 			&model.Conversation{},
 			&model.Message{},
 		},

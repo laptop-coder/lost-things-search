@@ -85,7 +85,7 @@ func SetupRoutes(
 	mux.Handle("GET /api/v1/posts", authMiddleware(false)(requirePermissions(log, false, permissions.PostReadAny)(http.HandlerFunc(postHandler.GetPosts))))
 	mux.Handle("GET /api/v1/posts/{id}", authMiddleware(true)(http.HandlerFunc(postHandler.GetPostByID)))
 	mux.Handle("GET /api/v1/users/me/posts", authMiddleware(false)(requirePermissions(log, false, permissions.PostReadOwn)(http.HandlerFunc(postHandler.GetOwnPosts))))
-	mux.Handle("PATCH /api/v1/posts/{id}/verify", authMiddleware(false)(requirePermissions(log, false, permissions.PostVerify)(http.HandlerFunc(postHandler.Verify))))
+	mux.Handle("PATCH /api/v1/posts/{id}/moderation", authMiddleware(false)(requirePermissions(log, false, permissions.PostVerify)(http.HandlerFunc(postHandler.ChangeModerationStatus))))
 	mux.Handle("PATCH /api/v1/posts/{id}/return", authMiddleware(false)(requirePermissions(log, false, permissions.PostMarkReturnedAny, permissions.PostMarkReturnedOwn)(http.HandlerFunc(postHandler.ReturnToOwner))))
 	mux.Handle("POST /api/v1/posts/similar", authMiddleware(true)(http.HandlerFunc(postHandler.GetSimilar)))
 	// Rooms

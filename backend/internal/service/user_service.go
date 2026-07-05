@@ -96,6 +96,7 @@ type UserResponseDTO struct {
 	LastName   string            `json:"lastName"`
 	HasAvatar  bool              `json:"hasAvatar"`
 	Roles      []RoleResponseDTO `json:"roles"`
+	Type       model.UserType    `json:"userType"`
 }
 
 type ChangePasswordDTO struct {
@@ -183,6 +184,7 @@ func (s *userService) CreateUser(ctx context.Context, createUserDTO CreateUserDT
 		MiddleName: createUserDTO.MiddleName,
 		LastName:   createUserDTO.LastName,
 		HasAvatar:  hasAvatar,
+		Type:       model.UserTypeHuman,
 	}
 	// Transaction for creating user
 	err = s.db.Transaction(func(tx *gorm.DB) error {
@@ -733,6 +735,9 @@ func (s *userService) validateUpdateUserDTO(dto *UpdateUserDTO) error {
 }
 
 func UserToDTO(user *model.User) *UserResponseDTO {
+	if user == nil {
+		return nil
+	}
 	var roles []RoleResponseDTO
 	for _, role := range user.Roles {
 		roles = append(roles, *RoleToDTO(&role))
@@ -747,6 +752,7 @@ func UserToDTO(user *model.User) *UserResponseDTO {
 		LastName:   user.LastName,
 		HasAvatar:  user.HasAvatar,
 		Roles:      roles,
+		Type:       user.Type,
 	}
 }
 

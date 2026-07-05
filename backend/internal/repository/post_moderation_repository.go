@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/valkey-io/valkey-go"
 	"gorm.io/gorm"
 )
 
@@ -20,16 +19,15 @@ type PostModerationRepository interface {
 
 type postModerationRepository struct {
 	db     *gorm.DB
-	client valkey.Client
 	log    logger.Logger
 }
 
-func NewPostModerationRepository(db *gorm.DB, client valkey.Client, log logger.Logger) PostModerationRepository {
+func NewPostModerationRepository(db *gorm.DB, log logger.Logger) PostModerationRepository {
 	if db == nil {
 		log.Error("DB is nil")
 		panic("DB is nil")
 	}
-	return &postModerationRepository{db: db, client: client, log: log}
+	return &postModerationRepository{db: db, log: log}
 }
 
 func (r *postModerationRepository) FindByID(ctx context.Context, id *uuid.UUID) (*model.PostModeration, error) {
@@ -37,7 +35,7 @@ func (r *postModerationRepository) FindByID(ctx context.Context, id *uuid.UUID) 
 		return nil, fmt.Errorf("post id cannot be nil: %w", apperrors.ErrRequiredField)
 	}
 	var moderation model.PostModeration
-	result := r.db.WithContext(ctx).Preload("HumanModerator").Preload("HumanModerator.Roles").First(&moderation, *id)
+	result := r.db.WithContext(ctx).Preload("ModeratorUser").Preload("ModeratorUser.Roles").First(&moderation, *id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("info about post moderation by post id %s was not found: %s: %w", *id, result.Error.Error(), apperrors.ErrPostNotFound)
@@ -65,7 +63,7 @@ func (r *postModerationRepository) Update(ctx context.Context, moderation *model
 	var count int64
 	err := r.db.WithContext(ctx).
 		Model(&model.PostModeration{}).
-		Where("id = ?", moderation.PostID).
+		Where("post_id = ?", moderation.PostID).
 		Count(&count).Error
 	if err != nil {
 		return fmt.Errorf("failed to check post moderation existence: %w", err)

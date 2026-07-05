@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"backend/internal/model"
 	"backend/internal/permissions"
 	"backend/internal/repository"
 	"backend/internal/service"
@@ -12,10 +13,12 @@ import (
 	"net/http"
 	"slices"
 	"strconv"
+	"strings"
 )
 
 type PostHandler struct {
 	postService         service.PostService
+	userService         service.UserService
 	teacherService      service.TeacherService
 	parentService       service.ParentService
 	studentGroupService service.StudentGroupService
@@ -23,9 +26,10 @@ type PostHandler struct {
 	log                 logger.Logger
 }
 
-func NewPostHandler(postService service.PostService, teacherService service.TeacherService, parentService service.ParentService, studentGroupService service.StudentGroupService, studentService service.StudentService, log logger.Logger) *PostHandler {
+func NewPostHandler(postService service.PostService, userService service.UserService, teacherService service.TeacherService, parentService service.ParentService, studentGroupService service.StudentGroupService, studentService service.StudentService, log logger.Logger) *PostHandler {
 	return &PostHandler{
 		postService:         postService,
+		userService:         userService,
 		teacherService:      teacherService,
 		parentService:       parentService,
 		studentGroupService: studentGroupService,
@@ -156,9 +160,9 @@ func (h *PostHandler) Update(w http.ResponseWriter, r *http.Request) {
 			helpers.ForbiddenError(h.log, w)
 			return
 		}
-		// Forbid to edit post after verification
-		if post.Verified {
-			h.log.Error("forbidden: you cannot edit post after verification")
+		// Forbid to edit post after approving
+		if post.Moderation.Status == model.ModerationStatusApproved || post.Moderation.Status == model.ModerationStatusAutoApproved {
+			h.log.Error("forbidden: you cannot edit approved post")
 			helpers.ForbiddenError(h.log, w)
 			return
 		}
@@ -283,9 +287,9 @@ func (h *PostHandler) RemovePhoto(w http.ResponseWriter, r *http.Request) {
 			helpers.ForbiddenError(h.log, w)
 			return
 		}
-		// Forbid to remove post photo after post verification
-		if post.Verified {
-			h.log.Error("forbidden: you cannot remove photo of the verified post")
+		// Forbid to remove post photo after post approving
+		if post.Moderation.Status == model.ModerationStatusApproved || post.Moderation.Status == model.ModerationStatusAutoApproved {
+			h.log.Error("forbidden: you cannot remove photo of the approved post")
 			helpers.ForbiddenError(h.log, w)
 			return
 		}
@@ -348,9 +352,9 @@ func (h *PostHandler) UpdatePhoto(w http.ResponseWriter, r *http.Request) {
 			helpers.ForbiddenError(h.log, w)
 			return
 		}
-		// Forbid to update post photo after post verification
-		if post.Verified {
-			h.log.Error("forbidden: you cannot update photo of the verified post")
+		// Forbid to update post photo of the approved post
+		if post.Moderation.Status == model.ModerationStatusApproved || post.Moderation.Status == model.ModerationStatusAutoApproved {
+			h.log.Error("forbidden: you cannot update photo of the approved post")
 			helpers.ForbiddenError(h.log, w)
 			return
 		}
@@ -383,7 +387,7 @@ func (h *PostHandler) GetPosts(w http.ResponseWriter, r *http.Request) {
 	}
 	// Parse query parameters (for filter)
 	authorIDString := r.URL.Query().Get("authorId")
-	verifiedString := r.URL.Query().Get("verified")
+	moderationStatusStrings := r.URL.Query()["moderationStatus"]
 	thingReturnedToOwnerString := r.URL.Query().Get("thingReturnedToOwner")
 	limitString := r.URL.Query().Get("limit")
 	offsetString := r.URL.Query().Get("offset")
@@ -404,15 +408,19 @@ func (h *PostHandler) GetPosts(w http.ResponseWriter, r *http.Request) {
 		// Add to filter
 		filter.AuthorIDs = []uuid.UUID{authorID}
 	}
-	// Parse verification status if passed
-	if verifiedString != "" {
-		verified, err := strconv.ParseBool(verifiedString)
-		if err != nil {
-			h.log.Error("cannot convert verification status from string to boolean")
-			helpers.BadRequestFieldError(h.log, w, "verified")
-			return
+	// Parse moderation statuses if passed
+	if len(moderationStatusStrings) > 0 {
+		moderationStatuses := []model.ModerationStatus{}
+		for _, statusString := range moderationStatusStrings {
+			status, err := model.ParseModerationStatus(statusString)
+			if err != nil || status == nil {
+				h.log.Error("cannot parse moderation status")
+				helpers.BadRequestFieldError(h.log, w, "moderationStatus")
+				return
+			}
+			moderationStatuses = append(moderationStatuses, *status)
 		}
-		filter.Verified = &verified
+		filter.ModerationStatuses = moderationStatuses
 	}
 	// Parse thing returning to owner status if passed
 	if thingReturnedToOwnerString != "" {
@@ -498,7 +506,10 @@ func (h *PostHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
 	// 1. if post verified (public access)
 	// 2. if post was not verified, but the user is the author of this post
 	// 3. if the user is not the author of the post, but he has permission to read any post
-	if post.Verified || (slices.Contains(userPermissions, permissions.PostReadOwn) && (post.Author.ID == userID)) || slices.Contains(userPermissions, permissions.PostReadAny) {
+	if post.Moderation.Status == model.ModerationStatusApproved ||
+		post.Moderation.Status == model.ModerationStatusAutoApproved ||
+		(slices.Contains(userPermissions, permissions.PostReadOwn) && (post.Author.ID == userID)) ||
+		slices.Contains(userPermissions, permissions.PostReadAny) {
 		helpers.SuccessResponse(w, map[string]interface{}{
 			"post": post,
 		})
@@ -537,9 +548,11 @@ func (h *PostHandler) GetPostsPublic(w http.ResponseWriter, r *http.Request) {
 		// Add to filter
 		filter.AuthorIDs = []uuid.UUID{authorID}
 	}
-	// Show only verified posts
-	verified := true
-	filter.Verified = &verified
+	// Show only approved posts
+	filter.ModerationStatuses = []model.ModerationStatus{
+		model.ModerationStatusApproved,
+		model.ModerationStatusAutoApproved,
+	}
 	// Parse thing returning to owner status if passed
 	if thingReturnedToOwnerString != "" {
 		thingReturnedToOwner, err := strconv.ParseBool(thingReturnedToOwnerString)
@@ -718,7 +731,7 @@ func (h *PostHandler) GetOwnPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Parse query parameters (for filter)
-	verifiedString := r.URL.Query().Get("verified")
+	moderationStatusStrings := r.URL.Query()["moderationStatus"]
 	thingReturnedToOwnerString := r.URL.Query().Get("thingReturnedToOwner")
 	limitString := r.URL.Query().Get("limit")
 	offsetString := r.URL.Query().Get("offset")
@@ -736,15 +749,19 @@ func (h *PostHandler) GetOwnPosts(w http.ResponseWriter, r *http.Request) {
 	}
 	// Set author ID to user ID
 	filter.AuthorIDs = []uuid.UUID{userID}
-	// Parse verification status if passed
-	if verifiedString != "" {
-		verified, err := strconv.ParseBool(verifiedString)
-		if err != nil {
-			h.log.Error("cannot convert verification status from string to boolean")
-			helpers.BadRequestFieldError(h.log, w, "verified")
-			return
+	// Parse moderation statuses if passed
+	if len(moderationStatusStrings) > 0 {
+		moderationStatuses := []model.ModerationStatus{}
+		for _, statusString := range moderationStatusStrings {
+			status, err := model.ParseModerationStatus(statusString)
+			if err != nil || status == nil {
+				h.log.Error("cannot parse moderation status")
+				helpers.BadRequestFieldError(h.log, w, "moderationStatus")
+				return
+			}
+			moderationStatuses = append(moderationStatuses, *status)
 		}
-		filter.Verified = &verified
+		filter.ModerationStatuses = moderationStatuses
 	}
 	// Parse thing returning to owner status if passed
 	if thingReturnedToOwnerString != "" {
@@ -791,7 +808,7 @@ func (h *PostHandler) GetOwnPosts(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (h *PostHandler) Verify(w http.ResponseWriter, r *http.Request) {
+func (h *PostHandler) ChangeModerationStatus(w http.ResponseWriter, r *http.Request) {
 	// Check method
 	if r.Method != http.MethodPatch {
 		helpers.MethodNotAllowedError(h.log, w)
@@ -813,10 +830,53 @@ func (h *PostHandler) Verify(w http.ResponseWriter, r *http.Request) {
 		helpers.BadRequestFieldError(h.log, w, "id")
 		return
 	}
-	// Verify post
-	postResponse, err := h.postService.VerifyPost(r.Context(), postID)
+	// Get and parse new moderation status
+	moderationStatusFields := r.PostForm["moderationStatus"]
+	if len(moderationStatusFields) != 1 {
+		h.log.Error("failed to parse form: moderationStatus value must be provided exactly once")
+		helpers.FieldExactlyOneError(h.log, w, "moderationStatus")
+		return
+	}
+	moderationStatus, err := model.ParseModerationStatus(moderationStatusFields[0])
+	if err != nil || moderationStatus == nil {
+		h.log.Error("failed to parse moderation status")
+		helpers.BadRequestFieldError(h.log, w, "moderationStatus")
+		return
+	}
+	// Get reject reason
+	var rejectReason *string
+	rejectReasonFields := r.PostForm["rejectReason"]
+	if len(rejectReasonFields) > 1 {
+		h.log.Error(fmt.Sprintf("failed to parse form: too many rejectReason values (%d)", len(rejectReasonFields)))
+		helpers.TooManyFieldsError(h.log, w, "rejectReason")
+		return
+	} else if len(rejectReasonFields) != 0 && strings.TrimSpace(rejectReasonFields[0]) != "" {
+		rejectReason = &rejectReasonFields[0]
+	}
+	// Get and convert user ID
+	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	if !ok {
+		h.log.Error("failed to get userID from context and convert it to UUID")
+		helpers.InternalError(h.log, w)
+		return
+	}
+	// Get user
+	user, err := h.userService.GetUserByID(r.Context(), userID)
 	if err != nil {
-		helpers.HandleServiceError(h.log, w, fmt.Errorf("failed to change post verification status: %w", err))
+		helpers.HandleServiceError(h.log, w, fmt.Errorf("failed to get user by id from the context: %w", err))
+		return
+	}
+	// Check if user is human
+	// TODO: is it necessary? The bot cannot be logged in
+	if user.Type != model.UserTypeHuman {
+		h.log.Error("the user must be a human, but current user type is %s", string(user.Type))
+		helpers.ForbiddenError(h.log, w)
+		return
+	}
+	// Change moderation status
+	postResponse, err := h.postService.ChangePostModerationStatus(r.Context(), postID, *moderationStatus, &userID, rejectReason)
+	if err != nil {
+		helpers.HandleServiceError(h.log, w, fmt.Errorf("failed to change post moderation status: %w", err))
 		return
 	}
 	// Return response
@@ -852,9 +912,9 @@ func (h *PostHandler) ReturnToOwner(w http.ResponseWriter, r *http.Request) {
 		helpers.HandleServiceError(h.log, w, fmt.Errorf("failed to find the post by ID: %w", err))
 		return
 	}
-	// Check if the post is verified
-	if !post.Verified {
-		h.log.Error("forbidden: you cannot close unverified post")
+	// Check if the post is approved
+	if post.Moderation.Status != model.ModerationStatusApproved && post.Moderation.Status != model.ModerationStatusAutoApproved {
+		h.log.Error("forbidden: you cannot close unapproved post")
 		helpers.ForbiddenError(h.log, w)
 		return
 	}

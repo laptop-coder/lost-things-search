@@ -2,7 +2,6 @@
 package main
 
 import (
-	"fmt"
 	"backend/internal/config"
 	"backend/internal/database"
 	"backend/internal/handler"
@@ -14,6 +13,7 @@ import (
 	"backend/pkg/logger"
 	"backend/pkg/middleware"
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -100,6 +100,7 @@ func main() {
 	jwtRepo := repository.NewJWTRepository(jwtClient, log)
 	studentGroupRepo := repository.NewStudentGroupRepository(db, log)
 	postRepo := repository.NewPostRepository(db, businessClient, log)
+	postModerationRepo := repository.NewPostModerationRepository(db, log)
 	msgRepo := repository.NewMessageRepository(db, log)
 	convRepo := repository.NewConversationRepository(db, log)
 	roomRepo := repository.NewRoomRepository(db, log)
@@ -123,7 +124,7 @@ func main() {
 	}
 	authService := service.NewAuthService(emailService, userRepo, jwtRepo, db, businessClient, serviceConfigs.Auth, log)
 	userService := service.NewUserService(userRepo, studentRepo, roomRepo, db, serviceConfigs.User, log)
-	postService := service.NewPostService(postRepo, hashCalc, db, businessClient, serviceConfigs.Post, log)
+	postService := service.NewPostService(postRepo, postModerationRepo, hashCalc, db, businessClient, serviceConfigs.Post, log)
 	conversationService := service.NewConversationService(convRepo, msgRepo, postRepo, userRepo, emailService, db, log)
 	studentGroupService := service.NewStudentGroupService(userRepo, studentGroupRepo, db, log)
 	roomService := service.NewRoomService(roomRepo, db, log)
@@ -141,7 +142,7 @@ func main() {
 	log.Info("Initializing handlers...")
 	authHandler := handler.NewAuthHandler(authService, userService, inviteService, serviceConfigs.Auth, log)
 	userHandler := handler.NewUserHandler(userService, log)
-	postHandler := handler.NewPostHandler(postService, teacherService, parentService, studentGroupService, studentService, log)
+	postHandler := handler.NewPostHandler(postService, userService, teacherService, parentService, studentGroupService, studentService, log)
 	conversationHandler := handler.NewConversationHandler(conversationService, log)
 	studentGroupHandler := handler.NewStudentGroupHandler(teacherService, studentGroupService, log)
 	roomHandler := handler.NewRoomHandler(roomService, log)
