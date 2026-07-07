@@ -392,11 +392,11 @@ func main() {
 			if err != nil {
 				panic(fmt.Errorf("MIGRATION | failed to create posts moderator bot: %w", err))
 			}
+			log.Info("MIGRATION | Posts moderator bot was successfully created")
 		} else {
 			panic(fmt.Errorf("MIGRATION | failed to get posts moderator bots: %w", err))
 		}
 	} else {
 		log.Info("MIGRATION | Posts moderator bot was found")
 	}
-	log.Info("MIGRATION | Posts moderator bot was successfully created")
 }
