@@ -18,6 +18,11 @@ Lost and found service for educational institutions.
 
 **Superadmin** role is the system entrypoint. This account is created manually and there can be only one. `Superadmin` creates tokens for `admin` users registration, can assign/unassign `admin` role. In turn, **admins** manage the system (users, content). They can create tokens for all other users registration.
 
+## System roles
+| ID | Role                |
+| -- | ------------------- |
+| 8  | Bot Moderator Posts |
+
 ## Tech Stack
 
 - **Backend:** Go, GORM, PostgreSQL, Valkey

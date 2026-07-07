@@ -8,11 +8,14 @@ import (
 	"backend/internal/repository"
 	"backend/internal/service"
 	"backend/internal/valkey"
+	"backend/pkg/apperrors"
 	"backend/pkg/env"
 	"backend/pkg/imghash"
 	"backend/pkg/logger"
 	"context"
+	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -65,13 +68,17 @@ func main() {
 
 	// Repositories
 	log.Info("MIGRATION | Initializing repositories...")
+	userRepo := repository.NewUserRepository(db, log)
 	postRepo := repository.NewPostRepository(db, businessClient, log)
 	postModerationRepo := repository.NewPostModerationRepository(db, log)
+	roomRepo := repository.NewRoomRepository(db, log)
+	studentRepo := repository.NewStudentRepository(db, log)
 
 	// Services
 	log.Info("MIGRATION | Creating service configurations...")
 	serviceConfigs := config.NewServiceConfigs(sharedConfig, appConfig)
 	log.Info("MIGRATION | Initializing services...")
+	userService := service.NewUserService(userRepo, studentRepo, roomRepo, db, serviceConfigs.User, log)
 	postService := service.NewPostService(postRepo, postModerationRepo, hashCalc, db, businessClient, serviceConfigs.Post, log)
 
 	if err := database.Migrate(
@@ -129,6 +136,7 @@ func main() {
 		{ID: 5, Name: "teacher"},
 		{ID: 6, Name: "parent"},
 		{ID: 7, Name: "student"},
+		{ID: 8, Name: "bot_moderator_posts"},
 	}
 	for _, role := range roles {
 		if err := db.FirstOrCreate(&role, model.Role{ID: role.ID}).Error; err != nil {
@@ -365,4 +373,30 @@ func main() {
 	if err := postService.CalcAllPhotosHashes(context.Background()); err != nil {
 		panic(fmt.Errorf("MIGRATION | %w", err))
 	}
+
+	// Set up bots
+	log.Info("MIGRATION | Checking posts moderator bots existence...")
+	ctx := context.Background()
+	_, err = userService.GetPostsModeratorBot(ctx)
+	if err != nil {
+		if errors.Is(err, apperrors.ErrUserNotFound) {
+			log.Info("MIGRATION | No posts moderator bots found. Creating new one...")
+			createUserDTO := service.CreateUserDTO{
+				Email:     fmt.Sprintf("bot_%s@example.com", uuid.New().String()),
+				Password:  uuid.New().String(),
+				FirstName: "Posts",
+				LastName:  "Moderator",
+				RoleIDs:   []uint16{8},
+			}
+			_, err := userService.CreateBot(ctx, createUserDTO)
+			if err != nil {
+				panic(fmt.Errorf("MIGRATION | failed to create posts moderator bot: %w", err))
+			}
+		} else {
+			panic(fmt.Errorf("MIGRATION | failed to get posts moderator bots: %w", err))
+		}
+	} else {
+		log.Info("MIGRATION | Posts moderator bot was found")
+	}
+	log.Info("MIGRATION | Posts moderator bot was successfully created")
 }
