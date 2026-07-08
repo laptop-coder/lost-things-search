@@ -186,6 +186,20 @@ func (s *postService) CreatePost(ctx context.Context, dto CreatePostDTO, canVeri
 	if err != nil {
 		return nil, fmt.Errorf("transaction failed: %w", err)
 	}
+	if !verified {
+		// Add post to moderation queue
+		err = s.client.Do(
+			ctx,
+			s.client.B().
+				Rpush().
+				Key("moderation:queue").
+				Element(postID.String()).
+				Build(),
+		).Error()
+		if err != nil {
+			return nil, fmt.Errorf("failed to push post id to moderation queue: %w", err)
+		}
+	}
 	// Get created post for response
 	createdPost, err := s.postRepo.FindByID(ctx, &post.ID)
 	if err != nil {
