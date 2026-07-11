@@ -2,12 +2,14 @@
 package main
 
 import (
+	"errors"
 	"backend/internal/config"
 	"backend/internal/database"
 	"backend/internal/handler"
 	"backend/internal/repository"
 	"backend/internal/service"
 	"backend/internal/valkey"
+	valkeyGo "github.com/valkey-io/valkey-go"
 	"backend/pkg/env"
 	"backend/pkg/imghash"
 	"backend/pkg/logger"
@@ -203,6 +205,39 @@ func main() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Error("Failed to start server", "error", err.Error())
 			panic(err)
+		}
+	}()
+
+	// Moderation worker
+	go func() {
+		log.Info("starting moderation worker...")
+		for {
+			res := businessClient.Do(
+				context.Background(),
+				businessClient.
+					B().
+					Brpop().
+					Key("moderation:posts:queue").
+					Timeout(5).
+					Build(),
+			)
+			if errors.Is(res.Error(), valkeyGo.Nil) {
+				log.Info("moderation worker: there are no posts to moderate. Waiting for 30 seconds to check one more time...")
+				time.Sleep(30 * time.Second)
+				continue
+			}
+			if res.Error() != nil {
+				log.Error("moderation worker error: failed to get post to moderate from queue. Waiting for 5 seconds to retry...", "error", res.Error().Error())
+				time.Sleep(5 * time.Second)
+				continue
+			}
+			arr, err := res.AsStrSlice()
+			if err != nil {
+				log.Error("moderation worker error: failed to represent response as array. Waiting for 5 seconds to retry...")
+				time.Sleep(5 * time.Second)
+				continue
+			}
+			log.Info(fmt.Sprintf("%v", arr))
 		}
 	}()
 

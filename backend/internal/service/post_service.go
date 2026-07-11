@@ -192,7 +192,7 @@ func (s *postService) CreatePost(ctx context.Context, dto CreatePostDTO, canVeri
 			ctx,
 			s.client.B().
 				Rpush().
-				Key("moderation:queue").
+				Key("moderation:posts:queue").
 				Element(postID.String()).
 				Build(),
 		).Error()
