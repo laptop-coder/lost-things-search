@@ -5,9 +5,9 @@ import (
 	"backend/internal/permissions"
 	"backend/internal/repository"
 	"backend/internal/service"
+	"backend/pkg/appcontext"
 	"backend/pkg/helpers"
 	"backend/pkg/logger"
-	"backend/pkg/middleware"
 	"fmt"
 	"github.com/google/uuid"
 	"net/http"
@@ -62,7 +62,7 @@ func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	name := nameFields[0]
 	// Get and convert user ID
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -91,7 +91,7 @@ func (h *PostHandler) Create(w http.ResponseWriter, r *http.Request) {
 		dto.Photo = formFiles[0]
 	}
 	// Check if user can verify posts
-	userPermissions, ok := r.Context().Value(middleware.UserPermissionsKey).([]string)
+	userPermissions, ok := r.Context().Value(appcontext.UserPermissionsKey).([]string)
 	if !ok {
 		h.log.Error("failed to get user permissions from the context")
 		helpers.InternalError(h.log, w)
@@ -133,7 +133,7 @@ func (h *PostHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get user permissions
-	userPermissions, ok := r.Context().Value(middleware.UserPermissionsKey).([]string)
+	userPermissions, ok := r.Context().Value(appcontext.UserPermissionsKey).([]string)
 	if !ok {
 		h.log.Error("failed to get user permissions from the context")
 		helpers.InternalError(h.log, w)
@@ -142,7 +142,7 @@ func (h *PostHandler) Update(w http.ResponseWriter, r *http.Request) {
 	// Check if user updating his own post
 	if slices.Contains(userPermissions, permissions.PostUpdateOwn) && !slices.Contains(userPermissions, permissions.PostUpdateAny) {
 		// Get and convert user ID
-		userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+		userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 		if !ok {
 			h.log.Error("failed to get userID from context and convert it to UUID")
 			helpers.InternalError(h.log, w)
@@ -209,7 +209,7 @@ func (h *PostHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get user permissions
-	userPermissions, ok := r.Context().Value(middleware.UserPermissionsKey).([]string)
+	userPermissions, ok := r.Context().Value(appcontext.UserPermissionsKey).([]string)
 	if !ok {
 		h.log.Error("failed to get user permissions from the context")
 		helpers.InternalError(h.log, w)
@@ -218,7 +218,7 @@ func (h *PostHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	// Check if user deleting his own post
 	if slices.Contains(userPermissions, permissions.PostDeleteOwn) && !slices.Contains(userPermissions, permissions.PostDeleteAny) {
 		// Get and convert user ID
-		userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+		userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 		if !ok {
 			h.log.Error("failed to get userID from context and convert it to UUID")
 			helpers.InternalError(h.log, w)
@@ -260,7 +260,7 @@ func (h *PostHandler) RemovePhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get user permissions
-	userPermissions, ok := r.Context().Value(middleware.UserPermissionsKey).([]string)
+	userPermissions, ok := r.Context().Value(appcontext.UserPermissionsKey).([]string)
 	if !ok {
 		h.log.Error("failed to get user permissions from the context")
 		helpers.InternalError(h.log, w)
@@ -269,7 +269,7 @@ func (h *PostHandler) RemovePhoto(w http.ResponseWriter, r *http.Request) {
 	// Check if user deleting photo of his own post
 	if slices.Contains(userPermissions, permissions.PostPhotoDeleteOwn) && !slices.Contains(userPermissions, permissions.PostPhotoDeleteAny) {
 		// Get and convert user ID
-		userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+		userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 		if !ok {
 			h.log.Error("failed to get userID from context and convert it to UUID")
 			helpers.InternalError(h.log, w)
@@ -325,7 +325,7 @@ func (h *PostHandler) UpdatePhoto(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get user permissions
-	userPermissions, ok := r.Context().Value(middleware.UserPermissionsKey).([]string)
+	userPermissions, ok := r.Context().Value(appcontext.UserPermissionsKey).([]string)
 	if !ok {
 		h.log.Error("failed to get user permissions from the context")
 		helpers.InternalError(h.log, w)
@@ -334,7 +334,7 @@ func (h *PostHandler) UpdatePhoto(w http.ResponseWriter, r *http.Request) {
 	// Check if user deleting photo of his own post
 	if slices.Contains(userPermissions, permissions.PostPhotoUpdateOwn) && !slices.Contains(userPermissions, permissions.PostPhotoUpdateAny) {
 		// Get and convert user ID
-		userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+		userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 		if !ok {
 			h.log.Error("failed to get userID from context and convert it to UUID")
 			helpers.InternalError(h.log, w)
@@ -489,14 +489,14 @@ func (h *PostHandler) GetPostByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get user permissions
-	userPermissions, ok := r.Context().Value(middleware.UserPermissionsKey).([]string)
+	userPermissions, ok := r.Context().Value(appcontext.UserPermissionsKey).([]string)
 	if !ok {
 		h.log.Error("failed to get user permissions from the context")
 		helpers.InternalError(h.log, w)
 		return
 	}
 	// Get ID of the authorized user
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -564,7 +564,7 @@ func (h *PostHandler) GetPostsPublic(w http.ResponseWriter, r *http.Request) {
 		filter.ThingReturnedToOwner = &thingReturnedToOwner
 	}
 	// Get and convert user ID
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -741,7 +741,7 @@ func (h *PostHandler) GetOwnPosts(w http.ResponseWriter, r *http.Request) {
 		Offset: 0,
 	}
 	// Get and convert user ID
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -854,7 +854,7 @@ func (h *PostHandler) ChangeModerationStatus(w http.ResponseWriter, r *http.Requ
 		rejectReason = &rejectReasonFields[0]
 	}
 	// Get and convert user ID
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -919,7 +919,7 @@ func (h *PostHandler) ReturnToOwner(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get user permissions
-	userPermissions, ok := r.Context().Value(middleware.UserPermissionsKey).([]string)
+	userPermissions, ok := r.Context().Value(appcontext.UserPermissionsKey).([]string)
 	if !ok {
 		h.log.Error("failed to get user permissions from the context")
 		helpers.InternalError(h.log, w)
@@ -928,7 +928,7 @@ func (h *PostHandler) ReturnToOwner(w http.ResponseWriter, r *http.Request) {
 	// Check if user updating his own post
 	if slices.Contains(userPermissions, permissions.PostMarkReturnedOwn) && !slices.Contains(userPermissions, permissions.PostMarkReturnedAny) {
 		// Get and convert user ID
-		userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+		userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 		if !ok {
 			h.log.Error("failed to get userID from context and convert it to UUID")
 			helpers.InternalError(h.log, w)

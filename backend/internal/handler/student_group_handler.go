@@ -4,9 +4,9 @@ import (
 	"backend/internal/permissions"
 	"backend/internal/repository"
 	"backend/internal/service"
+	"backend/pkg/appcontext"
 	"backend/pkg/helpers"
 	"backend/pkg/logger"
-	"backend/pkg/middleware"
 	"fmt"
 	"github.com/google/uuid"
 	"net/http"
@@ -236,7 +236,7 @@ func (h *StudentGroupHandler) UnassignAdvisor(w http.ResponseWriter, r *http.Req
 	}
 	studentGroupID := uint16(studentGroupID64)
 	// Get user permissions
-	userPermissions, ok := r.Context().Value(middleware.UserPermissionsKey).([]string)
+	userPermissions, ok := r.Context().Value(appcontext.UserPermissionsKey).([]string)
 	if !ok {
 		h.log.Error("failed to get user permissions from the context")
 		helpers.InternalError(h.log, w)
@@ -245,7 +245,7 @@ func (h *StudentGroupHandler) UnassignAdvisor(w http.ResponseWriter, r *http.Req
 	// Check if user unassigning himself
 	if slices.Contains(userPermissions, permissions.StudentGroupAdvisorUnassignOwn) && !slices.Contains(userPermissions, permissions.StudentGroupAdvisorUnassignAny) {
 		// Get and convert user ID
-		userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+		userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 		if !ok {
 			h.log.Error("failed to get userID from context and convert it to UUID")
 			helpers.InternalError(h.log, w)

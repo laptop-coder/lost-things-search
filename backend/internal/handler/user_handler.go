@@ -4,9 +4,9 @@ import (
 	"backend/internal/permissions"
 	"backend/internal/repository"
 	"backend/internal/service"
+	"backend/pkg/appcontext"
 	"backend/pkg/helpers"
 	"backend/pkg/logger"
-	"backend/pkg/middleware"
 	"fmt"
 	"github.com/google/uuid"
 	"net/http"
@@ -41,7 +41,7 @@ func (h *UserHandler) UpdateOwnProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get and convert user ID
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -89,7 +89,7 @@ func (h *UserHandler) RemoveOwnAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get and convert user ID
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -119,7 +119,7 @@ func (h *UserHandler) UpdateOwnAvatar(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get and convert user ID
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -241,7 +241,7 @@ func (h *UserHandler) GetOwnUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get and convert user ID
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -292,7 +292,7 @@ func (h *UserHandler) GetOwnRoles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get and convert user ID
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -351,7 +351,7 @@ func (h *UserHandler) AssignRoles(w http.ResponseWriter, r *http.Request) {
 		roleIDs[i] = uint16(val)
 	}
 	// Get user permissions
-	userPermissions, ok := r.Context().Value(middleware.UserPermissionsKey).([]string)
+	userPermissions, ok := r.Context().Value(appcontext.UserPermissionsKey).([]string)
 	if !ok {
 		h.log.Error("failed to get user permissions from the context")
 		helpers.InternalError(h.log, w)
@@ -521,7 +521,7 @@ func (h *UserHandler) AssignExtensionsOwn(w http.ResponseWriter, r *http.Request
 		return
 	}
 	// Get and convert user ID
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -684,7 +684,7 @@ func (h *UserHandler) AssignNonAdminRoles(w http.ResponseWriter, r *http.Request
 		roleIDs[i] = uint16(val)
 	}
 	// Get user permissions
-	userPermissions, ok := r.Context().Value(middleware.UserPermissionsKey).([]string)
+	userPermissions, ok := r.Context().Value(appcontext.UserPermissionsKey).([]string)
 	if !ok {
 		h.log.Error("failed to get user permissions from the context")
 		helpers.InternalError(h.log, w)
@@ -863,7 +863,7 @@ func (h *UserHandler) AddRoles(w http.ResponseWriter, r *http.Request) {
 		roleIDs[i] = uint16(val)
 	}
 	// Get user permissions
-	userPermissions, ok := r.Context().Value(middleware.UserPermissionsKey).([]string)
+	userPermissions, ok := r.Context().Value(appcontext.UserPermissionsKey).([]string)
 	if !ok {
 		h.log.Error("failed to get user permissions from the context")
 		helpers.InternalError(h.log, w)
@@ -1041,7 +1041,7 @@ func (h *UserHandler) RemoveRole(w http.ResponseWriter, r *http.Request) {
 	}
 	roleID := uint16(roleID64)
 	// Get user permissions
-	userPermissions, ok := r.Context().Value(middleware.UserPermissionsKey).([]string)
+	userPermissions, ok := r.Context().Value(appcontext.UserPermissionsKey).([]string)
 	if !ok {
 		h.log.Error("failed to get user permissions from the context")
 		helpers.InternalError(h.log, w)
