@@ -2,7 +2,9 @@ package service
 
 import (
 	"backend/internal/model"
+	"backend/internal/permissions"
 	"backend/internal/repository"
+	"backend/pkg/appcontext"
 	"backend/pkg/apperrors"
 	"backend/pkg/imghash"
 	"backend/pkg/logger"
@@ -743,10 +745,8 @@ func (s *postService) GetSimilar(ctx context.Context, dto *GetSimilarDTO) ([]Pos
 	sort.Slice(sortedScores, func(i, j int) bool {
 		return sortedScores[i].Value > sortedScores[j].Value
 	})
-	// Get first 10 posts
-	if len(sortedScores) > 10 {
-		sortedScores = sortedScores[:10]
-	}
+	// Get posts' info
+	// TODO: optimize, don't collect info about posts if threre are already 10 posts
 	var postDTOs []PostResponseDTO
 	for _, kv := range sortedScores {
 		id := kv.Key
@@ -758,8 +758,52 @@ func (s *postService) GetSimilar(ctx context.Context, dto *GetSimilarDTO) ([]Pos
 		// Convert to DTO
 		postDTOs = append(postDTOs, *PostToDTO(post))
 	}
+	// Filter posts
+	var filteredPosts []PostResponseDTO
+	// Check if user is authorized
+	userPermissions, ok := ctx.Value(appcontext.UserPermissionsKey).([]string)
+	if ok {
+		s.log.Debug("user is authorized")
+		// Filter posts depends on user's permissions
+		if slices.Contains(userPermissions, permissions.PostReadAny) {
+			s.log.Debug("user can read any posts")
+			filteredPosts = postDTOs
+		} else if slices.Contains(userPermissions, permissions.PostReadOwn) {
+			s.log.Debug("user can read own posts")
+			userID, ok := ctx.Value(appcontext.UserIDKey).(uuid.UUID)
+			if !ok {
+				return nil, fmt.Errorf("failed to get user ID from the context and convert it to UUID")
+			}
+			for _, post := range postDTOs {
+				if post.Author.ID == userID {
+					filteredPosts = append(filteredPosts, post)
+				}
+			}
+		} else {
+			// Show only verified posts
+			for _, post := range postDTOs {
+				if post.Moderation.Status == model.ModerationStatusApproved ||
+					post.Moderation.Status == model.ModerationStatusAutoApproved {
+					filteredPosts = append(filteredPosts, post)
+				}
+			}
+		}
+	} else {
+		s.log.Debug("user is not authorized")
+		// Show only verified posts
+		for _, post := range postDTOs {
+			if post.Moderation.Status == model.ModerationStatusApproved ||
+				post.Moderation.Status == model.ModerationStatusAutoApproved {
+				filteredPosts = append(filteredPosts, post)
+			}
+		}
+	}
+	// Get first 10 posts
+	if len(filteredPosts) > 10 {
+		filteredPosts = filteredPosts[:10]
+	}
 	s.log.Info("successfully received the list of similar posts")
-	return postDTOs, nil
+	return filteredPosts, nil
 }
 
 func (s *postService) CalcAllPhotosHashes(ctx context.Context) error {
