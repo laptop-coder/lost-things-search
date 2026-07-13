@@ -2,20 +2,21 @@
 package main
 
 import (
-	"errors"
+	"github.com/google/uuid"
 	"backend/internal/config"
 	"backend/internal/database"
 	"backend/internal/handler"
 	"backend/internal/repository"
 	"backend/internal/service"
 	"backend/internal/valkey"
-	valkeyGo "github.com/valkey-io/valkey-go"
 	"backend/pkg/env"
 	"backend/pkg/imghash"
 	"backend/pkg/logger"
 	"backend/pkg/middleware"
 	"context"
+	"errors"
 	"fmt"
+	valkeyGo "github.com/valkey-io/valkey-go"
 	"net/http"
 	"os"
 	"os/signal"
@@ -126,7 +127,7 @@ func main() {
 	}
 	authService := service.NewAuthService(emailService, userRepo, jwtRepo, db, businessClient, serviceConfigs.Auth, log)
 	userService := service.NewUserService(userRepo, studentRepo, roomRepo, db, serviceConfigs.User, log)
-	postService := service.NewPostService(postRepo, postModerationRepo, hashCalc, db, businessClient, serviceConfigs.Post, log)
+	postService := service.NewPostService(postRepo, postModerationRepo, userService, hashCalc, db, businessClient, serviceConfigs.Post, log)
 	conversationService := service.NewConversationService(convRepo, msgRepo, postRepo, userRepo, emailService, db, log)
 	studentGroupService := service.NewStudentGroupService(userRepo, studentGroupRepo, db, log)
 	roomService := service.NewRoomService(roomRepo, db, log)
@@ -237,7 +238,17 @@ func main() {
 				time.Sleep(5 * time.Second)
 				continue
 			}
-			log.Info(fmt.Sprintf("%v", arr))
+			postID, err := uuid.Parse(arr[1])
+			if err != nil {
+				log.Error("moderation worker error: cannot convert post id to uuid. Waiting for 5 seconds to retry...")
+				time.Sleep(5 * time.Second)
+				continue
+			}
+			if err := postService.ModeratePost(context.Background(), postID); err != nil {
+				log.Error("moderation worker error: failed to moderate post. Waiting for 5 seconds to retry...", "error", err.Error())
+				time.Sleep(5 * time.Second)
+				continue
+			}
 		}
 	}()
 

@@ -79,7 +79,7 @@ func main() {
 	serviceConfigs := config.NewServiceConfigs(sharedConfig, appConfig)
 	log.Info("MIGRATION | Initializing services...")
 	userService := service.NewUserService(userRepo, studentRepo, roomRepo, db, serviceConfigs.User, log)
-	postService := service.NewPostService(postRepo, postModerationRepo, hashCalc, db, businessClient, serviceConfigs.Post, log)
+	postService := service.NewPostService(postRepo, postModerationRepo, userService, hashCalc, db, businessClient, serviceConfigs.Post, log)
 
 	if err := database.Migrate(
 		db,

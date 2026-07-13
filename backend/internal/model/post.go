@@ -15,7 +15,7 @@ type Post struct {
 	UpdatedAt   time.Time
 	DeletedAt   gorm.DeletedAt
 	Name        string `gorm:"type:varchar(50);check:length(trim(name)) >= 2"`
-	Description string `gorm:"type:varchar(1000)"`
+	Description string `gorm:"type:varchar(1000)"` // TODO: maybe change to nullable? Check in all models
 	// was the thing found, i.e. returned to owner? (true/false)
 	ThingReturnedToOwner bool `gorm:"type:boolean;default:false"`
 	// the logic is the same as for user's avatar

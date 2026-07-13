@@ -35,7 +35,8 @@ const PostStatusBadge = (props: Props) => {
       setColorClasses(colorMap.yellow);
       setMessage(messagesMap.inProgress);
       break;
-    case (PostModerationStatus.AutoApproved, PostModerationStatus.Approved):
+    case PostModerationStatus.AutoApproved:
+    case PostModerationStatus.Approved:
       if (props.thingReturnedToOwner) {
         setColorClasses(colorMap.purple);
         setMessage(messagesMap.found);
@@ -44,7 +45,8 @@ const PostStatusBadge = (props: Props) => {
         setMessage(messagesMap.approved);
       }
       break;
-    case (PostModerationStatus.AutoRejected, PostModerationStatus.Rejected):
+    case PostModerationStatus.AutoRejected:
+    case PostModerationStatus.Rejected:
       setColorClasses(colorMap.red);
       setMessage(messagesMap.rejected);
       break;

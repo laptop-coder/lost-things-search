@@ -7,6 +7,7 @@ import (
 	"backend/pkg/imghash"
 	"backend/pkg/logger"
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/valkey-io/valkey-go"
@@ -20,11 +21,13 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"slices"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -40,6 +43,7 @@ type PostService interface {
 	ReturnToOwner(ctx context.Context, id uuid.UUID) (*PostResponseDTO, error)
 	GetSimilar(ctx context.Context, dto *GetSimilarDTO) ([]PostResponseDTO, error)
 	CalcAllPhotosHashes(ctx context.Context) error
+	ModeratePost(ctx context.Context, postID uuid.UUID) error
 }
 
 type CreatePostDTO struct {
@@ -88,6 +92,7 @@ type GetSimilarDTO struct {
 type postService struct {
 	postRepo           repository.PostRepository
 	postModerationRepo repository.PostModerationRepository
+	userService        UserService
 	hashCalc           imghash.HashCalculator
 	db                 *gorm.DB
 	client             valkey.Client
@@ -98,6 +103,7 @@ type postService struct {
 func NewPostService(
 	postRepo repository.PostRepository,
 	postModerationRepo repository.PostModerationRepository,
+	userService UserService,
 	hashCalc imghash.HashCalculator,
 	db *gorm.DB,
 	client valkey.Client,
@@ -107,6 +113,7 @@ func NewPostService(
 	return &postService{
 		postRepo:           postRepo,
 		postModerationRepo: postModerationRepo,
+		userService:        userService,
 		hashCalc:           hashCalc,
 		db:                 db,
 		client:             client,
@@ -555,9 +562,21 @@ func (s *postService) GetPosts(ctx context.Context, filter repository.PostFilter
 
 func (s *postService) ChangePostModerationStatus(ctx context.Context, postID uuid.UUID, newStatus model.ModerationStatus, moderatorID *uuid.UUID, rejectReason *string) (*PostModerationResponseDTO, error) {
 	// If reject reason is specified, check that new post status is "rejected"
-	if newStatus != model.ModerationStatusRejected && rejectReason != nil {
-		s.log.Error("cannot specify reject reason for not rejected post", "current_new_status", string(newStatus), "required_new_status", string(model.ModerationStatusRejected))
-		return nil, fmt.Errorf("cannot specify reject reason for not rejected post (current new status is %s, but required %s)", string(newStatus), string(model.ModerationStatusRejected)) // TODO: return Bad Request
+	if newStatus != model.ModerationStatusRejected &&
+		newStatus != model.ModerationStatusAutoRejected &&
+		rejectReason != nil {
+		s.log.Error(
+			"cannot specify reject reason for not rejected post",
+			"current_new_status",
+			string(newStatus),
+			"required_new_status",
+			fmt.Sprintf(
+				"%s or %s",
+				string(model.ModerationStatusRejected),
+				string(model.ModerationStatusAutoRejected),
+			),
+		)
+		return nil, fmt.Errorf("cannot specify reject reason for not rejected post (current new status is %s, but required %s or %s)", string(newStatus), string(model.ModerationStatusRejected), string(model.ModerationStatusAutoRejected)) // TODO: return Bad Request
 	}
 	// Getting existing post moderation
 	moderation, err := s.postModerationRepo.FindByID(ctx, &postID)
@@ -628,7 +647,7 @@ func (s *postService) GetSimilar(ctx context.Context, dto *GetSimilarDTO) ([]Pos
 	if dto.HasPhoto && dto.ID != nil {
 		// Read file
 		file, err := os.Open(filepath.Join(s.config.PhotoUploadPath, fmt.Sprintf("%s.jpeg", (*dto.ID).String())))
-		if err != nil || file == nil {
+		if err != nil || file == nil { // TODO: if file is nil, cannot use err.Error(), because err is nil (check the whole code and refactor)
 			s.log.Error("failed to open file", "error", err.Error())
 			return nil, fmt.Errorf("failed to open file: %w", err)
 		}
@@ -776,6 +795,116 @@ func (s *postService) CalcAllPhotosHashes(ctx context.Context) error {
 		}
 	}
 	return nil
+}
+
+func (s *postService) ModeratePost(ctx context.Context, postID uuid.UUID) error {
+	// Get post
+	post, err := s.postRepo.FindByID(ctx, &postID)
+	if err != nil {
+		return fmt.Errorf("failed to get post by id (%s): %w", postID.String(), err)
+	}
+	if post == nil {
+		return fmt.Errorf("post is nil")
+	}
+	// Get moderation bot user
+	bot, err := s.userService.GetPostsModeratorBot(ctx)
+	if err != nil {
+		s.log.Error("failed to get moderation bot user", "error", err.Error())
+		return fmt.Errorf("failed to get moderation bot user: %w", err)
+	}
+	if bot == nil {
+		s.log.Error("bot is nil")
+		return fmt.Errorf("bot is nil")
+	}
+	// Change moderation status to "in progress"
+	s.ChangePostModerationStatus(
+		ctx,
+		postID,
+		model.ModerationStatusInProgress,
+		&bot.ID,
+		nil,
+	)
+	// Send request and get response
+	var description *string
+	if strings.TrimSpace(post.Description) != "" {
+		description = &post.Description
+	}
+	var id *uuid.UUID
+	if post.HasPhoto {
+		id = &post.ID
+	}
+	res, err := s.sendModerateRequest(post.Name, description, id)
+	if err != nil {
+		return err
+	}
+	if res == nil {
+		return fmt.Errorf("response from moderation service is nil")
+	}
+	s.log.Info("successfully received new moderation status of the post", "post_id", postID.String(), "new_moderation_status", (*res).Status)
+	// Parse moderation status from the response
+	parsedStatus, err := model.ParseModerationStatus((*res).Status)
+	if err != nil {
+		s.log.Error("failed to parse moderation status", "error", err.Error())
+		return fmt.Errorf("failed to parse moderation status: %w", err)
+	}
+	if parsedStatus == nil {
+		s.log.Error("parsed status is nil")
+		return fmt.Errorf("parsed status is nil")
+	}
+	// Change moderation status of the post in the DB
+	s.ChangePostModerationStatus(
+		ctx,
+		postID,
+		*parsedStatus,
+		&bot.ID,
+		func() *string {
+			if *parsedStatus == model.ModerationStatusAutoRejected {
+				reason := "Содержится неприемлемый контент"
+				return &reason
+			}
+			return nil
+		}(),
+	)
+	s.log.Info("the post was successfully moderated", "post_id", postID.String())
+	return nil
+}
+
+func (s *postService) sendModerateRequest(postTitle string, postDescription *string, postID *uuid.UUID) (*ModerationResult, error) {
+	data := url.Values{}
+
+	data.Set("title", postTitle)
+	if postDescription != nil {
+		data.Set("description", *postDescription)
+	}
+	if postID != nil {
+		data.Set("post_id", (*postID).String())
+	}
+
+	res, err := http.Post(
+		"http://ml:4746/moderate",
+		"application/x-www-form-urlencoded",
+		strings.NewReader(data.Encode()),
+	)
+	if err != nil {
+		s.log.Error("failed to send POST request to moderation service", "error", err.Error())
+		return nil, fmt.Errorf("failed to send POST request to moderation service: %w", err)
+	}
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		s.log.Error("failed to send POST request to moderation service: status code is not 200")
+		return nil, fmt.Errorf("failed to send POST request to moderation service: status code is not 200")
+	}
+	// Parse the result
+	var result ModerationResult
+	if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
+		s.log.Error("failed to send POST request to moderation service: failed to parse result as JSON", "error", err.Error())
+		return nil, fmt.Errorf("failed to send POST request to moderation service: failed to parse result as JSON: %w", err)
+	}
+	return &result, nil
+}
+
+type ModerationResult struct {
+	Status string `json:"status"`
 }
 
 func (s *postService) validateCreatePostDTO(dto *CreatePostDTO) error {
