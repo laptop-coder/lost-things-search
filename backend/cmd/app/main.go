@@ -2,7 +2,6 @@
 package main
 
 import (
-	"github.com/google/uuid"
 	"backend/internal/config"
 	"backend/internal/database"
 	"backend/internal/handler"
@@ -16,6 +15,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	valkeyGo "github.com/valkey-io/valkey-go"
 	"net/http"
 	"os"
@@ -211,44 +211,82 @@ func main() {
 
 	// Moderation worker
 	go func() {
+		counter := 0
 		log.Info("starting moderation worker...")
 		for {
-			res := businessClient.Do(
-				context.Background(),
-				businessClient.
-					B().
-					Brpop().
-					Key("moderation:posts:queue").
-					Timeout(5).
-					Build(),
-			)
-			if errors.Is(res.Error(), valkeyGo.Nil) {
-				log.Info("moderation worker: there are no posts to moderate. Waiting for 30 seconds to check one more time...")
+			// Check if moderation worker exists
+			if _, err := userService.GetPostsModeratorBot(context.Background()); err != nil {
+				log.Error(
+					"failed to check posts moderator bot existence, maybe it does not exist. Waiting for 30 seconds to check one more time...",
+					"error",
+					err.Error(),
+				)
 				time.Sleep(30 * time.Second)
 				continue
 			}
-			if res.Error() != nil {
-				log.Error("moderation worker error: failed to get post to moderate from queue. Waiting for 5 seconds to retry...", "error", res.Error().Error())
-				time.Sleep(5 * time.Second)
-				continue
+			// Get post ID. If this is the 64th request, take ID from the DB
+			// instead of queue
+			var postID uuid.UUID
+			if counter == 64 {
+				counter = 0
+				post, err := postService.GetOldestPendingPost(context.Background())
+				if err != nil {
+					log.Error("moderation worker: failed to get the oldest post with pending moderation status", "error", err.Error())
+					continue
+				}
+				if post == nil {
+					log.Error("moderation worker: post is nil")
+					continue
+				}
+				postID = post.ID
+			} else {
+				// Else get post ID from the queue
+				res := businessClient.Do(
+					context.Background(),
+					businessClient.
+						B().
+						Brpop().
+						Key("moderation:posts:queue").
+						Timeout(5).
+						Build(),
+				)
+				if errors.Is(res.Error(), valkeyGo.Nil) {
+					log.Info("moderation worker: there are no posts in queue to moderate. Looking at the database...")
+					if err := postService.ModerateAllPosts(context.Background()); err != nil {
+						log.Error("moderation worker: failed to moderate all posts", "error", err.Error())
+						continue
+					}
+					log.Info("moderation worker: all posts were moderated. Waiting for 30 seconds to check one more time...")
+					time.Sleep(30 * time.Second)
+					continue
+				}
+				if res.Error() != nil {
+					log.Error("moderation worker error: failed to get post to moderate from queue. Waiting for 5 seconds to retry...", "error", res.Error().Error())
+					time.Sleep(5 * time.Second)
+					continue
+				}
+				arr, err := res.AsStrSlice()
+				if err != nil {
+					log.Error("moderation worker error: failed to represent response as array. Waiting for 5 seconds to retry...")
+					time.Sleep(5 * time.Second)
+					continue
+				}
+				postIDParsed, err := uuid.Parse(arr[1])
+				if err != nil {
+					log.Error("moderation worker error: cannot convert post id to uuid. Waiting for 5 seconds to retry...")
+					time.Sleep(5 * time.Second)
+					continue
+				}
+				postID = postIDParsed
 			}
-			arr, err := res.AsStrSlice()
-			if err != nil {
-				log.Error("moderation worker error: failed to represent response as array. Waiting for 5 seconds to retry...")
-				time.Sleep(5 * time.Second)
-				continue
-			}
-			postID, err := uuid.Parse(arr[1])
-			if err != nil {
-				log.Error("moderation worker error: cannot convert post id to uuid. Waiting for 5 seconds to retry...")
-				time.Sleep(5 * time.Second)
-				continue
-			}
+			// Send post to the moderation service and change status in the DB
 			if err := postService.ModeratePost(context.Background(), postID); err != nil {
 				log.Error("moderation worker error: failed to moderate post. Waiting for 5 seconds to retry...", "error", err.Error())
 				time.Sleep(5 * time.Second)
 				continue
 			}
+			// Increment counter
+			counter += 1
 		}
 	}()
 

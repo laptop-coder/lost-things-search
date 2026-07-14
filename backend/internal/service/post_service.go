@@ -46,6 +46,8 @@ type PostService interface {
 	GetSimilar(ctx context.Context, dto *GetSimilarDTO) ([]PostResponseDTO, error)
 	CalcAllPhotosHashes(ctx context.Context) error
 	ModeratePost(ctx context.Context, postID uuid.UUID) error
+	ModerateAllPosts(ctx context.Context) error
+	GetOldestPendingPost(ctx context.Context) (*PostResponseDTO, error)
 }
 
 type CreatePostDTO struct {
@@ -850,6 +852,10 @@ func (s *postService) ModeratePost(ctx context.Context, postID uuid.UUID) error 
 	if post == nil {
 		return fmt.Errorf("post is nil")
 	}
+	// Return nil if moderation status of the post is not pending
+	if post.Moderation.Status != model.ModerationStatusPending {
+		return nil
+	}
 	// Get moderation bot user
 	bot, err := s.userService.GetPostsModeratorBot(ctx)
 	if err != nil {
@@ -910,6 +916,38 @@ func (s *postService) ModeratePost(ctx context.Context, postID uuid.UUID) error 
 		}(),
 	)
 	s.log.Info("the post was successfully moderated", "post_id", postID.String())
+	return nil
+}
+
+func (s *postService) GetOldestPendingPost(ctx context.Context) (*PostResponseDTO, error) {
+	var post model.Post
+	result := s.db.WithContext(ctx).
+		Model(&model.Post{}).
+		Where("status = ?", string(model.ModerationStatusPending)).
+		Order("created_at ASC").
+		First(&post)
+	if result.Error != nil {
+		return nil, fmt.Errorf("failed to get the oldest post with pending moderation status")
+	}
+	return PostToDTO(&post), nil
+}
+
+func (s *postService) ModerateAllPosts(ctx context.Context) error {
+	// Get IDs of the posts with pending status
+	var postModerations []model.PostModeration
+	result := s.db.WithContext(ctx).Model(&model.PostModeration{}).Where("status = ?", string(model.ModerationStatusPending)).Find(&postModerations)
+	if result.Error != nil {
+		return fmt.Errorf("failed to get IDs of the posts with pending moderation status")
+	}
+	// Moderate posts
+	for _, moderation := range postModerations {
+		s.log.Debug("trying to moderate post", "post_id", moderation.PostID.String())
+		if err := s.ModeratePost(ctx, moderation.PostID); err != nil {
+			s.log.Error("failed to moderate post", "post_id", moderation.PostID.String(), "error", err.Error())
+			return fmt.Errorf("failed to moderate post with id %s: %w", moderation.PostID.String(), err)
+		}
+		s.log.Debug("the post was successfully moderated", "post_id", moderation.PostID.String())
+	}
 	return nil
 }
 
