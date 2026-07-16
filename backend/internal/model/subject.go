@@ -1,8 +1,8 @@
 package model
 
 import (
-	"time"
 	"gorm.io/gorm"
+	"time"
 )
 
 // Subject provides model of table with list of subjects ("Русский язык",

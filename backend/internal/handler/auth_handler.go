@@ -3,9 +3,9 @@ package handler
 import (
 	"backend/internal/permissions"
 	"backend/internal/service"
+	"backend/pkg/appcontext"
 	"backend/pkg/helpers"
 	"backend/pkg/logger"
-	"backend/pkg/middleware"
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
@@ -506,7 +506,7 @@ func (h *AuthHandler) DeleteAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get auth user permissions
-	userPermissions, ok := r.Context().Value(middleware.UserPermissionsKey).([]string)
+	userPermissions, ok := r.Context().Value(appcontext.UserPermissionsKey).([]string)
 	if !ok {
 		h.log.Error("failed to get user permissions from the context")
 		helpers.InternalError(h.log, w)
@@ -557,7 +557,7 @@ func (h *AuthHandler) DeleteOwnAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get and convert user ID
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)

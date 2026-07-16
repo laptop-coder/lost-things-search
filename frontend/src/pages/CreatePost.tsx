@@ -4,6 +4,7 @@ import { postApi, api } from "../lib/api";
 import { useNavigate, A } from "@solidjs/router";
 import type { Post } from "../lib/types";
 import { X, Image, ImageOff } from "lucide-solid";
+import PostStatusBadge from "../components/PostStatusBadge";
 
 const CreatePost = () => {
   const [name, setName] = createSignal("");
@@ -164,8 +165,11 @@ const CreatePost = () => {
                         href={`/posts/${post().id}`}
                       >
                         <Show when={post().thingReturnedToOwner}>
-                          <span class="absolute top-1 right-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full">
-                            Найдено
+                          <span class="absolute top-[5px] right-[5px]">
+                            <PostStatusBadge
+                              moderationStatus={post().moderation.status}
+                              thingReturnedToOwner={post().thingReturnedToOwner}
+                            />
                           </span>
                         </Show>
                         <Show when={post().hasPhoto}>

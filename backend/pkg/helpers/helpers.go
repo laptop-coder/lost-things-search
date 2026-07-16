@@ -41,6 +41,8 @@ func SuccessResponse(w http.ResponseWriter, data interface{}) {
 }
 
 func HandleServiceError(log logger.Logger, w http.ResponseWriter, err error) {
+	log.Error(err.Error())
+
 	switch {
 
 	// HTTP 400

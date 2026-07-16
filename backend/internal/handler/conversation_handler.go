@@ -2,9 +2,9 @@ package handler
 
 import (
 	"backend/internal/service"
+	"backend/pkg/appcontext"
 	"backend/pkg/helpers"
 	"backend/pkg/logger"
-	"backend/pkg/middleware"
 	"github.com/google/uuid"
 	"net/http"
 	"strings"
@@ -39,7 +39,7 @@ func (h *ConversationHandler) CreateConversation(w http.ResponseWriter, r *http.
 	}
 
 	// Get requesterID from the context
-	requesterID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	requesterID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -117,7 +117,7 @@ func (h *ConversationHandler) SendMessage(w http.ResponseWriter, r *http.Request
 	}
 
 	// Get senderID from the context
-	senderID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	senderID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -181,7 +181,7 @@ func (h *ConversationHandler) GetConversation(w http.ResponseWriter, r *http.Req
 	}
 
 	// Get userID from the context
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -219,7 +219,7 @@ func (h *ConversationHandler) GetMyConversations(w http.ResponseWriter, r *http.
 	}
 
 	// Get userID from the context
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -255,7 +255,7 @@ func (h *ConversationHandler) MarkAsRead(w http.ResponseWriter, r *http.Request)
 	}
 
 	// Get userID from the context
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -279,7 +279,7 @@ func (h *ConversationHandler) GetTotalUnreadCount(w http.ResponseWriter, r *http
 	}
 
 	// Get userID from the context
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)

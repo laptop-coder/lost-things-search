@@ -7,6 +7,13 @@ import (
 	"time"
 )
 
+type UserType string
+
+const (
+	UserTypeHuman UserType = "human"
+	UserTypeBot   UserType = "bot"
+)
+
 type User struct {
 	// UUID4; maybe it will be used in URIs to see users' profiles, e.g., or
 	// their posts.
@@ -39,7 +46,8 @@ type User struct {
 	// 1. Can be null if the user hasn't created any posts yet
 	// 2. Removing of the user will cause removing all of his posts
 	// 3. one-to-many (author-to-post, i.e. user-to-post)
-	Posts *[]Post `gorm:"foreignKey:AuthorID;references:ID;constraint:OnDelete:cascade,OnUpdate:restrict"`
+	Posts *[]Post  `gorm:"foreignKey:AuthorID;references:ID;constraint:OnDelete:cascade,OnUpdate:restrict"`
+	Type  UserType `gorm:"type:varchar(50)"`
 }
 
 func AddConstraintsUserRoles(db *gorm.DB) error {

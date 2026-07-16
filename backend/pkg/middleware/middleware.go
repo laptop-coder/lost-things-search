@@ -4,6 +4,7 @@ import (
 	"backend/internal/model"
 	"backend/internal/repository"
 	"backend/internal/service"
+	"backend/pkg/appcontext"
 	"backend/pkg/env"
 	"backend/pkg/helpers"
 	"backend/pkg/logger"
@@ -42,12 +43,6 @@ func CORS(next http.Handler) http.Handler {
 	})
 }
 
-type contextKey string
-
-const UserIDKey contextKey = "user_id"
-const UserRolesKey contextKey = "user_roles"
-const UserPermissionsKey contextKey = "user_permissions"
-
 func Auth(authService service.AuthService, authServiceConfig service.AuthServiceConfig, jwtRepo repository.JWTRepository, db *gorm.DB, log logger.Logger, allowUnauthorized bool) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -60,9 +55,9 @@ func Auth(authService service.AuthService, authServiceConfig service.AuthService
 				jwtRefresh, err := helpers.GetCookie("jwt_refresh", r)
 				if err != nil {
 					if allowUnauthorized {
-						ctx = context.WithValue(ctx, UserIDKey, uuid.Nil)
-						ctx = context.WithValue(ctx, UserRolesKey, []string{})
-						ctx = context.WithValue(ctx, UserPermissionsKey, []string{})
+						ctx = context.WithValue(ctx, appcontext.UserIDKey, uuid.Nil)
+						ctx = context.WithValue(ctx, appcontext.UserRolesKey, []string{})
+						ctx = context.WithValue(ctx, appcontext.UserPermissionsKey, []string{})
 						next.ServeHTTP(w, r.WithContext(ctx))
 						return
 					}
@@ -76,9 +71,9 @@ func Auth(authService service.AuthService, authServiceConfig service.AuthService
 				// When pointer is returned check if it nil.
 				if err != nil || tokens == nil {
 					if allowUnauthorized {
-						ctx = context.WithValue(ctx, UserIDKey, uuid.Nil)
-						ctx = context.WithValue(ctx, UserRolesKey, []string{})
-						ctx = context.WithValue(ctx, UserPermissionsKey, []string{})
+						ctx = context.WithValue(ctx, appcontext.UserIDKey, uuid.Nil)
+						ctx = context.WithValue(ctx, appcontext.UserRolesKey, []string{})
+						ctx = context.WithValue(ctx, appcontext.UserPermissionsKey, []string{})
 						next.ServeHTTP(w, r.WithContext(ctx))
 						return
 					}
@@ -90,9 +85,9 @@ func Auth(authService service.AuthService, authServiceConfig service.AuthService
 				parsedAccessToken, err := authService.ParseToken(tokens.AccessToken)
 				if err != nil || parsedAccessToken == nil {
 					if allowUnauthorized {
-						ctx = context.WithValue(ctx, UserIDKey, uuid.Nil)
-						ctx = context.WithValue(ctx, UserRolesKey, []string{})
-						ctx = context.WithValue(ctx, UserPermissionsKey, []string{})
+						ctx = context.WithValue(ctx, appcontext.UserIDKey, uuid.Nil)
+						ctx = context.WithValue(ctx, appcontext.UserRolesKey, []string{})
+						ctx = context.WithValue(ctx, appcontext.UserPermissionsKey, []string{})
 						next.ServeHTTP(w, r.WithContext(ctx))
 						return
 					}
@@ -103,9 +98,9 @@ func Auth(authService service.AuthService, authServiceConfig service.AuthService
 				parsedRefreshToken, err := authService.ParseToken(tokens.RefreshToken)
 				if err != nil || parsedRefreshToken == nil {
 					if allowUnauthorized {
-						ctx = context.WithValue(ctx, UserIDKey, uuid.Nil)
-						ctx = context.WithValue(ctx, UserRolesKey, []string{})
-						ctx = context.WithValue(ctx, UserPermissionsKey, []string{})
+						ctx = context.WithValue(ctx, appcontext.UserIDKey, uuid.Nil)
+						ctx = context.WithValue(ctx, appcontext.UserRolesKey, []string{})
+						ctx = context.WithValue(ctx, appcontext.UserPermissionsKey, []string{})
 						next.ServeHTTP(w, r.WithContext(ctx))
 						return
 					}
@@ -149,9 +144,9 @@ func Auth(authService service.AuthService, authServiceConfig service.AuthService
 			if err != nil || claims == nil {
 				if allowUnauthorized {
 					ctx := r.Context()
-					ctx = context.WithValue(ctx, UserIDKey, uuid.Nil)
-					ctx = context.WithValue(ctx, UserRolesKey, []string{})
-					ctx = context.WithValue(ctx, UserPermissionsKey, []string{})
+					ctx = context.WithValue(ctx, appcontext.UserIDKey, uuid.Nil)
+					ctx = context.WithValue(ctx, appcontext.UserRolesKey, []string{})
+					ctx = context.WithValue(ctx, appcontext.UserPermissionsKey, []string{})
 					next.ServeHTTP(w, r.WithContext(ctx))
 					return
 				}
@@ -168,9 +163,9 @@ func Auth(authService service.AuthService, authServiceConfig service.AuthService
 				First(&user, "id = ?", claims.UserID).Error
 			if err != nil {
 				if allowUnauthorized {
-					ctx = context.WithValue(ctx, UserIDKey, uuid.Nil)
-					ctx = context.WithValue(ctx, UserRolesKey, []string{})
-					ctx = context.WithValue(ctx, UserPermissionsKey, []string{})
+					ctx = context.WithValue(ctx, appcontext.UserIDKey, uuid.Nil)
+					ctx = context.WithValue(ctx, appcontext.UserRolesKey, []string{})
+					ctx = context.WithValue(ctx, appcontext.UserPermissionsKey, []string{})
 					next.ServeHTTP(w, r.WithContext(ctx))
 					return
 				}
@@ -194,9 +189,9 @@ func Auth(authService service.AuthService, authServiceConfig service.AuthService
 				roles = append(roles, role.Name)
 			}
 			// Put user ID, roles and permissions to the context
-			ctx = context.WithValue(ctx, UserIDKey, claims.UserID)
-			ctx = context.WithValue(ctx, UserRolesKey, roles)
-			ctx = context.WithValue(ctx, UserPermissionsKey, permissions)
+			ctx = context.WithValue(ctx, appcontext.UserIDKey, claims.UserID)
+			ctx = context.WithValue(ctx, appcontext.UserRolesKey, roles)
+			ctx = context.WithValue(ctx, appcontext.UserPermissionsKey, permissions)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
@@ -206,7 +201,7 @@ func RequireRoles(log logger.Logger, all bool, requiredRoles ...string) func(htt
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Get roles from context
-			userRoles, ok := r.Context().Value(UserRolesKey).([]string)
+			userRoles, ok := r.Context().Value(appcontext.UserRolesKey).([]string)
 			if !ok {
 				log.Error("Forbidden: failed to get roles from context")
 				helpers.ErrorResponse(log, w, "forbidden", http.StatusForbidden)
@@ -242,7 +237,7 @@ func RequirePermissions(log logger.Logger, all bool, requiredPermissions ...stri
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			// Get user permissions from context
-			userPermissions, ok := r.Context().Value(UserPermissionsKey).([]string)
+			userPermissions, ok := r.Context().Value(appcontext.UserPermissionsKey).([]string)
 			if !ok {
 				log.Error("Forbidden: failed to get permissions from context")
 				helpers.ErrorResponse(log, w, "forbidden", http.StatusForbidden)

@@ -45,6 +45,9 @@ type UserService interface {
 	RemoveRolesFromUser(ctx context.Context, userID uuid.UUID, roleIDs []uint16) error
 	RemoveRoleFromUser(ctx context.Context, userID uuid.UUID, roleID uint16) error
 	AssignExtensionsToUser(ctx context.Context, userID uuid.UUID, dto UserExtensionsDTO) error
+	// Bots
+	CreateBot(ctx context.Context, createUserDTO CreateUserDTO) (*UserResponseDTO, error)
+	GetPostsModeratorBot(ctx context.Context) (*UserResponseDTO, error)
 }
 
 type PermissionResponseDTO struct {
@@ -96,6 +99,7 @@ type UserResponseDTO struct {
 	LastName   string            `json:"lastName"`
 	HasAvatar  bool              `json:"hasAvatar"`
 	Roles      []RoleResponseDTO `json:"roles"`
+	Type       model.UserType    `json:"userType"`
 }
 
 type ChangePasswordDTO struct {
@@ -183,6 +187,7 @@ func (s *userService) CreateUser(ctx context.Context, createUserDTO CreateUserDT
 		MiddleName: createUserDTO.MiddleName,
 		LastName:   createUserDTO.LastName,
 		HasAvatar:  hasAvatar,
+		Type:       model.UserTypeHuman,
 	}
 	// Transaction for creating user
 	err = s.db.Transaction(func(tx *gorm.DB) error {
@@ -510,6 +515,83 @@ func (s *userService) RemoveRoleFromUser(ctx context.Context, userID uuid.UUID, 
 	})
 }
 
+func (s *userService) CreateBot(ctx context.Context, createUserDTO CreateUserDTO) (*UserResponseDTO, error) {
+	userExtensionsDTO := UserExtensionsDTO{}
+	// Input data validation
+	if err := s.validateCreateUserDTO(&createUserDTO); err != nil {
+		return nil, fmt.Errorf("validation error during bot creation: %w", err)
+	}
+	// Check email uniqueness
+	existingUser, err := s.userRepo.FindByEmail(ctx, &createUserDTO.Email)
+	if err == nil && existingUser != nil {
+		s.log.Error("user with this email already exists")
+		return nil, fmt.Errorf("user with this email already exists: %w", apperrors.ErrUserWithThisEmailAlreadyExists)
+	}
+	if err != nil && !errors.Is(err, apperrors.ErrUserNotFound) {
+		return nil, fmt.Errorf("failed to check email uniqueness: %w", err)
+	}
+	// Password hashing
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(createUserDTO.Password), s.config.BcryptCost)
+	if err != nil {
+		s.log.Error("failed to hash password", "error", err.Error())
+		return nil, fmt.Errorf("failed to hash password: %w", err)
+	}
+	// Generating ID for bot
+	botID := uuid.New()
+	// Creating model object
+	bot := &model.User{
+		ID:         botID,
+		Email:      createUserDTO.Email,
+		Password:   string(passwordHash),
+		FirstName:  createUserDTO.FirstName,
+		MiddleName: nil,
+		LastName:   createUserDTO.LastName,
+		HasAvatar:  false,
+		Type:       model.UserTypeBot,
+	}
+	// Transaction for creating bot
+	err = s.db.Transaction(func(tx *gorm.DB) error {
+		txRepo := repository.NewUserRepository(tx, s.log)
+		if err := txRepo.Create(ctx, bot); err != nil {
+			s.log.Error("failed to create bot", "error", err.Error())
+			return fmt.Errorf("failed to create bot: %w", err)
+		}
+		return nil
+	})
+	if err != nil {
+		s.log.Error("transaction failed", "error", err.Error())
+		return nil, fmt.Errorf("transaction failed: %w", err)
+	}
+	// TODO: add transaction for roles assigning. If user was created, but roles
+	// was not assigned (e.g. not all of them exists, so it causes error), user
+	// must be deleted
+	// Assign roles to bot
+	if err := s.assignRolesToUser(ctx, botID, userExtensionsDTO, createUserDTO.RoleIDs); err != nil {
+		s.log.Error("failed to assign roles to bot", "error", err.Error())
+		return nil, fmt.Errorf("failed to assign roles to bot: %w", err)
+	}
+	// Get created bot for response
+	createdBot, err := s.userRepo.FindByID(ctx, &bot.ID)
+	if err != nil {
+		s.log.Error("failed to fetch created bot", "error", err.Error())
+		return nil, fmt.Errorf("failed to fetch created bot: %w", err)
+	}
+	return UserToDTO(createdBot), nil
+}
+
+func (s *userService) GetPostsModeratorBot(ctx context.Context) (*UserResponseDTO, error) {
+	var roleID uint16 = 8
+	moderatorBots, err := s.GetUsers(ctx, repository.UserFilter{RoleID: &roleID})
+	if err != nil {
+		s.log.Error("failed to get posts moderator bots", "error", err.Error())
+		return nil, fmt.Errorf("failed to get posts moderator bots: %w", err)
+	}
+	if len(moderatorBots) > 0 {
+		return &moderatorBots[0], nil
+	}
+	return nil, fmt.Errorf("failed to get posts moderator bot: there are no bots: %w", apperrors.ErrUserNotFound)
+}
+
 type RoleResponseDTO struct {
 	ID          uint16                  `json:"id"`
 	CreatedAt   string                  `json:"createdAt"`
@@ -733,6 +815,9 @@ func (s *userService) validateUpdateUserDTO(dto *UpdateUserDTO) error {
 }
 
 func UserToDTO(user *model.User) *UserResponseDTO {
+	if user == nil {
+		return nil
+	}
 	var roles []RoleResponseDTO
 	for _, role := range user.Roles {
 		roles = append(roles, *RoleToDTO(&role))
@@ -747,6 +832,7 @@ func UserToDTO(user *model.User) *UserResponseDTO {
 		LastName:   user.LastName,
 		HasAvatar:  user.HasAvatar,
 		Roles:      roles,
+		Type:       user.Type,
 	}
 }
 
@@ -896,8 +982,10 @@ func (s *userService) addUserToExtensionTable(ctx context.Context, tx *gorm.DB, 
 		return tx.Create(parent).Error
 	case 7: // student
 		return tx.Create(&model.Student{UserID: userID, StudentGroupID: *dto.StudentGroupID}).Error
+	case 8: // bot_moderator_posts
+		return nil
 	}
-	return fmt.Errorf("role with id %d does not exist: %w", roleID, apperrors.ErrNotFound)
+	return fmt.Errorf("role with id %d does not exist (has not been compared with any case): %w", roleID, apperrors.ErrNotFound)
 }
 
 func (s *userService) removeUserFromExtensionTable(tx *gorm.DB, userID uuid.UUID, roleID uint16) error {
@@ -914,8 +1002,10 @@ func (s *userService) removeUserFromExtensionTable(tx *gorm.DB, userID uuid.UUID
 		return tx.Where("user_id = ?", userID).Delete(&model.Parent{}).Error
 	case 7: // student
 		return tx.Where("user_id = ?", userID).Delete(&model.Student{}).Error
+	case 8: // bot_moderator_posts
+		return nil
 	}
-	return fmt.Errorf("role with id %d does not exist: %w", roleID, apperrors.ErrNotFound)
+	return fmt.Errorf("role with id %d does not exist (has not been compared with any case): %w", roleID, apperrors.ErrNotFound)
 }
 
 func (s *userService) AssignExtensionsToUser(ctx context.Context, userID uuid.UUID, dto UserExtensionsDTO) error {

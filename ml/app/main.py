@@ -17,10 +17,11 @@ from dictionary import en_to_ru
 
 app = FastAPI()
 # load models, tokenizer
+torch.set_num_threads(1)
 check_inappropriate_content_model = pipeline(
     "text-classification", model="apanc/russian-inappropriate-messages"
 )
-computer_vision_model = YOLO("yolo26n.pt")
+computer_vision_model = YOLO("./models/yolo26n.pt")
 sts_model = AutoModel.from_pretrained("sergeyzh/rubert-mini-sts")
 sts_tokenizer = AutoTokenizer.from_pretrained("sergeyzh/rubert-mini-sts")
 
@@ -56,35 +57,35 @@ async def health():
 @app.post("/moderate")
 async def moderate(
     title: Annotated[str, Form()],
-    description: Annotated[str | None, Form()],
-    post_id: Annotated[str | None, Form()], # for photo accessing
+    description: Annotated[str | None, Form()] = None,
+    post_id: Annotated[str | None, Form()] = None,  # for photo accessing
 ):
 
     # check title
     inappropriate, score = is_string_inappropriate(
         title, check_inappropriate_content_model
     )
-    if score < 0.7:
-        return {"result": "need_check"}
+    if score < 0.9:
+        return {"status": "needs_review"}
     if inappropriate:
-        return {"result": "reject"}
+        return {"status": "auto_rejected"}
 
     # description is unnecessary
     if description is None:
-        return {"result": "accept"}
+        return {"status": "auto_approved"}
 
     # check description
     inappropriate, score = is_string_inappropriate(
         description, check_inappropriate_content_model
     )
-    if score < 0.7:
-        return {"result": "need_check"}
+    if score < 0.9:
+        return {"status": "needs_review"}
     if inappropriate:
-        return {"result": "reject"}
+        return {"status": "auto_rejected"}
 
     # photo is unnecessary
     if post_id is None:
-        return {"result": "accept"}
+        return {"status": "auto_approved"}
 
     # recognize things on photo
     results = computer_vision_model.predict(f"/storage/post_photos/{post_id}.jpeg")
@@ -97,7 +98,7 @@ async def moderate(
                 things_on_photo.append(en_to_ru.get(name, name))
 
     if len(things_on_photo) == 0:
-        return {"result": "need_check"}
+        return {"status": "needs_review"}
 
     # get embeddings
     title_embedding = embed_bert_cls(title, sts_model, sts_tokenizer)
@@ -145,5 +146,5 @@ async def moderate(
         )
     )
     if similarity < 0.8:
-        return {"result": "need_check"}
-    return {"result": "accept"}
+        return {"status": "needs_review"}
+    return {"status": "auto_approved"}

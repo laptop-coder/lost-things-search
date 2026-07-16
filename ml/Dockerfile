@@ -1,19 +1,16 @@
-FROM python:3.12-slim
-
-# Install uv.
+FROM python:3.12-slim AS builder
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
-
 WORKDIR /app
 COPY pyproject.toml uv.lock ./
-
-# Install the application dependencies.
 RUN apt-get update && \
-    apt-get install -y gcc g++ meson wget && \
+    apt-get install -y wget && \
     rm -rf /var/lib/apt/lists/* && \
-    uv sync --frozen # --no-cache
+    uv sync --frozen --no-cache
 
-# Copy the application into the container.
+FROM python:3.12-slim
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+WORKDIR /app
+COPY --from=builder /app/.venv /app/.venv
 COPY app app
-
-# Run the application.
+ADD https://huggingface.co/Ultralytics/YOLO26/resolve/main/yolo26n.pt app/models/yolo26n.pt
 CMD ["/app/.venv/bin/fastapi", "run", "app/main.py", "--port", "4746", "--host", "0.0.0.0"]

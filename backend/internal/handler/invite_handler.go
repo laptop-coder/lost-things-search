@@ -3,9 +3,9 @@ package handler
 import (
 	"backend/internal/permissions"
 	"backend/internal/service"
+	"backend/pkg/appcontext"
 	"backend/pkg/helpers"
 	"backend/pkg/logger"
-	"backend/pkg/middleware"
 	"fmt"
 	"net/http"
 	"slices"
@@ -72,7 +72,7 @@ func (h *InviteHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get user permissions
-	userPermissions, ok := r.Context().Value(middleware.UserPermissionsKey).([]string)
+	userPermissions, ok := r.Context().Value(appcontext.UserPermissionsKey).([]string)
 	if !ok {
 		h.log.Error("failed to get user permissions from the context")
 		helpers.InternalError(h.log, w)
@@ -138,7 +138,7 @@ func (h *InviteHandler) Revoke(w http.ResponseWriter, r *http.Request) {
 	// TODO: move this code to service layer (the same for the whole code: move
 	// business logic to the service layer):
 	// Get user permissions
-	userPermissions, ok := r.Context().Value(middleware.UserPermissionsKey).([]string)
+	userPermissions, ok := r.Context().Value(appcontext.UserPermissionsKey).([]string)
 	if !ok {
 		h.log.Error("failed to get user permissions from the context")
 		helpers.InternalError(h.log, w)

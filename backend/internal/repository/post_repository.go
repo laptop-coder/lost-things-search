@@ -39,7 +39,7 @@ type postRepository struct {
 
 type PostFilter struct {
 	AuthorIDs            []uuid.UUID
-	Verified             *bool
+	ModerationStatuses   []model.ModerationStatus
 	ThingReturnedToOwner *bool
 	Limit                int
 	Offset               int
@@ -58,7 +58,7 @@ func (r *postRepository) FindAll(ctx context.Context, filter *PostFilter) ([]mod
 		return nil, fmt.Errorf("posts list filter cannot be nil: %w", apperrors.ErrRequiredField)
 	}
 	var posts []model.Post
-	query := r.db.WithContext(ctx).Model(&model.Post{})
+	query := r.db.WithContext(ctx).Model(&model.Post{}).Preload("Moderation")
 	// Filters
 	// by post's author:
 	if len(filter.AuthorIDs) > 0 {
@@ -66,9 +66,10 @@ func (r *postRepository) FindAll(ctx context.Context, filter *PostFilter) ([]mod
 			Where("posts.author_id IN (?)", filter.AuthorIDs)
 	}
 	// by verification status:
-	if filter.Verified != nil {
+	if len(filter.ModerationStatuses) > 0 {
 		query = query.
-			Where("posts.verified = ?", *filter.Verified)
+			Joins("JOIN post_moderations ON post_moderations.post_id = posts.id").
+			Where("post_moderations.status IN (?)", filter.ModerationStatuses)
 	}
 	// by thing return status:
 	if filter.ThingReturnedToOwner != nil {
@@ -99,7 +100,7 @@ func (r *postRepository) FindByID(ctx context.Context, id *uuid.UUID) (*model.Po
 		return nil, fmt.Errorf("post id cannot be nil: %w", apperrors.ErrRequiredField)
 	}
 	var post model.Post
-	result := r.db.WithContext(ctx).Preload("Author").Preload("Author.Roles").First(&post, *id)
+	result := r.db.WithContext(ctx).Preload("Moderation").Preload("Author").Preload("Author.Roles").First(&post, *id)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("post with id %s was not found: %s: %w", *id, result.Error.Error(), apperrors.ErrPostNotFound)
@@ -133,7 +134,7 @@ func (r *postRepository) Update(ctx context.Context, post *model.Post) error {
 		return fmt.Errorf("failed to check post existence: %w", err)
 	}
 	if count == 0 {
-		return fmt.Errorf("post with id %d was not found: %w", post.ID, apperrors.ErrPostNotFound)
+		return fmt.Errorf("post with id %s was not found: %w", post.ID.String(), apperrors.ErrPostNotFound)
 	}
 	result := r.db.WithContext(ctx).Save(post)
 	if result.Error != nil {

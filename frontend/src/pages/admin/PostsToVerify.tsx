@@ -31,7 +31,7 @@ const PostsToVerify = () => {
       if (loading() || !hasMore() || page() === 0) return;
       setLoading(true);
       const data = await api.get<{ posts: Post[] }>(
-        `/posts?verified=false&limit=10&offset=${page() * 10}`,
+        `/posts?moderationStatus=needs_review&limit=10&offset=${page() * 10}`,
       );
       setPosts([...posts(), ...data.posts]);
       setPage(page() + 1);
@@ -53,7 +53,7 @@ const PostsToVerify = () => {
     setPosts([]);
     try {
       const data = await api.get<{ posts: Post[] }>(
-        "/posts?verified=false&limit=10&offset=0",
+        "/posts?moderationStatus=needs_review&limit=10&offset=0",
       );
       setPosts(data.posts);
       setPage(1);

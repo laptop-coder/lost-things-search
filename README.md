@@ -18,6 +18,11 @@ Lost and found service for educational institutions.
 
 **Superadmin** role is the system entrypoint. This account is created manually and there can be only one. `Superadmin` creates tokens for `admin` users registration, can assign/unassign `admin` role. In turn, **admins** manage the system (users, content). They can create tokens for all other users registration.
 
+## System roles
+| ID | Role                |
+| -- | ------------------- |
+| 8  | Bot Moderator Posts |
+
 ## Tech Stack
 
 - **Backend:** Go, GORM, PostgreSQL, Valkey
@@ -50,3 +55,27 @@ make first-run
 | `down` | Stop the app |
 | `dev` | Run app in the development mode (with migrations) |
 | `help` | Display available `make` commands |
+
+## Contributing
+Please read [CONTRIBUTING.md](https://github.com/laptop-coder/lost-things-search/blob/main/CONTRIBUTING.md) before submitting a Pull Request.
+
+## More information
+
+### User types
+
+| Type  | Description                                |
+| ----- | ------------------------------------------ |
+| human | A regular account belonging to a person    |
+| bot   | Used to automatically moderate posts, e.g. |
+
+### Posts moderation statuses
+
+| Status        | Description                                                                                    |
+| ------------- | ---------------------------------------------------------------------------------------------- |
+| pending       | Awaiting verification                                                                          |
+| in_progress   | Currently being checked                                                                        |
+| auto_approved | Automatically approved by a bot                                                                |
+| auto_rejected | Automatically rejected by a bot                                                                |
+| approved      | Approved by a human                                                                            |
+| rejected      | Rejected by a human                                                                            |
+| needs_review  | The bot does not know whether to approve or reject the post, verification by human is required |

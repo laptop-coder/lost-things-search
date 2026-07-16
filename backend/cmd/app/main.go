@@ -2,7 +2,6 @@
 package main
 
 import (
-	"fmt"
 	"backend/internal/config"
 	"backend/internal/database"
 	"backend/internal/handler"
@@ -14,6 +13,10 @@ import (
 	"backend/pkg/logger"
 	"backend/pkg/middleware"
 	"context"
+	"errors"
+	"fmt"
+	"github.com/google/uuid"
+	valkeyGo "github.com/valkey-io/valkey-go"
 	"net/http"
 	"os"
 	"os/signal"
@@ -100,6 +103,7 @@ func main() {
 	jwtRepo := repository.NewJWTRepository(jwtClient, log)
 	studentGroupRepo := repository.NewStudentGroupRepository(db, log)
 	postRepo := repository.NewPostRepository(db, businessClient, log)
+	postModerationRepo := repository.NewPostModerationRepository(db, log)
 	msgRepo := repository.NewMessageRepository(db, log)
 	convRepo := repository.NewConversationRepository(db, log)
 	roomRepo := repository.NewRoomRepository(db, log)
@@ -123,7 +127,7 @@ func main() {
 	}
 	authService := service.NewAuthService(emailService, userRepo, jwtRepo, db, businessClient, serviceConfigs.Auth, log)
 	userService := service.NewUserService(userRepo, studentRepo, roomRepo, db, serviceConfigs.User, log)
-	postService := service.NewPostService(postRepo, hashCalc, db, businessClient, serviceConfigs.Post, log)
+	postService := service.NewPostService(postRepo, postModerationRepo, userService, hashCalc, db, businessClient, serviceConfigs.Post, log)
 	conversationService := service.NewConversationService(convRepo, msgRepo, postRepo, userRepo, emailService, db, log)
 	studentGroupService := service.NewStudentGroupService(userRepo, studentGroupRepo, db, log)
 	roomService := service.NewRoomService(roomRepo, db, log)
@@ -141,7 +145,7 @@ func main() {
 	log.Info("Initializing handlers...")
 	authHandler := handler.NewAuthHandler(authService, userService, inviteService, serviceConfigs.Auth, log)
 	userHandler := handler.NewUserHandler(userService, log)
-	postHandler := handler.NewPostHandler(postService, teacherService, parentService, studentGroupService, studentService, log)
+	postHandler := handler.NewPostHandler(postService, userService, teacherService, parentService, studentGroupService, studentService, log)
 	conversationHandler := handler.NewConversationHandler(conversationService, log)
 	studentGroupHandler := handler.NewStudentGroupHandler(teacherService, studentGroupService, log)
 	roomHandler := handler.NewRoomHandler(roomService, log)
@@ -202,6 +206,87 @@ func main() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Error("Failed to start server", "error", err.Error())
 			panic(err)
+		}
+	}()
+
+	// Moderation worker
+	go func() {
+		counter := 0
+		log.Info("starting moderation worker...")
+		for {
+			// Check if moderation worker exists
+			if _, err := userService.GetPostsModeratorBot(context.Background()); err != nil {
+				log.Error(
+					"failed to check posts moderator bot existence, maybe it does not exist. Waiting for 30 seconds to check one more time...",
+					"error",
+					err.Error(),
+				)
+				time.Sleep(30 * time.Second)
+				continue
+			}
+			// Get post ID. If this is the 64th request, take ID from the DB
+			// instead of queue
+			var postID uuid.UUID
+			if counter == 64 {
+				counter = 0
+				post, err := postService.GetOldestPendingPost(context.Background())
+				if err != nil {
+					log.Error("moderation worker: failed to get the oldest post with pending moderation status", "error", err.Error())
+					continue
+				}
+				if post == nil {
+					log.Error("moderation worker: post is nil")
+					continue
+				}
+				postID = post.ID
+			} else {
+				// Else get post ID from the queue
+				res := businessClient.Do(
+					context.Background(),
+					businessClient.
+						B().
+						Brpop().
+						Key("moderation:posts:queue").
+						Timeout(5).
+						Build(),
+				)
+				if errors.Is(res.Error(), valkeyGo.Nil) {
+					log.Info("moderation worker: there are no posts in queue to moderate. Looking at the database...")
+					if err := postService.ModerateAllPosts(context.Background()); err != nil {
+						log.Error("moderation worker: failed to moderate all posts", "error", err.Error())
+						continue
+					}
+					log.Info("moderation worker: all posts were moderated. Waiting for 30 seconds to check one more time...")
+					time.Sleep(30 * time.Second)
+					continue
+				}
+				if res.Error() != nil {
+					log.Error("moderation worker error: failed to get post to moderate from queue. Waiting for 5 seconds to retry...", "error", res.Error().Error())
+					time.Sleep(5 * time.Second)
+					continue
+				}
+				arr, err := res.AsStrSlice()
+				if err != nil {
+					log.Error("moderation worker error: failed to represent response as array. Waiting for 5 seconds to retry...")
+					time.Sleep(5 * time.Second)
+					continue
+				}
+				postIDParsed, err := uuid.Parse(arr[1])
+				if err != nil {
+					log.Error("moderation worker error: cannot convert post id to uuid. Waiting for 5 seconds to retry...")
+					time.Sleep(5 * time.Second)
+					continue
+				}
+				postID = postIDParsed
+			}
+			// Send post to the moderation service and change status in the DB
+			if err := postService.ModeratePost(context.Background(), postID); err != nil {
+				log.Error("moderation worker error: failed to moderate post. Waiting for 5 seconds to retry...", "error", err.Error())
+				time.Sleep(5 * time.Second)
+				continue
+			}
+			// Increment counter
+			counter += 1
 		}
 	}()
 

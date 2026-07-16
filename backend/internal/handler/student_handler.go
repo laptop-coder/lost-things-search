@@ -2,9 +2,9 @@ package handler
 
 import (
 	"backend/internal/service"
+	"backend/pkg/appcontext"
 	"backend/pkg/helpers"
 	"backend/pkg/logger"
-	"backend/pkg/middleware"
 	"fmt"
 	"github.com/google/uuid"
 	"net/http"
@@ -54,7 +54,7 @@ func (h *StudentHandler) GetOwn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get and convert user ID (i.e. student ID)
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -104,7 +104,7 @@ func (h *StudentHandler) GetClassroomOwn(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	// Get and convert user ID (i.e. student ID)
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -154,7 +154,7 @@ func (h *StudentHandler) GetAdvisorOwn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get and convert user ID (i.e. student ID)
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -204,7 +204,7 @@ func (h *StudentHandler) GetParentsOwn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Get and convert user ID (i.e. student ID)
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
@@ -229,7 +229,7 @@ func (h *StudentHandler) GetStudentGroupOwn(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	// Get and convert user ID (i.e. student ID)
-	userID, ok := r.Context().Value(middleware.UserIDKey).(uuid.UUID)
+	userID, ok := r.Context().Value(appcontext.UserIDKey).(uuid.UUID)
 	if !ok {
 		h.log.Error("failed to get userID from context and convert it to UUID")
 		helpers.InternalError(h.log, w)
