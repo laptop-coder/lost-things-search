@@ -29,6 +29,7 @@ done
 if [ "${NEED_RESTART}" -ne 0 ]; then
     cd "${PATH_TO_PROJECT}" || exit 1
     make down
+    git pull || true # ignore errors
     make deploy
 fi
 
