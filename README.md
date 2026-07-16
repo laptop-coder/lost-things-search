@@ -80,4 +80,3 @@ Please read [CONTRIBUTING.md](https://github.com/laptop-coder/lost-things-search
 | rejected      | Rejected by a human                                                                            |
 | needs_review  | The bot does not know whether to approve or reject the post, verification by human is required |
 
-test_ci
