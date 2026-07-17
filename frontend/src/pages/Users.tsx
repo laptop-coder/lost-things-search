@@ -518,7 +518,7 @@ const Users = () => {
               <tbody class="divide-y divide-gray-100">
                 <For
                   each={users().filter((user) =>
-                    user.roles.every((role) => role.id !== 1),
+                    user.roles.every((role) => role.id !== 1 && role.id !== 8), // TODO: refactor, change to constant
                   )}
                 >
                   {(user) => (
@@ -565,8 +565,8 @@ const Users = () => {
                             {(ur) => (
                               <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
                                 {
-                                  ROLES_TO_DISPLAY.find((r) => r.id === ur.id)!
-                                    .displayName
+                                  ROLES_TO_DISPLAY.find((r) => r.id === ur.id)
+                                    ?.displayName
                                 }
                               </span>
                             )}
@@ -618,7 +618,8 @@ const Users = () => {
                             (user.roles.every(
                               (r) =>
                                 r.name !== ROLES.ADMIN &&
-                                r.name !== ROLES.SUPERADMIN,
+                                r.name !== ROLES.SUPERADMIN &&
+                                r.name !== ROLES.BOT_MODERATOR_POSTS,
                             ) &&
                               hasPermission(
                                 PERMISSIONS.USER_DELETE_ANY_USER,
@@ -704,7 +705,8 @@ const Users = () => {
                         if (hasRole(ROLES.ADMIN)) {
                           return (
                             role.name !== ROLES.SUPERADMIN &&
-                            role.name !== ROLES.ADMIN
+                            role.name !== ROLES.ADMIN &&
+                            role.name !== ROLES.BOT_MODERATOR_POSTS
                           ); // TODO: make in the whole frontend code like here
                         }
                         return false;
