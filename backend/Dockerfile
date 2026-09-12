@@ -1,9 +1,9 @@
-FROM golang:1.26.3-trixie AS deps
+FROM golang:1.27.1-trixie AS deps
 WORKDIR /app
 COPY go.mod go.sum .
 RUN go mod download
 
-FROM golang:1.26.3-trixie AS builder
+FROM golang:1.27.1-trixie AS builder
 WORKDIR /app
 COPY --from=deps /go /go
 COPY . .
