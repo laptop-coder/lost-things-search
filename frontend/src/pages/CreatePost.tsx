@@ -88,12 +88,12 @@ const CreatePost = () => {
   return (
     <>
       {hasPermission(PERMISSIONS.POST_CREATE) && (
-        <div class="max-w-2xl mx-auto">
+        <div class="max-w-2xl mx-auto bg-bg">
           <div class="mb-6">
-            <h1 class="text-2xl font-bold text-gray-800 text-center">
+            <h1 class="text-2xl font-bold text-text text-center">
               Создать объявление
             </h1>
-            <p class="text-gray-500 mt-1 text-center">
+            <p class="text-text-muted mt-1 text-center">
               {hasPermission(PERMISSIONS.POST_VERIFY)
                 ? "Объявление будет опубликовано сразу после отправки"
                 : "Объявление будет опубликовано после проверки"}
@@ -102,22 +102,22 @@ const CreatePost = () => {
 
           <form
             onSubmit={handleSubmit}
-            class="bg-white rounded-2xl shadow-lg p-6 space-y-5"
+            class="bg-surface rounded-2xl shadow-lg p-6 space-y-5"
           >
             {/* Photo upload */}
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium text-text mb-1">
                 Фото
               </label>
 
               <Show when={!photoPreview()}>
-                <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-500 transition">
+                <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-focus transition">
                   <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Image />
-                    <p class="text-sm text-gray-500">
+                    <Image class="text-text-muted" />
+                    <p class="text-sm text-text-muted">
                       Нажмите для загрузки фото
                     </p>
-                    <p class="text-xs text-gray-400 mt-1">
+                    <p class="text-xs text-text-muted mt-1">
                       JPEG, PNG, WebP, GIF (макс. 15MB)
                     </p>
                   </div>
@@ -142,18 +142,18 @@ const CreatePost = () => {
                     onClick={removePhoto}
                     class="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition cursor-pointer"
                   >
-                    <X />
+                    <X class="text-urgent bg-urgent-bg" />
                   </button>
                 </div>
               </Show>
-              <p class="text-xs text-gray-500 mt-1">
+              <p class="text-xs text-text-muted mt-1">
                 Вы можете добавить одно фото
               </p>
             </div>
 
             <Show when={similarPosts()?.length > 0}>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-sm font-medium text-text mb-1">
                   Похожие объявления
                 </label>
                 <div class="flex gap-3 overflow-x-auto">
@@ -176,12 +176,12 @@ const CreatePost = () => {
                           <img
                             src={`/storage/storage/post_photos/${post().id}.jpeg`}
                             alt={post().name}
-                            class="object-cover rounded-xl border-2 border-gray-300 hover:border-blue-500 transition"
+                            class="object-cover rounded-xl border-2 border-border hover:border-focus transition"
                           />
                         </Show>
                         <Show when={!post().hasPhoto}>
-                          <div class="flex w-30 h-full justify-center items-center rounded-xl border-2 border-gray-300 hover:border-blue-500 transition flex-col gap-3 p-2">
-                            <ImageOff />
+                          <div class="flex w-30 h-full justify-center items-center rounded-xl border-2 border-border hover:border-focus transition flex-col gap-3 p-2">
+                            <ImageOff class="text-text-muted" />
                             <span class="truncate max-w-full">
                               {post().name}
                             </span>
@@ -195,7 +195,7 @@ const CreatePost = () => {
             </Show>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium text-text mb-1">
                 Название *
               </label>
               <input
@@ -207,16 +207,16 @@ const CreatePost = () => {
                   refreshSimilarPosts();
                 }}
                 placeholder="Например: синяя шапка"
-                class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition text-text-muted"
                 required
               />
-              <p class="text-xs text-gray-500 mt-1">
+              <p class="text-xs text-text-muted mt-1">
                 Коротко опишите, что потеряли или нашли
               </p>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium text-text mb-1">
                 Описание
               </label>
               <textarea
@@ -227,13 +227,15 @@ const CreatePost = () => {
                 }}
                 placeholder="Где и когда, особые приметы..."
                 rows={5}
-                class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition min-h-[140px] max-h-[600px]"
+                class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition min-h-[140px] max-h-[600px] text-text-muted"
               />
-              <p class="text-xs text-gray-500 mt-1">Чем подробнее, тем лучше</p>
+              <p class="text-xs text-text-muted mt-1">
+                Чем подробнее, тем лучше
+              </p>
             </div>
 
             {error() && (
-              <div class="bg-red-50 text-red-600 p-3 rounded-xl text-sm border border-red-200">
+              <div class="bg-urgent-bg text-urgent p-3 rounded-xl text-sm border border-urgent">
                 {error()}
               </div>
             )}
@@ -242,14 +244,14 @@ const CreatePost = () => {
               <button
                 type="button"
                 onClick={() => navigate("/")}
-                class="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium cursor-pointer"
+                class="flex-1 px-4 py-2 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium cursor-pointer"
               >
                 Отмена
               </button>
               <button
                 type="submit"
                 disabled={loading()}
-                class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                class="flex-1 px-4 py-2 bg-accent text-bg rounded-xl hover:bg-accent-hover transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {loading() ? "Отправка..." : "Отправить"}
               </button>

@@ -31,7 +31,7 @@ import type {
   StaffPosition,
   InstitutionAdministratorPosition,
 } from "../lib/types";
-import { Pencil, Trash, LogOut, Plus } from "lucide-solid";
+import { Pencil, Trash, LogOut, Plus, Check } from "lucide-solid";
 import Skeleton from "../components/Skeleton";
 import Spinner from "../components/Spinner";
 import { Motion, Presence } from "solid-motionone";
@@ -427,13 +427,13 @@ const Profile = () => {
           {/* "Copied!" notification */}
           <Show when={showCopied()}>
             <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50">
-              <div class="bg-gray-800 text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium">
-                ✓ Скопировано!
+              <div class="bg-surface-2 text-text px-5 py-3 rounded-xl shadow-lg text-sm font-medium gap-2">
+                <Check /> Скопировано!
               </div>
             </div>
           </Show>
 
-          <h1 class="text-2xl font-bold text-center text-gray-800">
+          <h1 class="text-2xl font-bold text-center text-text">
             Личный кабинет
           </h1>
 
@@ -446,7 +446,7 @@ const Profile = () => {
                     <Skeleton class="h-5 w-48 max-md:mx-auto" />
                     <Skeleton class="h-4 w-36 max-md:mx-auto" />
                   </div>
-                  <div class="text-sm text-gray-500 space-y-2 mt-4">
+                  <div class="text-sm text-text space-y-2 mt-4">
                     <Skeleton class="h-3 w-52" />
                     <Skeleton class="h-4 w-40" />
                     <Skeleton class="h-3 w-48" />
@@ -457,21 +457,21 @@ const Profile = () => {
           </Show>
 
           <Show when={error()}>
-            <div class="bg-red-100 text-red-700 p-4 rounded-xl">{error()}</div>
+            <div class="bg-urgent-bg text-urgent p-4 rounded-xl">{error()}</div>
           </Show>
 
           <Show when={user() && !error() && !loading()}>
-            <div class="bg-white rounded-2xl shadow-lg p-6 relative">
+            <div class="bg-surface rounded-2xl shadow-lg p-6 relative">
               <button
                 onClick={handleLogout}
-                class="aspect-square h-10 bg-red-700 text-white rounded-lg hover:bg-red-800 transition cursor-pointer absolute top-4 right-4 flex justify-center items-center"
+                class="aspect-square h-10 bg-urgent-bg text-urgent rounded-lg hover:bg-urgent-bg transition cursor-pointer absolute top-4 right-4 flex justify-center items-center"
               >
                 <LogOut />
               </button>
               <div class="flex flex-col md:flex-row gap-6 items-center md:items-start">
                 <div class="relative group w-32 h-32 rounded-full">
                   <img
-                    class="w-32 h-32 rounded-full object-cover border-4 border-gray-100"
+                    class="w-32 h-32 rounded-full object-cover border-4 border-border"
                     src={
                       user()!.hasAvatar
                         ? `/storage/storage/avatars/${user()!.id}.jpeg`
@@ -480,7 +480,7 @@ const Profile = () => {
                     alt="Фото профиля"
                   />
                   <label class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition cursor-pointer">
-                    <Pencil class="text-white" />
+                    <Pencil class="text-text" />
                     <input
                       type="file"
                       accept="image/jpeg,image/png,image/webp,image/gif"
@@ -496,11 +496,11 @@ const Profile = () => {
                   </Show>
                 </div>
                 <div class="flex-1 text-center md:text-left md:mr-40">
-                  <h2 class="text-2xl font-bold text-gray-800">
+                  <h2 class="text-2xl font-bold text-text">
                     {user()!.lastName} {user()!.firstName} {user()?.middleName}
                   </h2>
                   <p
-                    class={`text-gray-500 mt-1 ${navigator.clipboard ? "cursor-copy" : ""}`}
+                    class={`text-text mt-1 ${navigator.clipboard ? "cursor-copy" : ""}`}
                     onClick={() => copyToClipboard(user()!.email)}
                   >
                     {user()!.email}
@@ -509,7 +509,7 @@ const Profile = () => {
                     <div class="flex flex-wrap gap-1">
                       <For each={user()!.roles}>
                         {(ur) => (
-                          <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                          <span class="px-2 py-1 bg-surface-2 text-text text-xs rounded-full">
                             {
                               ROLES_TO_DISPLAY.find((r) => r.id === ur.id)!
                                 .displayName
@@ -519,7 +519,7 @@ const Profile = () => {
                       </For>
                     </div>
                   </div>
-                  <div class="text-sm text-gray-500 text-left mt-4">
+                  <div class="text-sm text-text text-left mt-4">
                     <p
                       class={navigator.clipboard ? "cursor-copy" : ""}
                       onClick={() => copyToClipboard(user()!.id)}
@@ -534,13 +534,13 @@ const Profile = () => {
                     <Show when={!editMode()}>
                       <button
                         onClick={() => setEditMode(true)}
-                        class="w-55 h-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer"
+                        class="w-55 h-10 bg-surface-2 text-text rounded-lg hover:bg-surface transition cursor-pointer"
                       >
                         Редактировать
                       </button>
                       <button
                         onClick={openDeleteAccountModal}
-                        class="w-55 h-10 bg-red-600 text-white rounded-lg hover:bg-red-700 transition cursor-pointer"
+                        class="w-55 h-10 bg-urgent-bg text-urgent rounded-lg hover:bg-urgent-bg transition cursor-pointer"
                       >
                         Удалить учётную запись
                       </button>
@@ -548,13 +548,13 @@ const Profile = () => {
                     <Show when={editMode()}>
                       <button
                         onClick={cancelEdit}
-                        class="w-55 h-10 bg-red-700 text-white rounded-lg hover:bg-red-800 transition cursor-pointer"
+                        class="w-55 h-10 bg-urgent-bg text-urgent rounded-lg hover:bg-urgent-bg transition cursor-pointer"
                       >
                         Отмена
                       </button>
                       <button
                         onClick={saveProfile}
-                        class="w-55 h-10 bg-green-700 text-white rounded-lg hover:bg-green-800 transition cursor-pointer"
+                        class="w-55 h-10 bg-accent text-bg rounded-lg hover:bg-accent-hover transition cursor-pointer"
                       >
                         Сохранить
                       </button>
@@ -566,13 +566,11 @@ const Profile = () => {
 
             <Show when={hasRole(ROLES.PARENT)}>
               <Show when={parentStudentsUsers().length > 0 || editMode()}>
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                  <h2 class="text-xl font-bold text-gray-800">Мои дети</h2>
+                <div class="bg-surface rounded-2xl shadow-lg p-6">
+                  <h2 class="text-xl font-bold text-text">Мои дети</h2>
                   <Show when={editMode()}>
-                    <div class="space-y-3 border-t border-gray-100 pt-4">
-                      <h3 class="font-medium text-gray-800">
-                        Привязка учеников
-                      </h3>
+                    <div class="space-y-3 border-t border-border pt-4">
+                      <h3 class="font-medium text-text">Привязка учеников</h3>
 
                       <Index each={parentStudentIds}>
                         {(studentId, index) => (
@@ -587,13 +585,13 @@ const Profile = () => {
                                 updateStudentId(index, e.target.value);
                               }}
                               placeholder={`ID ученика ${index + 1}`}
-                              class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
+                              class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition disabled:opacity-50 disabled:cursor-not-allowed text-text"
                             />
                             <button
                               disabled={saving()}
                               type="button"
                               onClick={() => removeStudentId(index)}
-                              class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-red-700 text-white rounded-xl hover:bg-red-800 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                              class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-urgent-bg text-urgent rounded-xl hover:bg-urgent-bg transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                             >
                               <span class="hidden md:flex">Удалить</span>
                               <Trash class="flex md:hidden" />
@@ -606,7 +604,7 @@ const Profile = () => {
                         disabled={saving()}
                         type="button"
                         onClick={addStudentId}
-                        class="w-full py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
+                        class="w-full py-2 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
                       >
                         <Plus /> Добавить ученика
                       </button>
@@ -620,7 +618,7 @@ const Profile = () => {
                         >
                           <div class="flex flex-col md:flex-row items-center gap-3">
                             <img
-                              class="w-12 h-12 rounded-full object-cover border-2 border-gray-100"
+                              class="w-12 h-12 rounded-full object-cover border-2 border-border"
                               src={
                                 user.hasAvatar
                                   ? `/storage/storage/avatars/${user.id}.jpeg`
@@ -629,11 +627,11 @@ const Profile = () => {
                               alt="Фото профиля"
                             />
                             <div>
-                              <p class="font-semibold">
+                              <p class="font-semibold text-text">
                                 {user.lastName} {user.firstName}{" "}
                                 {user?.middleName}
                               </p>
-                              <p class="text-sm text-gray-500">{user.email}</p>
+                              <p class="text-sm text-text">{user.email}</p>
 
                               <div class="flex flex-wrap gap-2 mt-3 mb-3">
                                 <div class="flex flex-wrap gap-1">
@@ -643,14 +641,14 @@ const Profile = () => {
                                     )}
                                   >
                                     {(role) => (
-                                      <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                                      <span class="px-2 py-1 bg-surface-2 text-text text-xs rounded-full">
                                         {role.displayName}
                                       </span>
                                     )}
                                   </For>
                                 </div>
                               </div>
-                              <div class="text-sm text-gray-500">
+                              <div class="text-sm text-text">
                                 <p
                                   class={
                                     navigator.clipboard ? "cursor-copy" : ""
@@ -673,56 +671,50 @@ const Profile = () => {
               </Show>
             </Show>
             <Show when={hasRole(ROLES.TEACHER)}>
-              <div class="bg-white rounded-2xl shadow-lg p-6 space-y-4">
-                <h3 class="text-lg font-semibold text-gray-700">
-                  Преподаватель
-                </h3>
+              <div class="bg-surface rounded-2xl shadow-lg p-6 space-y-4">
+                <h3 class="text-lg font-semibold text-text">Преподаватель</h3>
 
                 <Show when={!editMode()}>
                   <div>
-                    <h4 class="text-sm font-medium text-gray-500 mb-2">
-                      Кабинет
-                    </h4>
+                    <h4 class="text-sm font-medium text-text mb-2">Кабинет</h4>
                     <div class="flex items-center gap-3">
-                      <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                      <span class="text-gray-800">
+                      <span class="w-2 h-2 bg-surface-2 rounded-full"></span>
+                      <span class="text-text">
                         {teacherClassroom()?.name || "Не указан"}
                       </span>
                     </div>
                   </div>
 
                   <div>
-                    <h4 class="text-sm font-medium text-gray-500 mb-2">
-                      Предметы
-                    </h4>
+                    <h4 class="text-sm font-medium text-text mb-2">Предметы</h4>
                     <div class="flex flex-wrap gap-2">
                       <For each={teacherSubjects()}>
                         {(subject) => (
-                          <span class="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full">
+                          <span class="px-3 py-1 bg-surface-2 text-text text-sm rounded-full">
                             {subject.name}
                           </span>
                         )}
                       </For>
                       <Show when={teacherSubjects().length === 0}>
-                        <span class="text-gray-500 text-sm">Нет предметов</span>
+                        <span class="text-text text-sm">Нет предметов</span>
                       </Show>
                     </div>
                   </div>
 
                   <div>
-                    <h4 class="text-sm font-medium text-gray-500 mb-2">
+                    <h4 class="text-sm font-medium text-text mb-2">
                       Классное руководство/наставничество
                     </h4>
                     <div class="flex flex-wrap gap-2">
                       <For each={teacherStudentGroups()}>
                         {(group) => (
-                          <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-sm rounded-full">
+                          <span class="px-3 py-1 bg-surface-2 text-text text-sm rounded-full">
                             {group.name}
                           </span>
                         )}
                       </For>
                       <Show when={teacherStudentGroups().length === 0}>
-                        <span class="text-gray-500 text-sm">
+                        <span class="text-text text-sm">
                           Нет учебных групп или классов
                         </span>
                       </Show>
@@ -731,7 +723,7 @@ const Profile = () => {
                 </Show>
                 <Show when={editMode()}>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                    <label class="block text-sm font-medium text-text mb-1">
                       Классный кабинет *
                     </label>
                     <select
@@ -739,7 +731,7 @@ const Profile = () => {
                       onChange={(e) =>
                         setTeacherClassroomId(Number(e.currentTarget.value))
                       }
-                      class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-text"
                     >
                       <option value="">Выберите кабинет</option>
                       <For each={rooms()}>
@@ -749,13 +741,13 @@ const Profile = () => {
                   </div>
 
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-text mb-2">
                       Предметы *
                     </label>
-                    <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border border-gray-200 rounded-xl">
+                    <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border border-border rounded-xl">
                       <For each={subjects()}>
                         {(subject) => (
-                          <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition">
+                          <label class="flex items-center gap-2 p-2 hover:bg-surface-2 rounded-lg cursor-pointer transition">
                             <input
                               type="checkbox"
                               checked={teacherSubjectIds().includes(subject.id)}
@@ -771,9 +763,9 @@ const Profile = () => {
                                   ]);
                                 }
                               }}
-                              class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                              class="w-4 h-4 text-text rounded focus:ring-focus"
                             />
-                            <span class="text-gray-700 text-sm">
+                            <span class="text-text text-sm">
                               {subject.name}
                             </span>
                           </label>
@@ -781,8 +773,8 @@ const Profile = () => {
                       </For>
                     </div>
                   </div>
-                  <div class="space-y-3 border-t border-gray-200 pt-4">
-                    <h3 class="font-medium text-gray-800">
+                  <div class="space-y-3 border-t border-border pt-4">
+                    <h3 class="font-medium text-text">
                       Классное руководство/наставничество
                     </h3>
 
@@ -797,7 +789,7 @@ const Profile = () => {
                                 Number(e.target.value),
                               )
                             }
-                            class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-text"
                           >
                             <option value="">Выберите группу</option>
                             <For
@@ -816,7 +808,7 @@ const Profile = () => {
                           <button
                             type="button"
                             onClick={() => removeTeacherStudentGroupId(index)}
-                            class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-red-700 text-white rounded-xl hover:bg-red-800 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                            class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-urgent-bg text-urgent rounded-xl hover:bg-urgent-bg transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                           >
                             <span class="hidden md:flex">Удалить</span>
                             <Trash class="flex md:hidden" />
@@ -828,7 +820,7 @@ const Profile = () => {
                     <button
                       type="button"
                       onClick={addTeacherStudentGroupId}
-                      class="w-full py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
+                      class="w-full py-2 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
                     >
                       <Plus /> Добавить группу
                     </button>
@@ -837,21 +829,19 @@ const Profile = () => {
               </div>
             </Show>
             <Show when={hasRole(ROLES.INSTITUTION_ADMINISTRATOR)}>
-              <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">
-                  Должность
-                </h3>
+              <div class="bg-surface rounded-2xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-text mb-4">Должность</h3>
                 <Show when={!editMode()}>
                   <div class="flex items-center gap-3">
-                    <span class="w-2 h-2 bg-red-500 rounded-full"></span>
-                    <span class="text-gray-800">
+                    <span class="w-2 h-2 bg-surface-2 rounded-full"></span>
+                    <span class="text-text">
                       {institutionAdministratorPosition()?.name}
                     </span>
                   </div>
                 </Show>
                 <Show when={editMode()}>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-text mb-2">
                       Должность администрации ОУ *
                     </label>
                     <select
@@ -864,7 +854,7 @@ const Profile = () => {
                           Number(e.currentTarget.value),
                         );
                       }}
-                      class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
                     >
                       <option value="">Выберите должность</option>
                       <For each={institutionAdministratorPositions()}>
@@ -878,19 +868,17 @@ const Profile = () => {
               </div>
             </Show>
             <Show when={hasRole(ROLES.STAFF)}>
-              <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">
-                  Должность
-                </h3>
+              <div class="bg-surface rounded-2xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-text mb-4">Должность</h3>
                 <Show when={!editMode()}>
                   <div class="flex items-center gap-3">
-                    <span class="w-2 h-2 bg-indigo-500 rounded-full"></span>
-                    <span class="text-gray-800">{staffPosition()?.name}</span>
+                    <span class="w-2 h-2 bg-surface-2 rounded-full"></span>
+                    <span class="text-text">{staffPosition()?.name}</span>
                   </div>
                 </Show>
                 <Show when={editMode()}>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-text mb-2">
                       Должность сотрудника ОУ *
                     </label>
                     <select
@@ -901,7 +889,7 @@ const Profile = () => {
                         setError("");
                         setStaffPositionId(Number(e.currentTarget.value));
                       }}
-                      class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
                     >
                       <option value="">Выберите должность</option>
                       <For each={staffPositions()}>
@@ -916,17 +904,15 @@ const Profile = () => {
             </Show>
             <Show when={hasRole(ROLES.STUDENT)}>
               <Show when={studentParentsUsers().length > 0}>
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                  <h2 class="text-xl font-bold text-gray-800 mb-4">
-                    Мои родители
-                  </h2>
+                <div class="bg-surface rounded-2xl shadow-lg p-6">
+                  <h2 class="text-xl font-bold text-text mb-4">Мои родители</h2>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <For each={studentParentsUsers()}>
                       {(user) => (
                         <div class="border rounded-xl p-4 hover:shadow-md transition">
                           <div class="flex items-center gap-3">
                             <img
-                              class="w-12 h-12 rounded-full object-cover border-2 border-gray-100"
+                              class="w-12 h-12 rounded-full object-cover border-2 border-border"
                               src={
                                 user.hasAvatar
                                   ? `/storage/storage/avatars/${user.id}.jpeg`
@@ -939,7 +925,7 @@ const Profile = () => {
                                 {user.lastName} {user.firstName}{" "}
                                 {user?.middleName}
                               </p>
-                              <p class="text-sm text-gray-500">{user.email}</p>
+                              <p class="text-sm text-text">{user.email}</p>
 
                               <div class="flex flex-wrap gap-2 mt-3 mb-3">
                                 <div class="flex flex-wrap gap-1">
@@ -949,7 +935,7 @@ const Profile = () => {
                                     )}
                                   >
                                     {(role) => (
-                                      <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                                      <span class="px-2 py-1 bg-surface-2 text-text text-xs rounded-full">
                                         {role.displayName}
                                       </span>
                                     )}
@@ -964,19 +950,19 @@ const Profile = () => {
                   </div>
                 </div>
               </Show>
-              <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">
+              <div class="bg-surface rounded-2xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-text mb-4">
                   Класс/учебная группа
                 </h3>
                 <Show when={!editMode()}>
                   <div class="flex items-center gap-3">
-                    <span class="w-2 h-2 bg-pink-500 rounded-full"></span>
-                    <span class="text-gray-800">{studentGroup()?.name}</span>
+                    <span class="w-2 h-2 bg-surface-2 rounded-full"></span>
+                    <span class="text-text">{studentGroup()?.name}</span>
                   </div>
                 </Show>
                 <Show when={editMode()}>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-text mb-2">
                       Учебная группа *
                     </label>
                     <select
@@ -985,7 +971,7 @@ const Profile = () => {
                       onChange={(e) =>
                         setStudentGroupId(Number(e.currentTarget.value))
                       }
-                      class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
                     >
                       <option value="">Выберите группу</option>
                       <For each={studentGroups()}>
@@ -1012,7 +998,7 @@ const Profile = () => {
                 transition={{ duration: 0.2 }}
               >
                 <Motion.div
-                  class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
+                  class="bg-surface rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
                   onClick={(e) => e.stopPropagation()}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -1020,11 +1006,11 @@ const Profile = () => {
                   transition={{ duration: 0.2 }}
                 >
                   {/* Header */}
-                  <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4">
-                    <h2 class="text-xl font-bold text-gray-800">
+                  <div class="sticky top-0 bg-surface border-b border-border px-6 py-4">
+                    <h2 class="text-xl font-bold text-text">
                       Подтвердите удаление
                     </h2>
-                    <p class="text-sm text-gray-500">
+                    <p class="text-sm text-text">
                       Введите email, на который зарегистрирована учётная запись
                     </p>
                   </div>
@@ -1032,7 +1018,7 @@ const Profile = () => {
                   {/* Body */}
                   <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-5 flex flex-col">
                     <Show when={error()}>
-                      <div class="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-sm">
+                      <div class="bg-urgent-bg border border-urgent text-urgent p-3 rounded-xl text-sm">
                         {error()}
                       </div>
                     </Show>
@@ -1054,23 +1040,23 @@ const Profile = () => {
                         }
                       }}
                       placeholder={user() ? user()!.email : "email@example.ru"}
-                      class="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      class="flex-1 px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition disabled:opacity-50 disabled:cursor-not-allowed text-text"
                       required
                     />
                   </div>
 
                   {/* Footer */}
-                  <div class="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+                  <div class="sticky bottom-0 bg-surface border-t border-border px-6 py-4 flex justify-end gap-3">
                     <button
                       onClick={closeDeleteAccountModal}
-                      class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium cursor-pointer"
+                      class="px-4 py-2 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium cursor-pointer"
                     >
                       Отмена
                     </button>
                     <button
                       onClick={deleteAccount}
                       disabled={deleteAccountLoading()}
-                      class="px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition font-medium disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                      class="px-4 py-2 bg-urgent-bg text-urgent rounded-xl hover:bg-urgent-bg transition font-medium disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                     >
                       {deleteAccountLoading() ? "Удаление..." : "Удалить"}
                     </button>

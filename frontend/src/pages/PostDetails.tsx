@@ -33,8 +33,8 @@ const PostDetails = () => {
   });
 
   return (
-    <div class="max-w-4xl mx-auto px-4 py-6">
-      <h1 class="text-2xl font-bold text-gray-800 text-center mb-6">
+    <div class="max-w-4xl mx-auto px-4 py-6 bg-bg">
+      <h1 class="text-2xl font-bold text-text text-center mb-6">
         Информация об объявлении
       </h1>
       <Show when={loading()}>
@@ -48,7 +48,7 @@ const PostDetails = () => {
         </div>
       </Show>
       <Show when={error()}>
-        <div class="bg-red-50 text-red-600 p-3 rounded-xl text-sm border border-red-200">
+        <div class="bg-urgent-bg text-urgent p-3 rounded-xl text-sm border border-urgent">
           {error()}
         </div>
       </Show>

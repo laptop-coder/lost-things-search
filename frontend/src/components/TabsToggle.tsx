@@ -56,7 +56,7 @@ const TabsToggle = (props: {
   });
 
   return (
-    <div class="relative bg-gray-100 h-[80px] w-full overflow-x-auto rounded-lg">
+    <div class="relative bg-surface h-[80px] w-full overflow-x-auto rounded-lg">
       <div
         class={`flex items-center h-[80px] ${props.tabs.length > 5 ? "justify-between" : "justify-evenly"} rounded-lg`}
         id={props.tabsHTMLElementId}
@@ -69,7 +69,7 @@ const TabsToggle = (props: {
                 setActiveTab(index());
                 props.onChange(props.tabs[index()]);
               }}
-              class="border-none bg-none p-[20px] h-full text-sm cursor-pointer flex items-center rounded-lg"
+              class="border-none bg-none p-[20px] h-full text-sm cursor-pointer flex items-center rounded-lg text-text"
             >
               <span class="relative z-2 select-none flex items-center justify-center">
                 {tab.label}
@@ -85,7 +85,7 @@ const TabsToggle = (props: {
           width: String(activeTabInfo().width - 10 + "px"),
         }}
         transition={{ duration: 0.3 }}
-        class="top-[5px] bottom-[5px] rounded-lg absolute bg-white z-1"
+        class="top-[5px] bottom-[5px] rounded-lg absolute bg-surface-2 z-1"
       />
     </div>
   );

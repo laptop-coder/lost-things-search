@@ -54,12 +54,12 @@ const ResetPassword = () => {
     <div class="min-h-[80vh] flex items-center justify-center px-4">
       <div class="w-full max-w-md">
         <div class="text-center mb-8">
-          <h1 class="text-3xl font-bold text-gray-800">Сброс пароля</h1>
-          <p class="text-gray-500 mt-2">Придумайте новый пароль</p>
+          <h1 class="text-3xl font-bold text-text">Сброс пароля</h1>
+          <p class="text-text-muted mt-2">Придумайте новый пароль</p>
         </div>
 
         <Show when={!token}>
-          <div class="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl text-center">
+          <div class="bg-urgent-bg border border-urgent text-urgent p-4 rounded-xl text-center">
             Недействительная ссылка
           </div>
         </Show>
@@ -79,10 +79,10 @@ const ResetPassword = () => {
         >
           <form
             onSubmit={handleSubmit}
-            class="bg-white rounded-2xl shadow-lg p-6 space-y-5"
+            class="bg-surface rounded-2xl shadow-lg p-6 space-y-5"
           >
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium text-text mb-1">
                 Новый пароль *
               </label>
               <input
@@ -90,13 +90,13 @@ const ResetPassword = () => {
                 value={password()}
                 onInput={(e) => setPassword(e.currentTarget.value)}
                 placeholder="••••••••"
-                class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition"
                 required
               />
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium text-text mb-1">
                 Подтверждение пароля *
               </label>
               <input
@@ -104,13 +104,13 @@ const ResetPassword = () => {
                 value={confirmPassword()}
                 onInput={(e) => setConfirmPassword(e.currentTarget.value)}
                 placeholder="••••••••"
-                class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition"
                 required
               />
             </div>
 
             <Show when={error()}>
-              <div class="bg-red-50 text-red-600 p-3 rounded-xl text-sm border border-red-200">
+              <div class="bg-urgent-bg text-urgent p-3 rounded-xl text-sm border border-urgent">
                 {error()}
               </div>
             </Show>
@@ -120,7 +120,7 @@ const ResetPassword = () => {
               disabled={
                 loading() || !password().trim() || !confirmPassword().trim()
               }
-              class="w-full py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition font-medium cursor-pointer disabled:cursor-not-allowed"
+              class="w-full py-2.5 bg-accent text-bg rounded-xl hover:bg-accent-hover disabled:opacity-50 transition font-medium cursor-pointer disabled:cursor-not-allowed"
             >
               {loading() ? "Сохранение..." : "Сохранить пароль"}
             </button>

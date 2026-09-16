@@ -21,6 +21,7 @@ import type {
   StaffPosition,
   InstitutionAdministratorPosition,
 } from "../lib/types";
+import { Check } from "lucide-solid";
 import Skeleton from "../components/Skeleton";
 
 const PublicProfile = () => {
@@ -167,13 +168,13 @@ const PublicProfile = () => {
           {/* "Copied!" notification */}
           <Show when={showCopied()}>
             <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50">
-              <div class="bg-gray-800 text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium">
-                ✓ Скопировано!
+              <div class="bg-surface-2 text-text px-5 py-3 rounded-xl shadow-lg text-sm font-medium gap-2">
+                <Check /> Скопировано!
               </div>
             </div>
           </Show>
 
-          <h1 class="text-2xl font-bold text-center text-gray-800">
+          <h1 class="text-2xl font-bold text-center text-text">
             Информация о пользователе
           </h1>
 
@@ -186,7 +187,7 @@ const PublicProfile = () => {
                     <Skeleton class="h-5 w-48 max-md:mx-auto" />
                     <Skeleton class="h-4 w-36 max-md:mx-auto" />
                   </div>
-                  <div class="text-sm text-gray-500 space-y-2 mt-4">
+                  <div class="text-sm text-text space-y-2 mt-4">
                     <Skeleton class="h-3 w-52" />
                     <Skeleton class="h-4 w-40" />
                     <Skeleton class="h-3 w-48" />
@@ -197,15 +198,15 @@ const PublicProfile = () => {
           </Show>
 
           <Show when={error()}>
-            <div class="bg-red-100 text-red-700 p-4 rounded-xl">{error()}</div>
+            <div class="bg-urgent-bg text-urgent p-4 rounded-xl">{error()}</div>
           </Show>
 
           <Show when={user() && !error() && !loading()}>
-            <div class="bg-white rounded-2xl shadow-lg p-6">
+            <div class="bg-surface rounded-2xl shadow-lg p-6">
               <div class="flex flex-col md:flex-row gap-6 items-center md:items-start">
                 <div class="relative group w-32 h-32 rounded-full">
                   <img
-                    class="w-32 h-32 rounded-full object-cover border-4 border-gray-100"
+                    class="w-32 h-32 rounded-full object-cover border-4 border-border"
                     src={
                       user()!.hasAvatar
                         ? `/storage/storage/avatars/${user()!.id}.jpeg`
@@ -215,12 +216,12 @@ const PublicProfile = () => {
                   />
                 </div>
                 <div class="flex-1 text-center md:text-left">
-                  <h2 class="text-2xl font-bold text-gray-800">
+                  <h2 class="text-2xl font-bold text-text">
                     {user()!.lastName} {user()!.firstName} {user()?.middleName}
                   </h2>
                   <Show when={hasPermission(PERMISSIONS.USER_READ_ALL)}>
                     <p
-                      class={`text-gray-500 mt-1 ${navigator.clipboard ? "cursor-copy" : ""}`}
+                      class={`text-text mt-1 ${navigator.clipboard ? "cursor-copy" : ""}`}
                       onClick={() => copyToClipboard(user()!.email)}
                     >
                       {user()!.email}
@@ -230,7 +231,7 @@ const PublicProfile = () => {
                     <div class="flex flex-wrap gap-1">
                       <For each={user()!.roles}>
                         {(ur) => (
-                          <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                          <span class="px-2 py-1 bg-surface-2 text-text text-xs rounded-full">
                             {
                               ROLES_TO_DISPLAY.find((r) => r.id === ur.id)!
                                 .displayName
@@ -241,7 +242,7 @@ const PublicProfile = () => {
                     </div>
                   </div>
                 </div>
-                <div class="text-sm text-gray-500">
+                <div class="text-sm text-text">
                   <Show when={hasRole(ROLES.ADMIN)}>
                     <p
                       class={navigator.clipboard ? "cursor-copy" : ""}
@@ -262,15 +263,15 @@ const PublicProfile = () => {
               }
             >
               <Show when={parentStudentsUsers().length > 0}>
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                  <h2 class="text-xl font-bold text-gray-800 mb-4">Дети</h2>
+                <div class="bg-surface rounded-2xl shadow-lg p-6">
+                  <h2 class="text-xl font-bold text-text mb-4">Дети</h2>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <For each={parentStudentsUsers()}>
                       {(user) => (
                         <div class="border rounded-xl p-4 hover:shadow-md transition relative">
                           <div class="flex flex-col md:flex-row items-center gap-3">
                             <img
-                              class="w-12 h-12 rounded-full object-cover border-2 border-gray-100"
+                              class="w-12 h-12 rounded-full object-cover border-2 border-border"
                               src={
                                 user.hasAvatar
                                   ? `/storage/storage/avatars/${user.id}.jpeg`
@@ -283,7 +284,7 @@ const PublicProfile = () => {
                                 {user.lastName} {user.firstName}{" "}
                                 {user?.middleName}
                               </p>
-                              <p class="text-sm text-gray-500">{user.email}</p>
+                              <p class="text-sm text-text">{user.email}</p>
 
                               <div class="flex flex-wrap gap-2 mt-3 mb-3">
                                 <div class="flex flex-wrap gap-1">
@@ -293,14 +294,14 @@ const PublicProfile = () => {
                                     )}
                                   >
                                     {(role) => (
-                                      <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                                      <span class="px-2 py-1 bg-surface-2 text-text text-xs rounded-full">
                                         {role.displayName}
                                       </span>
                                     )}
                                   </For>
                                 </div>
                               </div>
-                              <div class="text-sm text-gray-500">
+                              <div class="text-sm text-text">
                                 <p
                                   class={
                                     navigator.clipboard ? "cursor-copy" : ""
@@ -323,55 +324,49 @@ const PublicProfile = () => {
               </Show>
             </Show>
             <Show when={user()!.roles.find((r) => r.name === ROLES.TEACHER)}>
-              <div class="bg-white rounded-2xl shadow-lg p-6 space-y-4">
-                <h3 class="text-lg font-semibold text-gray-700">
-                  Преподаватель
-                </h3>
+              <div class="bg-surface rounded-2xl shadow-lg p-6 space-y-4">
+                <h3 class="text-lg font-semibold text-text">Преподаватель</h3>
 
                 <div>
-                  <h4 class="text-sm font-medium text-gray-500 mb-2">
-                    Предметы
-                  </h4>
+                  <h4 class="text-sm font-medium text-text mb-2">Предметы</h4>
                   <div class="flex flex-wrap gap-2">
                     <For each={teacherSubjects()}>
                       {(subject) => (
-                        <span class="px-3 py-1 bg-green-100 text-green-700 text-sm rounded-full">
+                        <span class="px-3 py-1 bg-surface-2 text-text text-sm rounded-full">
                           {subject.name}
                         </span>
                       )}
                     </For>
                     <Show when={teacherSubjects().length === 0}>
-                      <span class="text-gray-500 text-sm">Нет предметов</span>
+                      <span class="text-text text-sm">Нет предметов</span>
                     </Show>
                   </div>
                 </div>
 
                 <div>
-                  <h4 class="text-sm font-medium text-gray-500 mb-2">
-                    Кабинет
-                  </h4>
+                  <h4 class="text-sm font-medium text-text mb-2">Кабинет</h4>
                   <div class="flex items-center gap-3">
-                    <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                    <span class="text-gray-800">
+                    <span class="w-2 h-2 bg-surface-2 rounded-full"></span>
+                    <span class="text-text">
                       {teacherClassroom()?.name || "Не указан"}
                     </span>
                   </div>
                 </div>
 
                 <div>
-                  <h4 class="text-sm font-medium text-gray-500 mb-2">
+                  <h4 class="text-sm font-medium text-text mb-2">
                     Классное руководство/наставничество
                   </h4>
                   <div class="flex flex-wrap gap-2">
                     <For each={teacherStudentGroups()}>
                       {(group) => (
-                        <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-sm rounded-full">
+                        <span class="px-3 py-1 bg-surface-2 text-text text-sm rounded-full">
                           {group.name}
                         </span>
                       )}
                     </For>
                     <Show when={teacherStudentGroups().length === 0}>
-                      <span class="text-gray-500 text-sm">
+                      <span class="text-text text-sm">
                         Нет учебных групп или классов
                       </span>
                     </Show>
@@ -384,26 +379,22 @@ const PublicProfile = () => {
                 (r) => r.name === ROLES.INSTITUTION_ADMINISTRATOR,
               )}
             >
-              <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">
-                  Должность
-                </h3>
+              <div class="bg-surface-2 rounded-2xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-text mb-4">Должность</h3>
                 <div class="flex items-center gap-3">
-                  <span class="w-2 h-2 bg-red-500 rounded-full"></span>
-                  <span class="text-gray-800">
+                  <span class="w-2 h-2 bg-surface-2 rounded-full"></span>
+                  <span class="text-text">
                     {institutionAdministratorPosition()?.name}
                   </span>
                 </div>
               </div>
             </Show>
             <Show when={user()!.roles.find((r) => r.name === ROLES.STAFF)}>
-              <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">
-                  Должность
-                </h3>
+              <div class="bg-surface rounded-2xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-text mb-4">Должность</h3>
                 <div class="flex items-center gap-3">
-                  <span class="w-2 h-2 bg-indigo-500 rounded-full"></span>
-                  <span class="text-gray-800">{staffPosition()?.name}</span>
+                  <span class="w-2 h-2 bg-surface-2 rounded-full"></span>
+                  <span class="text-text">{staffPosition()?.name}</span>
                 </div>
               </div>
             </Show>
@@ -411,8 +402,8 @@ const PublicProfile = () => {
               <Show
                 when={hasRole(ROLES.ADMIN) && studentParentsUsers().length > 0}
               >
-                <div class="bg-white rounded-2xl shadow-lg p-6">
-                  <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <div class="bg-surface-2 rounded-2xl shadow-lg p-6">
+                  <h2 class="text-xl font-bold text-text mb-4">
                     Родители ученика
                   </h2>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -421,7 +412,7 @@ const PublicProfile = () => {
                         <div class="border rounded-xl p-4 hover:shadow-md transition">
                           <div class="flex items-center gap-3">
                             <img
-                              class="w-12 h-12 rounded-full object-cover border-2 border-gray-100"
+                              class="w-12 h-12 rounded-full object-cover border-2 border-border"
                               src={
                                 user.hasAvatar
                                   ? `/storage/storage/avatars/${user.id}.jpeg`
@@ -434,7 +425,7 @@ const PublicProfile = () => {
                                 {user.lastName} {user.firstName}{" "}
                                 {user?.middleName}
                               </p>
-                              <p class="text-sm text-gray-500">{user.email}</p>
+                              <p class="text-sm text-text">{user.email}</p>
 
                               <div class="flex flex-wrap gap-2 mt-3 mb-3">
                                 <div class="flex flex-wrap gap-1">
@@ -444,7 +435,7 @@ const PublicProfile = () => {
                                     )}
                                   >
                                     {(role) => (
-                                      <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                                      <span class="px-2 py-1 bg-surface-2 text-text text-xs rounded-full">
                                         {role.displayName}
                                       </span>
                                     )}
@@ -459,13 +450,13 @@ const PublicProfile = () => {
                   </div>
                 </div>
               </Show>
-              <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">
+              <div class="bg-surface rounded-2xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-text mb-4">
                   Класс/учебная группа
                 </h3>
                 <div class="flex items-center gap-3">
-                  <span class="w-2 h-2 bg-pink-500 rounded-full"></span>
-                  <span class="text-gray-800">{studentGroup()?.name}</span>
+                  <span class="w-2 h-2 bg-surface-2 rounded-full"></span>
+                  <span class="text-text">{studentGroup()?.name}</span>
                 </div>
               </div>
             </Show>

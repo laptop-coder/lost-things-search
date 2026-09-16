@@ -31,8 +31,7 @@ import type {
 } from "../lib/types";
 import { A } from "@solidjs/router";
 import Pagination from "../components/Pagination";
-import { Users as UsersIcon } from "lucide-solid";
-import { Trash, Plus } from "lucide-solid";
+import { Check, Trash, Plus, Users as UsersIcon } from "lucide-solid";
 import { Motion, Presence } from "solid-motionone";
 import Skeleton from "../components/Skeleton";
 
@@ -452,21 +451,19 @@ const Users = () => {
       {/* "Copied!" notification */}
       <Show when={showCopied()}>
         <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50">
-          <div class="bg-gray-800 text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium">
-            ✓ Скопировано!
+          <div class="bg-surface-2 text-text px-5 py-3 rounded-xl shadow-lg text-sm font-medium gap-2">
+            <Check /> Скопировано!
           </div>
         </div>
       </Show>
 
       <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">
-          Управление пользователями
-        </h1>
-        <p class="text-gray-500 mt-1">Назначение и изменение ролей</p>
+        <h1 class="text-3xl font-bold text-text">Управление пользователями</h1>
+        <p class="text-text-muted mt-1">Назначение и изменение ролей</p>
       </div>
 
       <Show when={error() && !selectedUser()}>
-        <div class="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl">
+        <div class="bg-urgent-bg border border-urgent text-urgent p-3 rounded-xl">
           {error()}
         </div>
       </Show>
@@ -483,54 +480,57 @@ const Users = () => {
       <Show when={!loading() && users().length === 0}>
         <div class="flex flex-col items-center justify-center gap-1 py-16">
           <UsersIcon class="w-15 h-15 mb-3" />
-          <p class="text-gray-500">Нет пользователей</p>
+          <p class="text-text-muted">Нет пользователей</p>
         </div>
       </Show>
 
       <Show when={!loading() && users().length > 0}>
         <Motion.div
-          class="bg-white rounded-2xl shadow-lg overflow-hidden"
+          class="bg-surface rounded-2xl shadow-lg overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.2 }}
         >
           <div class="overflow-x-auto">
             <table class="w-full">
-              <thead class="bg-gray-50 border-b border-gray-200">
+              <thead class="bg-surface-2 border-b border-border">
                 <tr>
-                  <th class="px-6 py-4 text-center text-sm font-semibold text-gray-600">
+                  <th class="px-6 py-4 text-center text-sm font-semibold text-text">
                     Пользователь
                   </th>
-                  <th class="px-6 py-4 text-center text-sm font-semibold text-gray-600">
+                  <th class="px-6 py-4 text-center text-sm font-semibold text-text">
                     Email
                   </th>
-                  <th class="px-6 py-4 text-center text-sm font-semibold text-gray-600">
+                  <th class="px-6 py-4 text-center text-sm font-semibold text-text">
                     ID
                   </th>
-                  <th class="px-6 py-4 text-center text-sm font-semibold text-gray-600">
+                  <th class="px-6 py-4 text-center text-sm font-semibold text-text">
                     Роли
                   </th>
-                  <th class="px-6 py-4 text-center text-sm font-semibold text-gray-600">
+                  <th class="px-6 py-4 text-center text-sm font-semibold text-text">
                     Действия
                   </th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-gray-100">
+              <tbody class="divide-y divide-border">
                 <For
-                  each={users().filter((user) =>
-                    user.roles.every((role) => role.id !== 1 && role.id !== 8), // TODO: refactor, change to constant
+                  each={users().filter(
+                    (user) =>
+                      user.roles.every(
+                        (role) => role.id !== 1 && role.id !== 8,
+                      ), // TODO: refactor, change to constant
                   )}
                 >
                   {(user) => (
-                    <tr class="hover:bg-gray-50 transition">
+                    <tr class="hover:bg-surface-2 transition">
                       <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
                           <A
                             href={`/users/${user.id}`}
-                            class="w-8 h-8 bg-gray-100 rounded-full hover:bg-gray-200 transition aspect-square"
+                            class="w-8 h-8 bg-surface rounded-full hover:bg-surface-2 transition aspect-square"
                           >
                             <img
-                              class="w-8 h-8 rounded-full object-cover border-2 border-gray-100 hover:brightness-95 transition"
+                              class="w-8 h-8 rounded-full object-cover border-2 border-border hover:brightness-95 transition"
                               src={
                                 user.hasAvatar
                                   ? `/storage/storage/avatars/${user.id}.jpeg`
@@ -540,7 +540,7 @@ const Users = () => {
                             />
                           </A>
                           <span
-                            class={`${auth.user()?.id === user.id ? "font-semibold" : ""}`}
+                            class={`text-text ${auth.user()?.id === user.id ? "font-semibold" : ""}`}
                           >
                             {user.lastName} {user.firstName}{" "}
                             {user?.middleName || ""}
@@ -548,13 +548,13 @@ const Users = () => {
                         </div>
                       </td>
                       <td
-                        class={`px-6 py-4 text-sm text-gray-500 ${navigator.clipboard ? "cursor-copy" : ""}`}
+                        class={`px-6 py-4 text-sm text-text ${navigator.clipboard ? "cursor-copy" : ""}`}
                         onClick={() => copyToClipboard(user.email)}
                       >
                         {user.email}
                       </td>
                       <td
-                        class={`px-6 py-4 text-sm text-gray-400 font-mono ${navigator.clipboard ? "cursor-copy" : ""}`}
+                        class={`px-6 py-4 text-sm text-text font-mono ${navigator.clipboard ? "cursor-copy" : ""}`}
                         onClick={() => copyToClipboard(user.id)}
                       >
                         {user.id.slice(0, 8)}...
@@ -563,7 +563,7 @@ const Users = () => {
                         <div class="flex flex-wrap gap-1.5">
                           <For each={user.roles}>
                             {(ur) => (
-                              <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                              <span class="px-2 py-1 bg-surface-2 text-text text-xs rounded-full">
                                 {
                                   ROLES_TO_DISPLAY.find((r) => r.id === ur.id)
                                     ?.displayName
@@ -579,7 +579,7 @@ const Users = () => {
                         >
                           <button
                             onClick={() => openModal(user)}
-                            class="text-blue-600 hover:text-blue-800 disabled:opacity-50 transition cursor-pointer disabled:cursor-not-allowed"
+                            class="text-accent hover:text-accent-hover disabled:opacity-50 transition cursor-pointer disabled:cursor-not-allowed"
                           >
                             Изменить роли
                           </button>
@@ -594,7 +594,7 @@ const Users = () => {
                           >
                             <button
                               onClick={() => addAdminRole(user)}
-                              class="text-blue-600 hover:text-blue-800 disabled:opacity-50 transition cursor-pointer disabled:cursor-not-allowed"
+                              class="text-accent-hover hover:text-accent-hover disabled:opacity-50 transition cursor-pointer disabled:cursor-not-allowed"
                             >
                               Сделать админом
                             </button>
@@ -607,7 +607,7 @@ const Users = () => {
                           >
                             <button
                               onClick={() => removeAdminRole(user)}
-                              class="text-red-600 hover:text-red-800 disabled:opacity-50 transition cursor-pointer disabled:cursor-not-allowed"
+                              class="text-urgent hover:text-urgent disabled:opacity-50 transition cursor-pointer disabled:cursor-not-allowed"
                             >
                               Снять права админа
                             </button>
@@ -630,7 +630,7 @@ const Users = () => {
                         >
                           <button
                             onClick={() => deleteUser(user)}
-                            class="text-red-600 hover:text-red-800 disabled:opacity-50 transition cursor-pointer disabled:cursor-not-allowed
+                            class="text-urgent hover:text-urgent disabled:opacity-50 transition cursor-pointer disabled:cursor-not-allowed
 "
                           >
                             Удалить
@@ -658,7 +658,7 @@ const Users = () => {
             transition={{ duration: 0.2 }}
           >
             <Motion.div
-              class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
+              class="bg-surface rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -666,7 +666,7 @@ const Users = () => {
               transition={{ duration: 0.2 }}
             >
               {/* Header */}
-              <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4">
+              <div class="sticky top-0 bg-surface border-b border-border px-6 py-4">
                 <div class="flex items-center gap-3">
                   <img
                     src={
@@ -678,10 +678,10 @@ const Users = () => {
                     class="w-10 h-10 rounded-full object-cover"
                   />
                   <div>
-                    <h2 class="text-xl font-bold text-gray-800">
+                    <h2 class="text-xl font-bold text-text">
                       {selectedUser()?.lastName} {selectedUser()?.firstName}
                     </h2>
-                    <p class="text-sm text-gray-500">{selectedUser()?.email}</p>
+                    <p class="text-sm text-text">{selectedUser()?.email}</p>
                   </div>
                 </div>
               </div>
@@ -689,14 +689,14 @@ const Users = () => {
               {/* Body */}
               <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-5">
                 <Show when={error()}>
-                  <div class="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-sm">
+                  <div class="bg-urgent-bg border border-urgent text-urgent p-3 rounded-xl text-sm">
                     {error()}
                   </div>
                 </Show>
 
                 {/* Roles selection */}
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-3">
+                  <label class="block text-sm font-medium text-text mb-3">
                     Выберите роли:
                   </label>
                   <div class="space-y-2">
@@ -713,7 +713,7 @@ const Users = () => {
                       })}
                     >
                       {(role) => (
-                        <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition cursor-pointer">
+                        <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-2 transition cursor-pointer">
                           <input
                             type="checkbox"
                             checked={selectedRoles().includes(role.id)}
@@ -723,9 +723,9 @@ const Users = () => {
                               toggleRole(role.id);
                             }}
                             disabled={saving()}
-                            class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                            class="w-4 h-4 text-surface-2 rounded focus:ring-focus"
                           />
-                          <span class="text-gray-700">{role.displayName}</span>
+                          <span class="text-text">{role.displayName}</span>
                         </label>
                       )}
                     </For>
@@ -735,7 +735,7 @@ const Users = () => {
                 {/* Institution Administrator Position */}
                 <Show when={selectedRoles().includes(3)}>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-text mb-2">
                       Должность администрации ОУ *
                     </label>
                     <select
@@ -748,7 +748,7 @@ const Users = () => {
                           Number(e.currentTarget.value),
                         );
                       }}
-                      class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
                     >
                       <option value="">Выберите должность</option>
                       <For each={institutionAdministratorPositions()}>
@@ -763,7 +763,7 @@ const Users = () => {
                 {/* Staff Position */}
                 <Show when={selectedRoles().includes(4)}>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-text mb-2">
                       Должность сотрудника ОУ *
                     </label>
                     <select
@@ -774,7 +774,7 @@ const Users = () => {
                         setError("");
                         setStaffPositionId(Number(e.currentTarget.value));
                       }}
-                      class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
                     >
                       <option value="">Выберите должность</option>
                       <For each={staffPositions()}>
@@ -788,11 +788,11 @@ const Users = () => {
 
                 {/* Teacher fields */}
                 <Show when={selectedRoles().includes(5)}>
-                  <div class="space-y-4 border-t border-gray-100 pt-4">
-                    <h3 class="font-medium text-gray-800">Данные учителя</h3>
+                  <div class="space-y-4 border-t border-border pt-4">
+                    <h3 class="font-medium text-text">Данные учителя</h3>
 
                     <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-2">
+                      <label class="block text-sm font-medium text-text mb-2">
                         Классный кабинет *
                       </label>
                       <select
@@ -803,7 +803,7 @@ const Users = () => {
                           setError("");
                           setTeacherClassroomId(Number(e.currentTarget.value));
                         }}
-                        class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
                       >
                         <option value="">Выберите кабинет</option>
                         <For each={rooms()}>
@@ -815,13 +815,13 @@ const Users = () => {
                     </div>
 
                     <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-2">
+                      <label class="block text-sm font-medium text-text mb-2">
                         Предметы *
                       </label>
-                      <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border border-gray-200 rounded-xl p-2">
+                      <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border border-border rounded-xl p-2">
                         <For each={subjects()}>
                           {(subject) => (
-                            <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition">
+                            <label class="flex items-center gap-2 p-2 hover:bg-surface-2 rounded-lg cursor-pointer transition">
                               <input
                                 disabled={saving()}
                                 type="checkbox"
@@ -844,9 +844,9 @@ const Users = () => {
                                     ]);
                                   }
                                 }}
-                                class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                class="w-4 h-4 text-text rounded focus:ring-focus"
                               />
-                              <span class="text-gray-700 text-sm">
+                              <span class="text-text text-sm">
                                 {subject.name}
                               </span>
                             </label>
@@ -855,8 +855,8 @@ const Users = () => {
                       </div>
                     </div>
 
-                    <div class="space-y-3 border-t border-gray-200 pt-4">
-                      <h3 class="font-medium text-gray-800">
+                    <div class="space-y-3 border-t border-border pt-4">
+                      <h3 class="font-medium text-text">
                         Классное руководство/наставничество
                       </h3>
 
@@ -871,7 +871,7 @@ const Users = () => {
                                   Number(e.target.value),
                                 )
                               }
-                              class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                              class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-text"
                             >
                               <option value="">Выберите группу</option>
                               <For
@@ -890,7 +890,7 @@ const Users = () => {
                             <button
                               type="button"
                               onClick={() => removeTeacherStudentGroupId(index)}
-                              class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-red-700 text-white rounded-xl hover:bg-red-800 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                              class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-urgent-bg text-urgent rounded-xl hover:bg-urgent transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                             >
                               <span class="hidden md:flex">Удалить</span>
                               <Trash class="flex md:hidden" />
@@ -902,7 +902,7 @@ const Users = () => {
                       <button
                         type="button"
                         onClick={addTeacherStudentGroupId}
-                        class="w-full py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
+                        class="w-full py-2 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
                       >
                         <Plus /> Добавить группу
                       </button>
@@ -912,8 +912,8 @@ const Users = () => {
 
                 {/* Parent fields */}
                 <Show when={selectedRoles().includes(6)}>
-                  <div class="space-y-3 border-t border-gray-100 pt-4">
-                    <h3 class="font-medium text-gray-800">Привязка учеников</h3>
+                  <div class="space-y-3 border-t border-border pt-4">
+                    <h3 class="font-medium text-text">Привязка учеников</h3>
 
                     <Index each={parentStudentIds}>
                       {(studentId, index) => (
@@ -928,13 +928,13 @@ const Users = () => {
                               updateStudentId(index, e.target.value);
                             }}
                             placeholder={`ID ученика ${index + 1}`}
-                            class="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
+                            class="flex-1 px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition disabled:opacity-50 disabled:cursor-not-allowed text-text"
                           />
                           <button
                             disabled={saving()}
                             type="button"
                             onClick={() => removeStudentId(index)}
-                            class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-red-700 text-white rounded-xl hover:bg-red-800 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                            class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-urgent-bg text-urgent rounded-xl hover:bg-urgent transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                           >
                             <span class="hidden md:flex">Удалить</span>
                             <Trash class="flex md:hidden" />
@@ -947,7 +947,7 @@ const Users = () => {
                       disabled={saving()}
                       type="button"
                       onClick={addStudentId}
-                      class="w-full py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
+                      class="w-full py-2 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
                     >
                       <Plus /> Добавить ученика
                     </button>
@@ -957,7 +957,7 @@ const Users = () => {
                 {/* Student fields */}
                 <Show when={selectedRoles().includes(7)}>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-text mb-2">
                       Учебная группа *
                     </label>
                     <select
@@ -966,7 +966,7 @@ const Users = () => {
                       onChange={(e) =>
                         setStudentGroupId(Number(e.currentTarget.value))
                       }
-                      class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
                     >
                       <option value="">Выберите группу</option>
                       <For each={studentGroups()}>
@@ -980,17 +980,17 @@ const Users = () => {
               </div>
 
               {/* Footer */}
-              <div class="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+              <div class="sticky bottom-0 bg-surface border-t border-border px-6 py-4 flex justify-end gap-3">
                 <button
                   onClick={closeModal}
-                  class="w-40 h-10 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium cursor-pointer"
+                  class="w-40 h-10 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium cursor-pointer"
                 >
                   Отмена
                 </button>
                 <button
                   onClick={saveRoles}
                   disabled={saving()}
-                  class="w-40 h-10 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                  class="w-40 h-10 bg-accent text-bg rounded-xl hover:bg-accent-hover transition font-medium disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                 >
                   Сохранить
                 </button>

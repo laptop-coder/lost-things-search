@@ -5,6 +5,15 @@ import "solid-devtools";
 
 import App from "./App";
 
+const html = document.documentElement;
+
+const setTheme = (theme: string) => {
+  html.classList.toggle("light", theme === "light");
+  localStorage.setItem("theme", theme);
+};
+
+setTheme(localStorage.getItem("theme") || "dark");
+
 const root = document.getElementById("root");
 
 if (import.meta.env.DEV && !(root instanceof HTMLElement)) {

@@ -20,7 +20,7 @@ import type {
   InstitutionAdministratorPosition,
 } from "../lib/types";
 import RequestStudentOrParentInvite from "./RequestStudentOrParentInvite";
-import { User, X } from "lucide-solid";
+import { User, X, Plus } from "lucide-solid";
 import Spinner from "../components/Spinner";
 
 const Register = () => {
@@ -269,13 +269,11 @@ const Register = () => {
     <div class="min-h-screen py-8 px-4">
       <div class="max-w-2xl mx-auto">
         <div class="text-center mb-8">
-          <h1 class="text-3xl font-bold text-gray-800">
-            Создание учётной записи
-          </h1>
+          <h1 class="text-3xl font-bold text-text">Создание учётной записи</h1>
           <Show when={!initialLoading() && roleNames().length > 0}>
-            <p class="text-gray-500 mt-2">
+            <p class="text-text-muted mt-2">
               Роли:{" "}
-              <span class="font-medium text-blue-600">
+              <span class="font-medium text-accent">
                 {ROLES_TO_DISPLAY.filter((role) =>
                   roleNames().includes(role.name),
                 )
@@ -297,7 +295,7 @@ const Register = () => {
           <Show
             when={roleNames().length > 0}
             fallback={
-              <div class="bg-red-100 text-red-700 p-4 rounded-xl text-center">
+              <div class="bg-urgent-bg text-urgent p-4 rounded-xl text-center">
                 Эта пригласительная ссылка больше не действует. Скорее всего,
                 она уже была использована — такие ссылки работают только один
                 раз
@@ -306,21 +304,21 @@ const Register = () => {
           >
             <form
               onSubmit={handleSubmit}
-              class="bg-white rounded-2xl shadow-lg p-6 space-y-5"
+              class="bg-surface rounded-2xl shadow-lg p-6 space-y-5"
             >
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-sm font-medium text-text mb-1">
                   Фотография
                 </label>
 
                 <Show when={!avatarPreview()}>
-                  <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-500 transition">
+                  <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-focus transition">
                     <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                      <User />
-                      <p class="text-sm text-gray-500">
+                      <User class="text-text" />
+                      <p class="text-sm text-text">
                         Нажмите для загрузки аватара
                       </p>
-                      <p class="text-xs text-gray-400 mt-1">
+                      <p class="text-xs text-text-muted mt-1">
                         JPEG, PNG, WebP, GIF (макс. 15MB)
                       </p>
                     </div>
@@ -338,12 +336,12 @@ const Register = () => {
                     <img
                       src={avatarPreview()!}
                       alt="Preview"
-                      class="w-24 h-24 rounded-full object-cover border-4 border-gray-100"
+                      class="w-24 h-24 rounded-full object-cover border-4 border-border"
                     />
                     <button
                       type="button"
                       onClick={removeAvatar}
-                      class="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition cursor-pointer"
+                      class="absolute -top-2 -right-2 p-1 bg-urgent-bg text-urgent rounded-full hover:bg-urgent-bg transition cursor-pointer"
                     >
                       <X />
                     </button>
@@ -353,7 +351,7 @@ const Register = () => {
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                  <label class="block text-sm font-medium text-text mb-1">
                     Фамилия *
                   </label>
                   <input
@@ -362,12 +360,12 @@ const Register = () => {
                     value={lastName()}
                     placeholder="Иванов"
                     onInput={(e) => setLastName(e.currentTarget.value)}
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                    class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition text-text"
                     required
                   />
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                  <label class="block text-sm font-medium text-text mb-1">
                     Имя *
                   </label>
                   <input
@@ -375,14 +373,14 @@ const Register = () => {
                     value={firstName()}
                     placeholder="Иван"
                     onInput={(e) => setFirstName(e.currentTarget.value)}
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                    class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition text-text"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-sm font-medium text-text mb-1">
                   Отчество
                 </label>
                 <input
@@ -390,12 +388,12 @@ const Register = () => {
                   value={middleName()}
                   placeholder="Иванович"
                   onInput={(e) => setMiddleName(e.currentTarget.value)}
-                  class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                  class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition text-text"
                 />
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-sm font-medium text-text mb-1">
                   Email *
                 </label>
                 <input
@@ -404,13 +402,13 @@ const Register = () => {
                   value={email()}
                   placeholder="email@example.ru"
                   onInput={(e) => setEmail(e.currentTarget.value)}
-                  class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition disabled:cursor-not-allowed"
+                  class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition disabled:cursor-not-allowed text-text"
                   required
                 />
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-sm font-medium text-text mb-1">
                   Пароль *
                 </label>
                 <input
@@ -418,14 +416,14 @@ const Register = () => {
                   value={password()}
                   placeholder="••••••••"
                   onInput={(e) => setPassword(e.currentTarget.value)}
-                  class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                  class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition text-text"
                   required
                 />
               </div>
 
               <Show when={roleIds().includes(3)}>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                  <label class="block text-sm font-medium text-text mb-1">
                     Должность администрации ОУ *
                   </label>
                   <select
@@ -435,7 +433,7 @@ const Register = () => {
                         Number(e.currentTarget.value),
                       )
                     }
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-text"
                   >
                     <option value="">Выберите должность</option>
                     <For each={institutionAdministratorPositions()}>
@@ -449,7 +447,7 @@ const Register = () => {
 
               <Show when={roleIds().includes(4)}>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                  <label class="block text-sm font-medium text-text mb-1">
                     Должность сотрудника ОУ *
                   </label>
                   <select
@@ -457,7 +455,7 @@ const Register = () => {
                     onChange={(e) =>
                       setStaffPositionId(Number(e.currentTarget.value))
                     }
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-text"
                   >
                     <option value="">Выберите должность</option>
                     <For each={staffPositions()}>
@@ -470,11 +468,11 @@ const Register = () => {
               </Show>
 
               <Show when={roleIds().includes(5)}>
-                <div class="space-y-4 border-t border-gray-200 pt-4">
-                  <h3 class="font-medium text-gray-800">Данные учителя</h3>
+                <div class="space-y-4 border-t border-border pt-4">
+                  <h3 class="font-medium text-text">Данные учителя</h3>
 
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                    <label class="block text-sm font-medium text-text mb-1">
                       Классный кабинет *
                     </label>
                     <select
@@ -482,7 +480,7 @@ const Register = () => {
                       onChange={(e) =>
                         setTeacherClassroomId(Number(e.currentTarget.value))
                       }
-                      class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-text"
                     >
                       <option value="">Выберите кабинет</option>
                       <For each={rooms()}>
@@ -492,13 +490,13 @@ const Register = () => {
                   </div>
 
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-text mb-2">
                       Предметы *
                     </label>
-                    <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border border-gray-200 rounded-xl">
+                    <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border border-border rounded-xl">
                       <For each={subjects()}>
                         {(subject) => (
-                          <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition">
+                          <label class="flex items-center gap-2 p-2 hover:bg-surface-2 rounded-lg cursor-pointer transition">
                             <input
                               type="checkbox"
                               checked={teacherSubjectIds().includes(subject.id)}
@@ -514,9 +512,9 @@ const Register = () => {
                                   ]);
                                 }
                               }}
-                              class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                              class="w-4 h-4 text-text rounded focus:ring-focus"
                             />
-                            <span class="text-gray-700 text-sm">
+                            <span class="text-text text-sm">
                               {subject.name}
                             </span>
                           </label>
@@ -524,8 +522,8 @@ const Register = () => {
                       </For>
                     </div>
                   </div>
-                  <div class="space-y-3 border-t border-gray-200 pt-4">
-                    <h3 class="font-medium text-gray-800">
+                  <div class="space-y-3 border-t border-border pt-4">
+                    <h3 class="font-medium text-text">
                       Классное руководство/наставничество
                     </h3>
 
@@ -540,7 +538,7 @@ const Register = () => {
                                 Number(e.target.value),
                               )
                             }
-                            class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-text"
                           >
                             <option value="">Выберите группу</option>
                             <For
@@ -559,7 +557,7 @@ const Register = () => {
                           <button
                             type="button"
                             onClick={() => removeTeacherStudentGroupId(index)}
-                            class="px-4 py-2 bg-red-700 text-white rounded-xl hover:bg-red-800 transition cursor-pointer"
+                            class="px-4 py-2 bg-urgent-bg text-urgent rounded-xl hover:bg-urgent-bg transition cursor-pointer"
                           >
                             Удалить
                           </button>
@@ -570,9 +568,9 @@ const Register = () => {
                     <button
                       type="button"
                       onClick={addTeacherStudentGroupId}
-                      class="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium cursor-pointer"
+                      class="w-full px-4 py-2 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium cursor-pointer gap-2"
                     >
-                      + Добавить группу
+                      <Plus /> Добавить группу
                     </button>
                   </div>
                 </div>
@@ -580,7 +578,7 @@ const Register = () => {
 
               <Show when={roleIds().includes(7)}>
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                  <label class="block text-sm font-medium text-text mb-1">
                     Класс/учебная группа *
                   </label>
                   <select
@@ -588,7 +586,7 @@ const Register = () => {
                     onChange={(e) =>
                       setStudentGroupId(Number(e.currentTarget.value))
                     }
-                    class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition bg-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-text"
                   >
                     <option value="">Выберите группу</option>
                     <For each={studentGroups()}>
@@ -601,8 +599,8 @@ const Register = () => {
               </Show>
 
               <Show when={roleIds().includes(6)}>
-                <div class="space-y-3 border-t border-gray-200 pt-4">
-                  <h3 class="font-medium text-gray-800">Привязка учеников</h3>
+                <div class="space-y-3 border-t border-border pt-4">
+                  <h3 class="font-medium text-text">Привязка учеников</h3>
 
                   <Index each={parentStudentIds}>
                     {(studentId, index) => (
@@ -614,12 +612,12 @@ const Register = () => {
                             updateStudentId(index, e.target.value)
                           }
                           placeholder={`ID ученика ${index + 1}`}
-                          class="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                          class="flex-1 px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition text-text"
                         />
                         <button
                           type="button"
                           onClick={() => removeStudentId(index)}
-                          class="px-4 py-2 bg-red-700 text-white rounded-xl hover:bg-red-800 transition cursor-pointer"
+                          class="px-4 py-2 bg-urgent-bg text-urgent rounded-xl hover:bg-urgent-bg transition cursor-pointer"
                         >
                           Удалить
                         </button>
@@ -630,36 +628,36 @@ const Register = () => {
                   <button
                     type="button"
                     onClick={addStudentId}
-                    class="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium cursor-pointer"
+                    class="w-full px-4 py-2 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium cursor-pointer gap-2"
                   >
-                    + Добавить ученика
+                    <Plus /> Добавить ученика
                   </button>
                 </div>
               </Show>
 
               {error() && (
-                <div class="bg-red-50 text-red-600 p-3 rounded-xl text-sm border border-red-200">
+                <div class="bg-urgent-bg text-urgent p-3 rounded-xl text-sm border border-urgent">
                   {error()}
                 </div>
               )}
 
-              <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition">
+              <label class="flex items-center gap-2 p-2 hover:bg-surface-2 rounded-lg cursor-pointer transition">
                 <input
                   type="checkbox"
                   required
-                  class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 mt-1 aspect-square"
+                  class="w-4 h-4 text-text rounded focus:ring-focus mt-1 aspect-square"
                 />
-                <span class="text-sm text-gray-600">
+                <span class="text-sm text-text">
                   Я даю согласие на обработку персональных данных и принимаю
                   условия{" "}
                   <A
                     href="/documents/privacy.pdf"
                     target="_blank"
-                    class="text-blue-600 hover:underline"
+                    class="text-accent hover:underline"
                   >
                     политики конфиденциальности
                   </A>
-                  <span class="text-red-500">*</span>
+                  <span class="text-urgent">*</span>
                 </span>
               </label>
 
@@ -667,7 +665,7 @@ const Register = () => {
                 <button
                   type="submit"
                   disabled={loading()}
-                  class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  class="flex-1 px-4 py-2 bg-accent text-bg rounded-xl hover:bg-accent-hover transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   {loading() ? "Создание..." : "Создать"}
                 </button>

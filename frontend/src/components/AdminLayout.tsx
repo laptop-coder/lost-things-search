@@ -111,12 +111,12 @@ const AdminLayout = (props: Props) => {
 
   const SidebarContent = () => (
     <>
-      <div class="p-5 border-b border-gray-200">
-        <h2 class="text-lg font-semibold text-gray-800">
+      <div class="p-5 border-b border-border">
+        <h2 class="text-lg font-semibold text-text">
           Панель{" "}
           {hasRole(ROLES.ADMIN) ? "администратора" : "суперадминистратора"}
         </h2>
-        <p class="text-xs text-gray-400 mt-1">Управление системой</p>
+        <p class="text-xs text-text-muted mt-1">Управление системой</p>
       </div>
       <nav class="flex-1 p-3">
         <div class="space-y-0.5">
@@ -129,14 +129,14 @@ const AdminLayout = (props: Props) => {
                       navigate(tab.path!);
                       setMobileMenuOpen(false);
                     }}
-                    class={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer ${isActive(tab.path) ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"}`}
+                    class={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer text-text ${isActive(tab.path) ? "bg-surface-2" : "hover:bg-surface-2"}`}
                   >
                     {tab.label}
                   </button>
                 ) : (
                   <button
                     onClick={() => toggleSubmenu(tab.key)}
-                    class={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex justify-between items-center cursor-pointer ${isParentActive(tab) ? "bg-blue-50 text-blue-700" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"}`}
+                    class={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex justify-between items-center cursor-pointer text-text ${isParentActive(tab) ? "bg-surface-2" : "hover:bg-surface-2"}`}
                   >
                     <span>{tab.label}</span>
                     <span>{openSubmenu() === tab.key ? "▾" : "▸"}</span>
@@ -144,7 +144,7 @@ const AdminLayout = (props: Props) => {
                 )}
 
                 <Show when={tab.subTabs && openSubmenu() === tab.key}>
-                  <div class="ml-3 pl-3 border-l border-gray-200 mt-1 space-y-0.5">
+                  <div class="ml-3 pl-3 border-l border-border mt-1 space-y-0.5">
                     <For each={tab.subTabs}>
                       {(sub) => (
                         <button
@@ -152,7 +152,7 @@ const AdminLayout = (props: Props) => {
                             navigate(sub.path);
                             setMobileMenuOpen(false);
                           }}
-                          class={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 cursor-pointer ${isActive(sub.path) ? "bg-blue-50 text-blue-700 font-medium" : "text-gray-500 hover:bg-gray-50 hover:text-gray-700"}`}
+                          class={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 cursor-pointer text-text ${isActive(sub.path) ? "bg-surface-2 font-medium" : "hover:bg-surface-2"}`}
                         >
                           {sub.label}
                         </button>
@@ -171,9 +171,9 @@ const AdminLayout = (props: Props) => {
   return (
     <>
       {hasAnyRole(ROLES.ADMIN, ROLES.SUPERADMIN) && (
-        <div class="flex min-h-screen bg-gray-50">
+        <div class="flex min-h-screen bg-bg">
           {/*Desktop menu*/}
-          <aside class="hidden md:flex w-64 bg-white border-r border-gray-200 rounded-lg flex flex-col">
+          <aside class="hidden md:flex w-64 bg-surface border-r border-border rounded-lg flex flex-col">
             <SidebarContent />
           </aside>
 
@@ -181,7 +181,7 @@ const AdminLayout = (props: Props) => {
           <div class="md:hidden fixed top-20 left-4 z-40">
             <button
               onClick={() => setMobileMenuOpen((prev) => !prev)}
-              class="p-2 bg-white rounded-lg shadow-md"
+              class="p-2 bg-surface rounded-lg shadow-md"
             >
               <Menu />
             </button>
@@ -204,7 +204,7 @@ const AdminLayout = (props: Props) => {
           <Presence>
             <Show when={mobileMenuOpen()}>
               <Motion.aside
-                class="md:hidden fixed left-0 top-0 bottom-0 w-64 bg-white z-50 flex flex-col shadow-xl"
+                class="md:hidden fixed left-0 top-0 bottom-0 w-64 bg-surface z-50 flex flex-col shadow-xl"
                 initial={{ x: -256 }}
                 animate={{ x: 0 }}
                 exit={{ x: -256 }}
@@ -217,7 +217,7 @@ const AdminLayout = (props: Props) => {
           </Presence>
 
           <main class="flex-1 overflow-auto pt-16 md:pt-6 md:pl-6">
-            <div class="p-0 md:p-6 md:bg-white md:rounded-lg md:shadow-sm">
+            <div class="p-0 md:p-6 md:bg-surface md:rounded-lg md:shadow-sm">
               {props.children}
             </div>
           </main>
