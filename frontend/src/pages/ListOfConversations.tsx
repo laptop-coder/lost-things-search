@@ -5,6 +5,7 @@ import { formatDate } from "../lib/utils";
 import { conversationApi } from "../lib/api";
 import { Motion, Presence } from "solid-motionone";
 import Skeleton from "../components/Skeleton";
+import { MessageSquareText } from "lucide-solid";
 
 const ListOfConversations = () => {
   const [conversations, setConversations] = createSignal<
@@ -28,18 +29,18 @@ const ListOfConversations = () => {
 
   return (
     <div class="max-w-4xl mx-auto p-4 space-y-4">
-      <h1 class="text-2xl font-bold text-gray-800">Сообщения</h1>
+      <h1 class="text-2xl font-bold text-text">Сообщения</h1>
 
       <Show when={loading()}>
         <div class="space-y-3">
-          <div class="flex items-center gap-4 p-4 bg-white rounded-xl">
+          <div class="flex items-center gap-4 p-4 bg-surface rounded-xl">
             <Skeleton class="w-12 h-12 !rounded-full" />
             <div class="flex-1 space-y-2">
               <Skeleton class="h-4 w-1/3" />
               <Skeleton class="h-3 w-2/3" />
             </div>
           </div>
-          <div class="flex items-center gap-4 p-4 bg-white rounded-xl">
+          <div class="flex items-center gap-4 p-4 bg-surface rounded-xl">
             <Skeleton class="w-12 h-12 !rounded-full" />
             <div class="flex-1 space-y-2">
               <Skeleton class="h-4 w-1/4" />
@@ -50,13 +51,13 @@ const ListOfConversations = () => {
       </Show>
 
       <Show when={error()}>
-        <div class="bg-red-50 text-red-600 p-4 rounded-xl">{error()}</div>
+        <div class="bg-urgent-bg text-urgent p-4 rounded-xl">{error()}</div>
       </Show>
 
       <Show when={!loading() && conversations().length === 0}>
-        <div class="text-center py-16 bg-white rounded-2xl shadow">
-          <div class="text-5xl mb-3">💬</div>
-          <p class="text-gray-500">Нет сообщений</p>
+        <div class="text-center py-16 bg-surface rounded-2xl shadow">
+          <div class="text-5xl mb-3"><MessageSquareText /></div>
+          <p class="text-text-muted">Нет сообщений</p>
         </div>
       </Show>
 
@@ -72,7 +73,7 @@ const ListOfConversations = () => {
               {(conv) => (
                 <A
                   href={`/conversations/${conv.id}`}
-                  class="block bg-white rounded-xl shadow hover:shadow-md transition p-4"
+                  class="block bg-surface rounded-xl shadow hover:shadow-md transition p-4"
                 >
                   <div class="flex items-center gap-4 relative">
                     <img
@@ -82,28 +83,28 @@ const ListOfConversations = () => {
                           : "/storage/assets/default_avatar.jpeg"
                       }
                       alt={`Фото профиля пользователя ${conv.otherUser.firstName} ${conv.otherUser.lastName}`}
-                      class="w-12 h-12 rounded-full object-cover border-2 border-gray-100 hover:brightness-95 transition"
+                      class="w-12 h-12 rounded-full object-cover border-2 border-border hover:brightness-95 transition"
                     />
                     <div class="flex-1 min-w-0">
                       <div class="flex justify-between items-start">
-                        <h3 class="font-semibold text-gray-800 truncate">
+                        <h3 class="font-semibold text-text truncate">
                           {conv.otherUser.firstName} {conv.otherUser.lastName}
                         </h3>
-                        <span class="text-xs text-gray-400">
+                        <span class="text-xs text-text">
                           {formatDate(conv.updatedAt)}
                         </span>
                       </div>
-                      <p class="text-sm text-gray-500 truncate mt-0.5">
+                      <p class="text-sm text-text truncate mt-0.5">
                         {conv.postName}
                       </p>
                       <Show when={conv.lastMessage}>
-                        <p class="text-sm text-gray-600 truncate mt-1">
+                        <p class="text-sm text-text truncate mt-1">
                           {conv.lastMessage}
                         </p>
                       </Show>
                     </div>
                     <Show when={conv.unreadCount > 0}>
-                      <div class="bg-blue-600 text-white text-xs font-medium px-2 py-1 rounded-full absolute right-0">
+                      <div class="bg-accent text-bg text-xs font-medium px-2 py-1 rounded-full absolute right-0">
                         {conv.unreadCount}
                       </div>
                     </Show>

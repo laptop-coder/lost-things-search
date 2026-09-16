@@ -1,5 +1,76 @@
 @import "tailwindcss";
 
-html {
-  overflow-y: scroll;
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+
+  --color-accent: var(--accent); /*buttons, links, active*/
+  --color-accent-hover: var(--accent-hover);
+  --color-disabled: var(--disabled);
+  --color-info: var(--info);
+
+  --color-focus: var(--focus);
+
+  --color-lost: var(--lost);
+  --color-found: var(--found);
+  --color-urgent: var(--urgent);
+  --color-urgent-bg: var(--urgent-bg);
+}
+
+:root {
+  --bg: #25274d;
+  --surface: #464866;
+  --surface-2: #3a3d5c;
+  --border: #5a5d7a;
+
+  --text: #ffefd3;
+  --text-muted: #aaabb8;
+
+  --accent: #ffc49b; /*buttons, links, active*/
+  --accent-hover: #ffb37a;
+  --disabled: #4a4d6a;
+  --info: #aaabb8;
+
+  --focus: #9193a8;
+
+  --lost: #ffb37a;
+  --found: #8fd9a8;
+  --urgent: #ff8a8a;
+  --urgent-bg: #4a2b2b;
+}
+
+.light {
+  --bg: #faf6ef;
+  --surface: #ffffff;
+  --surface-2: #f2ece0;
+  --border: #e0d8c8;
+
+  --text: #25274d;
+  --text-muted: #5c5f7a;
+
+  --accent: #e08a4a;
+  --accent-hover: #c9743a;
+  --disabled: #b8b3a8;
+  --info: #5c5f7a;
+
+  --focus: #25274d;
+
+  --lost: #e08a4a;
+  --found: #3f9e6a;
+  --urgent: #d9534f;
+  --urgent-bg: #fdecea;
+}
+
+@layer base {
+  body {
+    @apply bg-surface;
+  }
+  html {
+    @apply overflow-y-scroll;
+  }
 }

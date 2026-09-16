@@ -97,16 +97,16 @@ const PostsToVerify = () => {
     hasPermission(PERMISSIONS.POST_READ_ANY) && (
       <div class="space-y-6 p-4 overflow-hidden">
         <div class="mb-6">
-          <h1 class="text-3xl font-bold text-gray-800">
+          <h1 class="text-3xl font-bold text-text">
             Верификация объявлений
           </h1>
-          <p class="text-gray-500 mt-1">
+          <p class="text-text-muted mt-1">
             Проверьте и подтвердите объявления пользователей
           </p>
         </div>
 
         <Show when={error()}>
-          <div class="bg-red-50 border border-red-200 text-red-600 p-4 rounded-xl">
+          <div class="bg-urgent-bg border border-urgent text-urgent p-4 rounded-xl">
             {error()}
           </div>
         </Show>
@@ -151,14 +151,14 @@ const PostsToVerify = () => {
         </Show>
         <Show when={posts().length === 0 && !loading()}>
           <div class="flex flex-col items-center justify-center gap-1 py-16">
-            <Inbox class="w-15 h-15 mb-3" />
-            <p class="text-gray-500">Нет объявлений на верификацию</p>
-            <p class="text-gray-400 text-sm mt-1">Все объявления проверены</p>
+            <Inbox class="w-15 h-15 mb-3 text-text" />
+            <p class="text-text">Нет объявлений на верификацию</p>
+            <p class="text-text-muted text-sm mt-1">Все объявления проверены</p>
           </div>
         </Show>
         <div ref={observerRef} class="h-10">
           <Show when={!hasMore() && posts().length > 0}>
-            <div class="text-center text-gray-500 py-8">
+            <div class="text-center text-text-muted py-8">
               Больше нет объявлений
             </div>
           </Show>

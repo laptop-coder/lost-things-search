@@ -42,8 +42,8 @@ export const PublicRoute: Component<Props> = (props) => {
     /^\/conversations\/[^/]+$/.test(location.pathname) && isMobile();
 
   return (
-    <div class="min-h-screen bg-gray-50 flex flex-col">
-      <header class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-30">
+    <div class="min-h-screen bg-bg flex flex-col">
+      <header class="bg-surface border-b border-border shadow-sm sticky top-0 z-30">
         <div class="container mx-auto px-4 h-16 flex justify-between items-center">
           <A href="/" class="flex items-center gap-3">
             <img
@@ -51,7 +51,7 @@ export const PublicRoute: Component<Props> = (props) => {
               src={`/storage/assets/logo.svg`}
               alt="Логотип"
             />
-            <span class="text-xl font-bold text-gray-800">
+            <span class="text-xl font-bold text-text">
               <span class="hidden md:block">LostThingsSearch</span>
             </span>
           </A>
@@ -59,13 +59,13 @@ export const PublicRoute: Component<Props> = (props) => {
             <A
               href="/documents/privacy.pdf"
               target="_blank"
-              class="text-sm text-gray-500 hover:text-gray-700 transition text-nowrap hidden md:block"
+              class="text-sm text-text hover:text-text-muted transition text-nowrap hidden md:block"
             >
               Политика конфиденциальности
             </A>
             <A
               href="/about"
-              class="text-sm text-gray-500 hover:text-gray-700 transition text-nowrap"
+              class="text-sm text-text hover:text-text-muted transition text-nowrap"
             >
               О проекте
             </A>
@@ -77,7 +77,7 @@ export const PublicRoute: Component<Props> = (props) => {
                 {hasAnyRole(ROLES.ADMIN, ROLES.SUPERADMIN) && (
                   <A
                     href="/admin"
-                    class="bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition flex items-center justify-center w-10 h-10"
+                    class="bg-surface-2 text-text rounded-lg hover:bg-surface transition flex items-center justify-center w-10 h-10"
                   >
                     <Settings2 />
                   </A>
@@ -86,7 +86,7 @@ export const PublicRoute: Component<Props> = (props) => {
                 {hasPermission(PERMISSIONS.POST_CREATE) && (
                   <A
                     href="/posts/new"
-                    class="bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition flex items-center justify-center w-10 h-10"
+                    class="bg-surface-2 text-text rounded-lg hover:bg-surface transition flex items-center justify-center w-10 h-10"
                   >
                     <Plus />
                   </A>
@@ -95,11 +95,11 @@ export const PublicRoute: Component<Props> = (props) => {
                 <Show when={hasPermission(PERMISSIONS.CONVERSATION_READ_OWN)}>
                   <A
                     href="/conversations"
-                    class="bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition flex items-center justify-center w-10 h-10 relative"
+                    class="bg-surface-2 text-text rounded-lg hover:bg-surface transition flex items-center justify-center w-10 h-10 relative"
                   >
                     <MessageSquareText />
                     <Show when={unreadMessagesCount() > 0}>
-                      <div class="bg-blue-600 text-white text-xs font-medium px-2 py-1 rounded-full absolute -top-1 -right-1">
+                      <div class="bg-accent text-bg text-xs font-medium px-2 py-1 rounded-full absolute -top-1 -right-1">
                         {unreadMessagesCount()}
                       </div>
                     </Show>
@@ -108,10 +108,10 @@ export const PublicRoute: Component<Props> = (props) => {
 
                 <A
                   href="/profile"
-                  class="w-10 h-10 flex bg-gray-100 rounded-full hover:bg-gray-200 transition"
+                  class="w-10 h-10 flex bg-surface rounded-full hover:bg-surface-2 transition"
                 >
                   <img
-                    class="w-10 h-10 rounded-full object-cover border-2 border-gray-100 hover:brightness-95 transition"
+                    class="w-10 h-10 rounded-full object-cover border-2 border-border hover:brightness-95 transition"
                     src={
                       auth.user()?.hasAvatar
                         ? `/storage/storage/avatars/${auth.user()?.id}.jpeg`
@@ -125,7 +125,7 @@ export const PublicRoute: Component<Props> = (props) => {
               <Show when={location.pathname !== "/login"}>
                 <A
                   href="/login"
-                  class="px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  class="px-4 py-1.5 bg-accent text-white rounded-lg hover:bg-accent-2 transition"
                 >
                   Войти
                 </A>
@@ -145,10 +145,10 @@ export const PublicRoute: Component<Props> = (props) => {
           {props?.children}
         </main>
 
-        <footer class="bg-white border-t border-gray-200 mt-auto">
+        <footer class="bg-surface border-t border-border mt-auto">
           <div class="container mx-auto px-4 py-6">
             <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-              <div class="text-sm text-gray-500 text-nowrap">
+              <div class="text-sm text-text text-nowrap">
                 © {new Date().getFullYear()} LostThingsSearch.
               </div>
 
@@ -156,13 +156,13 @@ export const PublicRoute: Component<Props> = (props) => {
                 <A
                   href="/documents/privacy.pdf"
                   target="_blank"
-                  class="text-sm text-gray-500 hover:text-gray-700 transition text-nowrap"
+                  class="text-sm text-text hover:text-text-muted transition text-nowrap"
                 >
                   Политика конфиденциальности
                 </A>
                 <A
                   href="/about"
-                  class="text-sm text-gray-500 hover:text-gray-700 transition text-nowrap"
+                  class="text-sm text-text hover:text-text-muted transition text-nowrap"
                 >
                   О проекте
                 </A>

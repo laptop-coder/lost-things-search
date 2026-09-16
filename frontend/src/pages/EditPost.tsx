@@ -102,8 +102,8 @@ const EditPost = () => {
 
   return (
     <>
-      <div class="max-w-2xl mx-auto flex flex-col min-h-[50vh]">
-        <h1 class="text-2xl font-bold text-gray-800 text-center mb-6">
+      <div class="max-w-2xl mx-auto flex flex-col min-h-[50vh] bg-bg">
+        <h1 class="text-2xl font-bold text-text text-center mb-6">
           Редактировать объявление
         </h1>
 
@@ -120,35 +120,35 @@ const EditPost = () => {
               postAuthorId() === auth.user()?.id)) && (
             <form
               onSubmit={handleSubmit}
-              class="bg-white rounded-2xl shadow-lg p-6 space-y-5"
+              class="bg-surface rounded-2xl shadow-lg p-6 space-y-5"
             >
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-sm font-medium text-text mb-1">
                   Название *
                 </label>
                 <input
                   type="text"
                   value={name()}
                   onInput={(e) => setName(e.currentTarget.value)}
-                  class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                  class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition text-text"
                   required
                 />
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-sm font-medium text-text mb-1">
                   Описание
                 </label>
                 <textarea
                   value={description()}
                   onInput={(e) => setDescription(e.currentTarget.value)}
                   rows={5}
-                  class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition min-h-[140px] max-h-[600px]"
+                  class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition min-h-[140px] max-h-[600px] text-text"
                 />
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-sm font-medium text-text mb-1">
                   Фото
                 </label>
 
@@ -156,13 +156,13 @@ const EditPost = () => {
                   {(hasPermission(PERMISSIONS.POST_PHOTO_UPDATE_ANY) ||
                     (hasPermission(PERMISSIONS.POST_PHOTO_UPDATE_OWN) &&
                       postAuthorId() === auth.user()?.id)) && (
-                    <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-500 transition">
+                    <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-focus transition">
                       <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                        <Image />
-                        <p class="text-sm text-gray-500">
+                        <Image class="text-text-muted"/>
+                        <p class="text-sm text-text-muted">
                           Нажмите для загрузки фото
                         </p>
-                        <p class="text-xs text-gray-400 mt-1">
+                        <p class="text-xs text-text-muted mt-1">
                           JPEG, PNG, WebP, GIF (макс. 15MB)
                         </p>
                       </div>
@@ -189,20 +189,20 @@ const EditPost = () => {
                       <button
                         type="button"
                         onClick={removePhoto}
-                        class="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition cursor-pointer disabled:cursor-not-allowed"
+                        class="absolute top-2 right-2 p-1 bg-urgent-bg text-urgent rounded-full hover:bg-red-600 transition cursor-pointer disabled:cursor-not-allowed"
                       >
                         <X />
                       </button>
                     )}
                   </div>
                 </Show>
-                <p class="text-xs text-gray-500 mt-1">
+                <p class="text-xs text-text-muted mt-1">
                   Вы можете добавить или заменить фото
                 </p>
               </div>
 
               <Show when={error()}>
-                <div class="bg-red-50 text-red-600 p-3 rounded-xl text-sm border border-red-200">
+                <div class="bg-urgent-bg text-urgent p-3 rounded-xl text-sm border border-urgent">
                   {error()}
                 </div>
               </Show>
@@ -211,14 +211,14 @@ const EditPost = () => {
                 <button
                   type="button"
                   onClick={() => navigate("/")}
-                  class="flex-1 px-4 h-10 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium cursor-pointer"
+                  class="flex-1 px-4 h-10 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium cursor-pointer"
                 >
                   Отмена
                 </button>
                 <button
                   type="submit"
                   disabled={loading()}
-                  class="flex-1 px-4 h-10 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  class="flex-1 px-4 h-10 bg-accent text-bg rounded-xl hover:bg-accent-hover transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   Сохранить
                 </button>

@@ -115,7 +115,7 @@ const InstitutionAdministratorPositions = () => {
   return (
     <div class="space-y-6 p-4">
       <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">
+        <h1 class="text-3xl font-bold text-text">
           Должности администрации ОУ
         </h1>
         <p class="text-gray-500 mt-1">
@@ -124,7 +124,7 @@ const InstitutionAdministratorPositions = () => {
       </div>
 
       <Show when={error()}>
-        <div class="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl">
+        <div class="bg-urgent-bg border border-urgent text-urgent p-3 rounded-xl">
           {error()}
         </div>
       </Show>
@@ -135,8 +135,8 @@ const InstitutionAdministratorPositions = () => {
           PERMISSIONS.POSITION_INSTITUTION_ADMINISTRATOR_CREATE,
         )}
       >
-        <div class="bg-white rounded-2xl shadow-lg p-6">
-          <h2 class="text-lg font-semibold text-gray-800 mb-4">
+        <div class="bg-surface rounded-2xl shadow-lg p-6">
+          <h2 class="text-lg font-semibold text-text mb-4">
             Добавить должность
           </h2>
           <form
@@ -153,7 +153,7 @@ const InstitutionAdministratorPositions = () => {
                 )
               }
               placeholder="Название должности"
-              class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition disabled:opacity-50"
+              class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition disabled:opacity-50 text-text"
               disabled={creating()}
             />
             <button
@@ -161,7 +161,7 @@ const InstitutionAdministratorPositions = () => {
               disabled={
                 creating() || !newInstitutionAdministratorPositionName().trim()
               }
-              class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-blue-700 text-white rounded-xl hover:bg-blue-800 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-accent text-bg rounded-xl hover:bg-accent-hover transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               <span class="hidden md:flex">Создать</span>
               <Plus class="flex md:hidden" />
@@ -184,42 +184,42 @@ const InstitutionAdministratorPositions = () => {
         when={!loading() && institutionAdministratorPositions().length === 0}
       >
         <div class="flex flex-col items-center justify-center gap-1 py-16">
-          <School class="w-15 h-15 mb-3" />
-          <p class="text-gray-500">Нет должностей</p>
-          <p class="text-gray-400 text-sm mt-1">Создайте первую</p>
+          <School class="w-15 h-15 mb-3 text-text" />
+          <p class="text-text">Нет должностей</p>
+          <p class="text-text-muted text-sm mt-1">Создайте первую</p>
         </div>
       </Show>
 
       <Show when={!loading() && institutionAdministratorPositions().length > 0}>
         <Motion.div
-          class="bg-white rounded-2xl shadow-lg overflow-hidden"
+          class="bg-surface rounded-2xl shadow-lg overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.2 }}
         >
           <div class="overflow-x-auto">
             <table class="w-full">
-              <thead class="bg-gray-50 border-b border-gray-200">
+              <thead class="bg-surface-2 border-b border-border">
                 <tr>
-                  <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-text">
                     ID
                   </th>
-                  <th class="px-6 py-4 text-left text-sm font-semibold text-gray-600">
+                  <th class="px-6 py-4 text-left text-sm font-semibold text-text">
                     Название
                   </th>
-                  <th class="px-6 py-4 text-right text-sm font-semibold text-gray-600">
+                  <th class="px-6 py-4 text-right text-sm font-semibold text-text">
                     Действия
                   </th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-gray-100">
+              <tbody class="divide-y divide-border">
                 <For each={institutionAdministratorPositions()}>
                   {(position) => (
-                    <tr class="hover:bg-gray-50 transition">
-                      <td class="px-6 py-4 text-sm text-gray-500 font-mono">
+                    <tr class="hover:bg-surface transition">
+                      <td class="px-6 py-4 text-sm text-text font-mono">
                         {position.id}
                       </td>
-                      <td class="px-6 py-4 font-medium text-gray-800">
+                      <td class="px-6 py-4 font-medium text-text">
                         {position.name}
                       </td>
                       <td class="px-6 py-4 text-right">
@@ -235,7 +235,7 @@ const InstitutionAdministratorPositions = () => {
                               )
                             }
                             disabled={deletingId() === position.id}
-                            class="text-red-600 hover:text-red-800 disabled:opacity-50 transition cursor-pointer disabled:cursor-not-allowed font-medium"
+                            class="text-urgent hover:text-urgent disabled:opacity-50 transition cursor-pointer disabled:cursor-not-allowed font-medium"
                           >
                             {deletingId() === position.id
                               ? "Удаление..."

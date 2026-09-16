@@ -32,8 +32,8 @@ const ForgotPassword = () => {
     <div class="min-h-[80vh] flex items-center justify-center px-4">
       <div class="w-full max-w-md">
         <div class="text-center mb-8">
-          <h1 class="text-3xl font-bold text-gray-800">Забыли пароль?</h1>
-          <p class="text-gray-500 mt-2">
+          <h1 class="text-3xl font-bold text-text">Забыли пароль?</h1>
+          <p class="text-text mt-2">
             Укажите email, и мы отправим инструкцию по сбросу пароля
           </p>
         </div>
@@ -49,7 +49,7 @@ const ForgotPassword = () => {
                   отправлена инструкция по сбросу пароля.
                 </p>
               </div>
-              <A href="/login" class="block mt-4 text-blue-600 hover:underline">
+              <A href="/login" class="block mt-4 text-accent hover:underline">
                 Вернуться ко входу
               </A>
             </div>
@@ -57,10 +57,10 @@ const ForgotPassword = () => {
         >
           <form
             onSubmit={handleSubmit}
-            class="bg-white rounded-2xl shadow-lg p-6 space-y-5"
+            class="bg-surface rounded-2xl shadow-lg p-6 space-y-5"
           >
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
+              <label class="block text-sm font-medium text-text mb-1">
                 Email *
               </label>
               <input
@@ -68,13 +68,13 @@ const ForgotPassword = () => {
                 value={email()}
                 onInput={(e) => setEmail(e.currentTarget.value)}
                 placeholder="email@example.ru"
-                class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition"
                 required
               />
             </div>
 
             <Show when={error()}>
-              <div class="bg-red-50 text-red-600 p-3 rounded-xl text-sm border border-red-200">
+              <div class="bg-urgent-bg text-urgent p-3 rounded-xl text-sm border border-urgent">
                 {error()}
               </div>
             </Show>
@@ -82,13 +82,13 @@ const ForgotPassword = () => {
             <button
               type="submit"
               disabled={loading() || !email().trim()}
-              class="w-full py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition font-medium cursor-pointer disabled:cursor-not-allowed"
+              class="w-full py-2.5 bg-accent text-bg rounded-xl hover:bg-accent-hover disabled:opacity-50 transition font-medium cursor-pointer disabled:cursor-not-allowed"
             >
               {loading() ? "Отправка..." : "Отправить"}
             </button>
 
-            <p class="text-center text-sm text-gray-500">
-              <A href="/login" class="text-blue-600 hover:underline">
+            <p class="text-center text-sm">
+              <A href="/login" class="text-accent hover:underline">
                 Вернуться ко входу
               </A>
             </p>

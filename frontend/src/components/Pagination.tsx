@@ -15,15 +15,15 @@ const Pagination = (props: PaginationProps) => {
         <button
           onClick={props.onPrev}
           disabled={props.page === 0}
-          class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          class="px-4 py-2 bg-surface text-text rounded-xl hover:bg-surface-2 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           <ChevronLeft /> Назад
         </button>
-        <span class="text-sm text-gray-500">Страница {props.page + 1}</span>
+        <span class="text-sm text-text">Страница {props.page + 1}</span>
         <button
           onClick={props.onNext}
           disabled={!props.hasMore}
-          class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          class="px-4 py-2 bg-surface text-text rounded-xl hover:bg-surface-2 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           Вперёд <ChevronRight />
         </button>

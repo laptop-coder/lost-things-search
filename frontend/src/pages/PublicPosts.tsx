@@ -145,8 +145,8 @@ const PublicPosts = () => {
   const [statusTabsActive, setStatusTabsActive] = createSignal(statusTabs[0]);
 
   return (
-    <div class="max-w-4xl mx-auto space-y-6">
-      <h1 class="text-2xl font-bold text-center">Объявления</h1>
+    <div class="bg-bg max-w-4xl mx-auto space-y-6">
+      <h1 class="text-2xl font-bold text-center text-text">Объявления</h1>
 
       <div class="flex flex-col gap-3">
         <Show when={auth.user()}>
@@ -170,7 +170,7 @@ const PublicPosts = () => {
       </div>
 
       <Show when={error()}>
-        <div class="bg-red-100 text-red-700 p-4 rounded-lg">{error()}</div>
+        <div class="bg-urgent-bg text-urgent p-4 rounded-lg border-urgent">{error()}</div>
       </Show>
 
       <Show when={refreshLoading()}>
@@ -213,10 +213,10 @@ const PublicPosts = () => {
       </Show>
       <div ref={observerRef} class="h-10">
         <Show when={posts().length === 0 && !refreshLoading() && !loading()}>
-          <div class="text-center text-gray-500 py-8">Пока нет объявлений</div>
+          <div class="text-center text-text-muted py-8">Пока нет объявлений</div>
         </Show>
         <Show when={!hasMore() && posts().length > 0}>
-          <div class="text-center text-gray-500 py-8">
+          <div class="text-center text-text-muted py-8">
             Больше нет объявлений
           </div>
         </Show>

@@ -164,38 +164,36 @@ const InviteTokens = () => {
   };
 
   return (
-    <div class="space-y-6 p-4">
+    <div class="space-y-6 p-4 bg-surface">
       {/* "Copied!" notification */}
       <Show when={showTokenCopied()}>
         <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50">
-          <div class="bg-gray-800 text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium">
-            ✓ Скопировано!
+          <div class="bg-surface-2 text-text px-5 py-3 rounded-xl shadow-lg text-sm font-medium gap-2">
+            <Check /> Скопировано!
           </div>
         </div>
       </Show>
       <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">Инвайт-токены</h1>
-        <p class="text-gray-500 mt-1">
+        <h1 class="text-3xl font-bold text-text">Инвайт-токены</h1>
+        <p class="text-text-muted mt-1">
           Создание пригласительных ссылок для регистрации{" "}
           {hasRole(ROLES.SUPERADMIN) && "админов"}
         </p>
       </div>
 
       <Show when={error()}>
-        <div class="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl">
+        <div class="bg-urgent-bg border border-urgent text-urgent p-3 rounded-xl">
           {error()}
         </div>
       </Show>
 
-      <div class="bg-white rounded-2xl shadow-lg p-6 max-w-md">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">
-          Параметры токенов
-        </h2>
+      <div class="bg-surface rounded-2xl shadow-lg p-6 max-w-md">
+        <h2 class="text-lg font-semibold text-text mb-4">Параметры токенов</h2>
 
         <div class="space-y-4">
           {/* Count */}
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
+            <label class="block text-sm font-medium text-text-muted mb-2">
               Количество токенов
             </label>
             <input
@@ -212,20 +210,18 @@ const InviteTokens = () => {
                   ),
                 )
               }
-              class="w-32 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+              class="w-32 px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition text-text"
             />
           </div>
 
           {/* Roles */}
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">
-              Роли
-            </label>
+            <label class="block text-sm font-medium text-text mb-2">Роли</label>
             <div class="space-y-2">
               <For each={availableRoles}>
                 {(role) => (
                   <label
-                    class={`flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition cursor-pointer ${((hasRole(ROLES.SUPERADMIN) && role.id === 2) || creating()) && "cursor-not-allowed"}`}
+                    class={`flex items-center gap-3 p-2 rounded-lg hover:bg-surface-2 transition cursor-pointer ${((hasRole(ROLES.SUPERADMIN) && role.id === 2) || creating()) && "cursor-not-allowed"}`}
                   >
                     <input
                       type="checkbox"
@@ -234,13 +230,13 @@ const InviteTokens = () => {
                         (hasRole(ROLES.SUPERADMIN) && role.id === 2)
                       }
                       onChange={() => toggleRole(role.id)}
-                      class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500 cursor-pointer disabled:cursor-not-allowed"
+                      class="w-4 h-4 text-accent rounded focus:ring-accent-hover cursor-pointer disabled:cursor-not-allowed"
                       disabled={
                         (hasRole(ROLES.SUPERADMIN) && role.id === 2) ||
                         creating()
                       }
                     />
-                    <span class="text-gray-700">{role.name}</span>
+                    <span class="text-text">{role.name}</span>
                   </label>
                 )}
               </For>
@@ -250,7 +246,7 @@ const InviteTokens = () => {
           <button
             onClick={handleCreate}
             disabled={creating()}
-            class="w-full py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition cursor-pointer disabled:cursor-not-allowed font-medium"
+            class="w-full py-2.5 bg-accent text-bg rounded-xl hover:bg-accent-hover disabled:opacity-50 transition cursor-pointer disabled:cursor-not-allowed font-medium"
           >
             {creating()
               ? `Создание... ${progress().current}/${progress().total}`
@@ -268,12 +264,12 @@ const InviteTokens = () => {
           transition={{ duration: 0.2 }}
         >
           <div class="flex justify-between items-center">
-            <h2 class="text-xl font-semibold text-gray-800 text-center">
+            <h2 class="text-xl font-semibold text-text text-center">
               Созданные токены
             </h2>
             <button
               onClick={downloadTokensFile}
-              class="px-4 h-10 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition cursor-pointer font-medium flex flex-row flex-nowrap gap-2 items-center justify-center"
+              class="px-4 h-10 bg-surface text-text rounded-xl hover:bg-surface-2 transition cursor-pointer font-medium flex flex-row flex-nowrap gap-2 items-center justify-center"
             >
               <Download />{" "}
               <span class="hidden text-nowrap md:flex">Скачать Markdown</span>{" "}
@@ -281,13 +277,13 @@ const InviteTokens = () => {
             </button>
           </div>
 
-          <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+          <div class="bg-surface rounded-2xl shadow-lg overflow-hidden">
             <div class="divide-y divide-gray-100">
               <For each={tokens()}>
                 {(item, index) => (
-                  <div class="p-4 hover:bg-gray-50 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div class="p-4 hover:bg-surface-2 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <code
-                      class={`text-sm font-mono break-all text-gray-600 bg-gray-50 px-3 leading-10 text-center rounded-lg truncate ${navigator.clipboard ? "cursor-copy" : ""}`}
+                      class={`text-sm font-mono break-all text-text px-3 leading-10 text-center rounded-lg truncate ${navigator.clipboard ? "cursor-copy" : ""}`}
                       onClick={() => copyTokenToClipboard(item.token)}
                     >
                       {item.token}
@@ -301,7 +297,7 @@ const InviteTokens = () => {
                               index(),
                             )
                           }
-                          class="w-full md:w-36 h-10 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition cursor-pointer font-medium gap-2 flex items-center justify-center px-4"
+                          class="w-full md:w-36 h-10 text-sm bg-accent text-bg rounded-lg hover:bg-accent-hover transition cursor-pointer font-medium gap-2 flex items-center justify-center px-4"
                         >
                           {buttonCopiedIndex() === index() ? (
                             <>

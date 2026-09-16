@@ -139,7 +139,7 @@ const PostCardCompact = (props: Props) => {
 
   return (
     <Motion.div
-      class={`rounded-2xl shadow-md hover:shadow-xl overflow-hidden w-full ${props.post.thingReturnedToOwner ? "bg-gray-100 opacity-75" : "bg-white"}`}
+      class={`rounded-2xl shadow-md hover:shadow-xl overflow-hidden w-full bg-surface ${props.post.thingReturnedToOwner ? "opacity-75" : ""}`}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2 }}
@@ -148,10 +148,10 @@ const PostCardCompact = (props: Props) => {
         <div class="flex flex-col md:flex-row items-start gap-4 w-full">
           <A
             href={`/users/${props.post.author.id}`}
-            class="w-10 h-10 flex bg-gray-100 rounded-full hover:bg-gray-200 transition"
+            class="w-10 h-10 flex bg-surface rounded-full hover:bg-surface-2 transition"
           >
             <img
-              class={`w-10 h-10 rounded-full object-cover border-2 border-gray-100 hover:brightness-95 transition flex-shrink-0 ${props.post.thingReturnedToOwner ? "grayscale" : ""}`}
+              class={`w-10 h-10 rounded-full object-cover border-2 border-border hover:brightness-95 transition flex-shrink-0 ${props.post.thingReturnedToOwner ? "grayscale" : ""}`}
               src={
                 props.post.author.hasAvatar
                   ? `/storage/storage/avatars/${props.post.author.id}.jpeg`
@@ -163,7 +163,7 @@ const PostCardCompact = (props: Props) => {
           <div class="flex-1 min-w-0 w-full">
             <div class="flex items-center justify-between flex-wrap gap-2">
               <h3
-                class={`text-wrap text-lg font-semibold truncate ${props.post.thingReturnedToOwner ? "text-gray-500 line-through" : "text-gray-800"}`}
+                class={`text-wrap text-lg font-semibold truncate ${props.post.thingReturnedToOwner ? "text-text-muted line-through" : "text-text"}`}
               >
                 {props.post.name}
               </h3>
@@ -177,7 +177,7 @@ const PostCardCompact = (props: Props) => {
               </div>
             </div>
 
-            <div class="flex flex-col md:flex-row items-start md:items-center md:gap-3 mt-1 text-sm text-gray-500">
+            <div class="flex flex-col md:flex-row items-start md:items-center md:gap-3 mt-1 text-sm text-text">
               <span>
                 {props.post.author.firstName} {props.post.author.lastName}
               </span>
@@ -199,7 +199,7 @@ const PostCardCompact = (props: Props) => {
 
             <Show when={props.post.description}>
               <p
-                class={`mt-2 text-sm line-clamp-2 whitespace-pre-wrap ${props.post.thingReturnedToOwner ? "text-gray-400" : "text-gray-600"}`}
+                class={`mt-2 text-sm line-clamp-2 whitespace-pre-wrap ${props.post.thingReturnedToOwner ? "text-text-muted" : "text-text"}`}
               >
                 {props.post.description}
               </p>
@@ -310,7 +310,7 @@ const PostCardCompact = (props: Props) => {
             </div>
 
             <Show when={error()}>
-              <div class="mt-3 text-red-600 text-sm">{error()}</div>
+              <div class="mt-3 text-urgent text-sm">{error()}</div>
             </Show>
           </div>
         </div>
@@ -328,7 +328,7 @@ const PostCardCompact = (props: Props) => {
             transition={{ duration: 0.2 }}
           >
             <Motion.div
-              class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
+              class="bg-surface rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -336,11 +336,11 @@ const PostCardCompact = (props: Props) => {
               transition={{ duration: 0.2 }}
             >
               {/* Header */}
-              <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4">
-                <h2 class="text-xl font-bold text-gray-800">
+              <div class="sticky top-0 bg-surface border-b border-border px-6 py-4">
+                <h2 class="text-xl font-bold text-text">
                   Связаться с автором
                 </h2>
-                <p class="text-sm text-gray-500">
+                <p class="text-sm text-text">
                   {props.post.author.firstName} {props.post.author.lastName} ·{" "}
                   {props.post.name}
                 </p>
@@ -349,7 +349,7 @@ const PostCardCompact = (props: Props) => {
               {/* Body */}
               <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-5 flex flex-col">
                 <Show when={error()}>
-                  <div class="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-sm">
+                  <div class="bg-urgent-bg border border-urgent text-urgent p-3 rounded-xl text-sm">
                     {error()}
                   </div>
                 </Show>
@@ -371,23 +371,23 @@ const PostCardCompact = (props: Props) => {
                     }
                   }}
                   placeholder="Введите сообщение..."
-                  class="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="flex-1 px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition disabled:opacity-50 disabled:cursor-not-allowed text-text"
                   required
                 />
               </div>
 
               {/* Footer */}
-              <div class="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+              <div class="sticky bottom-0 bg-surface border-t border-border px-6 py-4 flex justify-end gap-3">
                 <button
                   onClick={closeModal}
-                  class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium cursor-pointer"
+                  class="px-4 py-2 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium cursor-pointer"
                 >
                   Отмена
                 </button>
                 <button
                   onClick={contactAuthor}
                   disabled={contactLoading()}
-                  class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                  class="px-4 py-2 bg-accent text-bg rounded-xl hover:bg-accent-hover transition font-medium disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                 >
                   {contactLoading() ? "Отправка..." : "Отправить"}
                 </button>

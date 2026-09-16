@@ -159,7 +159,7 @@ const PostCardDetailed = (props: Props) => {
   return (
     <Motion.div
       class={
-        "rounded-2xl shadow-md hover:shadow-xl overflow-hidden bg-white w-full"
+        "rounded-2xl shadow-md hover:shadow-xl overflow-hidden bg-surface w-full"
       }
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -169,10 +169,10 @@ const PostCardDetailed = (props: Props) => {
         <div class="flex flex-col md:flex-row items-center md:items-start gap-4 mt-8 md:mt-0">
           <A
             href={`/users/${props.post.author.id}`}
-            class="w-10 h-10 flex bg-gray-100 rounded-full hover:bg-gray-200 transition"
+            class="w-10 h-10 flex bg-surface rounded-full hover:bg-surface-2 transition"
           >
             <img
-              class="w-10 h-10 rounded-full object-cover border-2 border-gray-100 hover:brightness-95 transition"
+              class="w-10 h-10 rounded-full object-cover border-2 border-border hover:brightness-95 transition"
               src={
                 props.post.author.hasAvatar
                   ? `/storage/storage/avatars/${props.post.author.id}.jpeg`
@@ -183,7 +183,7 @@ const PostCardDetailed = (props: Props) => {
           </A>
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between flex-wrap gap-2">
-              <h3 class="text-lg font-semibold truncate text-gray-800 text-wrap">
+              <h3 class="text-lg font-semibold truncate text-text text-wrap">
                 {props.post.name}
               </h3>
               <div class="flex items-center gap-2 max-md:absolute max-md:right-4 max-md:top-4">
@@ -194,7 +194,7 @@ const PostCardDetailed = (props: Props) => {
               </div>
             </div>
 
-            <div class="flex flex-col md:flex-row items-start md:items-center md:gap-3 mt-1 text-sm text-gray-500">
+            <div class="flex flex-col md:flex-row items-start md:items-center md:gap-3 mt-1 text-sm text-text">
               <span>
                 {props.post.author.firstName} {props.post.author.lastName}
               </span>
@@ -215,14 +215,14 @@ const PostCardDetailed = (props: Props) => {
             </Show>
 
             <Show when={props.post.description}>
-              <p class="mt-2 text-sm text-gray-600 whitespace-pre-wrap">
+              <p class="mt-2 text-sm text-text whitespace-pre-wrap">
                 {props.post.description}
               </p>
             </Show>
 
             <Show when={similarPosts()?.length > 0}>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
+                <label class="block text-sm font-medium text-text mb-1">
                   Похожие объявления
                 </label>
                 <div class="flex gap-3 overflow-x-auto">
@@ -245,11 +245,11 @@ const PostCardDetailed = (props: Props) => {
                           <img
                             src={`/storage/storage/post_photos/${post().id}.jpeg`}
                             alt={post().name}
-                            class="object-cover rounded-xl border-2 border-gray-300 hover:border-blue-500 transition"
+                            class="object-cover rounded-xl border-2 border-border hover:border-focus transition"
                           />
                         </Show>
                         <Show when={!post().hasPhoto}>
-                          <div class="flex w-30 h-full justify-center items-center rounded-xl border-2 border-gray-300 hover:border-blue-500 transition flex-col gap-3 p-2">
+                          <div class="flex w-30 h-full justify-center items-center rounded-xl border-2 border-border hover:border-focus transition flex-col gap-3 p-2">
                             <ImageOff />
                             <span class="truncate max-w-full">
                               {post().name}
@@ -371,7 +371,7 @@ const PostCardDetailed = (props: Props) => {
             </div>
 
             <Show when={error()}>
-              <div class="mt-3 text-red-600 text-sm">{error()}</div>
+              <div class="mt-3 text-urgent text-sm">{error()}</div>
             </Show>
           </div>
         </div>
@@ -388,7 +388,7 @@ const PostCardDetailed = (props: Props) => {
             transition={{ duration: 0.2 }}
           >
             <Motion.div
-              class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
+              class="bg-surface rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -396,11 +396,11 @@ const PostCardDetailed = (props: Props) => {
               transition={{ duration: 0.2 }}
             >
               {/* Header */}
-              <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4">
-                <h2 class="text-xl font-bold text-gray-800">
+              <div class="sticky top-0 bg-surface border-b border-border px-6 py-4">
+                <h2 class="text-xl font-bold text-text">
                   Связаться с автором
                 </h2>
-                <p class="text-sm text-gray-500">
+                <p class="text-sm text-text">
                   {props.post.author.firstName} {props.post.author.lastName} ·{" "}
                   {props.post.name}
                 </p>
@@ -409,7 +409,7 @@ const PostCardDetailed = (props: Props) => {
               {/* Body */}
               <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-5 flex flex-col">
                 <Show when={error()}>
-                  <div class="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl text-sm">
+                  <div class="bg-urgent-bg border border-urgent text-urgent p-3 rounded-xl text-sm">
                     {error()}
                   </div>
                 </Show>
@@ -431,23 +431,23 @@ const PostCardDetailed = (props: Props) => {
                     }
                   }}
                   placeholder="Введите сообщение..."
-                  class="flex-1 px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="flex-1 px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition disabled:opacity-50 disabled:cursor-not-allowed text-text"
                   required
                 />
               </div>
 
               {/* Footer */}
-              <div class="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+              <div class="sticky bottom-0 bg-surface border-t border-border px-6 py-4 flex justify-end gap-3">
                 <button
                   onClick={closeModal}
-                  class="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition font-medium cursor-pointer"
+                  class="px-4 py-2 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium cursor-pointer"
                 >
                   Отмена
                 </button>
                 <button
                   onClick={contactAuthor}
                   disabled={contactLoading()}
-                  class="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition font-medium disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                  class="px-4 py-2 bg-accent text-bg rounded-xl hover:bg-accent-hover transition font-medium disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                 >
                   {contactLoading() ? "Отправка..." : "Отправить"}
                 </button>

@@ -95,13 +95,13 @@ const ConversationView = () => {
   const post = () => conversation()?.post;
 
   return (
-    <div class="max-w-4xl mx-auto h-full md:h-[calc(100vh-120px)] flex flex-col bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div class="max-w-4xl mx-auto h-full md:h-[calc(100vh-120px)] flex flex-col bg-surface rounded-2xl shadow-lg overflow-hidden">
       {/* Header */}
-      <div class="border-b border-gray-200 p-4 flex items-center gap-3">
+      <div class="border-b border-border p-4 flex items-center gap-3">
         <button
           onClick={() => navigate("/conversations")}
           type="button"
-          class="text-gray-500 hover:text-gray-700 cursor-pointer flex flex-row"
+          class="text-text hover:text-text-muted cursor-pointer flex flex-row"
         >
           <ChevronLeft /> <span class="hidden md:block">Назад</span>
         </button>
@@ -117,14 +117,14 @@ const ConversationView = () => {
                   : "/storage/assets/default_avatar.jpeg"
               }
               alt={`Фото профиля пользователя ${otherUser()!.firstName} ${otherUser()!.lastName}`}
-              class="w-10 h-10 rounded-full object-cover border-2 border-gray-100 hover:brightness-95 transition"
+              class="w-10 h-10 rounded-full object-cover border-2 border-border hover:brightness-95 transition"
             />
 
             <div>
-              <h2 class="font-semibold text-gray-800">
+              <h2 class="font-semibold text-text">
                 {otherUser()!.firstName} {otherUser()!.lastName}
               </h2>
-              <p class="text-sm text-gray-500">{post()?.name}</p>
+              <p class="text-sm text-text">{post()?.name}</p>
             </div>
           </A>
         </Show>
@@ -132,7 +132,7 @@ const ConversationView = () => {
           <button
             onClick={() => navigate(`/posts/${post()!.id}`)}
             type="button"
-            class="text-gray-500 hover:text-gray-700 cursor-pointer flex flex-row"
+            class="text-text hover:text-text-muted cursor-pointer flex flex-row"
           >
             <span class="hidden md:flex">
               Перейти к объявлению <ChevronRight />
@@ -151,7 +151,7 @@ const ConversationView = () => {
         </Show>
 
         <Show when={error()}>
-          <div class="bg-red-50 text-red-600 p-3 rounded-xl">{error()}</div>
+          <div class="bg-urgent-bg text-urgent p-3 rounded-xl">{error()}</div>
         </Show>
         <div class="flex flex-col justify-end min-h-full">
           <div class="space-y-3">
@@ -172,7 +172,7 @@ const ConversationView = () => {
                 return (
                   <>
                     <Show when={showDate}>
-                      <div class="text-center text-xs text-gray-400 py-2">
+                      <div class="text-center text-xs text-text py-2">
                         {curDate}
                       </div>
                     </Show>
@@ -183,8 +183,8 @@ const ConversationView = () => {
                         <Motion.div
                           class={`rounded-2xl px-4 py-2 ${
                             isOwn
-                              ? "bg-blue-600 text-white"
-                              : "bg-gray-100 text-gray-800"
+                              ? "bg-surface-2 text-text"
+                              : "bg-bg text-text"
                           }`}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -192,7 +192,7 @@ const ConversationView = () => {
                         >
                           <p class="text-sm">{msg().content}</p>
                         </Motion.div>
-                        <p class="text-xs text-gray-400 mt-1">
+                        <p class="text-xs text-text mt-1">
                           {new Date(msg().createdAt).toLocaleTimeString("ru", {
                             hour: "2-digit",
                             minute: "2-digit",
@@ -212,7 +212,7 @@ const ConversationView = () => {
       {/* Input */}
       <form
         onSubmit={sendMessage}
-        class="border-t border-gray-200 p-4 flex gap-2"
+        class="border-t border-border p-4 flex gap-2"
       >
         <input
           ref={messageInputRef}
@@ -221,12 +221,12 @@ const ConversationView = () => {
           onInput={(e) => setNewMessage(e.currentTarget.value)}
           placeholder="Сообщение..."
           disabled={sending()}
-          class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none disabled:opacity-50"
+          class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none disabled:opacity-50 text-text"
         />
         <button
           type="submit"
           disabled={sending() || !newMessage().trim()}
-          class="max-md:aspect-square flex items-center justify-center md:px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition font-medium cursor-pointer disabled:cursor-not-allowed"
+          class="max-md:aspect-square flex items-center justify-center md:px-5 py-2 bg-accent text-bg rounded-xl hover:bg-accent-hover disabled:opacity-50 transition font-medium cursor-pointer disabled:cursor-not-allowed"
         >
           <span class="hidden md:flex md:items-center md:justify-center">
             Отправить

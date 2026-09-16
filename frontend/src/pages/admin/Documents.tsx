@@ -55,12 +55,12 @@ const Documents = () => {
   return (
     <div class="space-y-6 p-4">
       <div class="mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">Управление документами</h1>
+        <h1 class="text-3xl font-bold text-text">Управление документами</h1>
         <p class="text-gray-500 mt-1">Загрузка документов</p>
       </div>
 
       <Show when={error()}>
-        <div class="bg-red-50 border border-red-200 text-red-600 p-3 rounded-xl">
+        <div class="bg-urgent-bg border border-urgent text-urgent p-3 rounded-xl">
           {error()}
         </div>
       </Show>
@@ -80,8 +80,8 @@ const Documents = () => {
             </div>
           </Show>
           <Show when={!uploadingPrivacy()}>
-            <div class="bg-white rounded-2xl shadow-lg p-6 max-w-md">
-              <h2 class="text-lg font-semibold text-gray-800 mb-4">
+            <div class="bg-surface rounded-2xl shadow-lg p-6 max-w-md">
+              <h2 class="text-lg font-semibold text-text mb-4">
                 Политика конфиденциальности
               </h2>
               <div class="flex gap-3 flex-col">
@@ -96,13 +96,13 @@ const Documents = () => {
                     <span>Документ загружен</span>
                   </Motion.div>
                 </Show>
-                <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-blue-500 transition">
+                <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-focus transition">
                   <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                    <FileText />
-                    <p class="text-sm text-gray-500">
+                    <FileText class="text-text" />
+                    <p class="text-sm text-text">
                       Нажмите для {hasPrivacy() ? "замены" : "загрузки"} файла
                     </p>
-                    <p class="text-xs text-gray-400 mt-1">PDF (макс. 10MB)</p>
+                    <p class="text-xs text-text-muted mt-1">PDF (макс. 10MB)</p>
                   </div>
                   <input
                     type="file"

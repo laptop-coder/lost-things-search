@@ -13,8 +13,8 @@ const RegistrationGuide = () => {
   return (
     <div class="max-w-5xl mx-auto px-4 py-8 md:py-16 space-y-12">
       <div class="text-center space-y-4">
-        <h1 class="text-3xl md:text-5xl font-bold text-gray-800">Инструкция</h1>
-        <p class="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto">
+        <h1 class="text-3xl md:text-5xl font-bold text-text">Инструкция</h1>
+        <p class="text-lg md:text-xl text-text-muted max-w-2xl mx-auto">
           Создание учётной записи {role === ROLES.STUDENT ? "ученика" : ""}
           {role === ROLES.PARENT ? "родителя" : ""}
         </p>
@@ -28,7 +28,7 @@ const RegistrationGuide = () => {
               <A
                 href="/login"
                 target="_blank"
-                class="text-blue-600 hover:underline"
+                class="text-accent hover:underline"
               >
                 Войти
               </A>
@@ -44,7 +44,7 @@ const RegistrationGuide = () => {
               <A
                 href="/register"
                 target="_blank"
-                class="text-blue-600 hover:underline"
+                class="text-accent hover:underline"
               >
                 Запросить пригласительную ссылку
               </A>
@@ -121,7 +121,7 @@ const RegistrationGuide = () => {
               <A
                 href="/login"
                 target="_blank"
-                class="text-blue-600 hover:underline"
+                class="text-accent hover:underline"
               >
                 Войти
               </A>
@@ -137,7 +137,7 @@ const RegistrationGuide = () => {
               <A
                 href="/register"
                 target="_blank"
-                class="text-blue-600 hover:underline"
+                class="text-accent hover:underline"
               >
                 Запросить пригласительную ссылку
               </A>
@@ -225,7 +225,7 @@ const RegistrationGuide = () => {
       </Show>
 
       <Show when={error()}>
-        <div class="bg-red-50 text-red-600 p-3 rounded-xl text-sm border border-red-200">
+        <div class="bg-urgent-bg text-urgent p-3 rounded-xl text-sm border border-urgent">
           {error()}
         </div>
       </Show>
