@@ -148,7 +148,7 @@ const PostCardCompact = (props: Props) => {
         <div class="flex flex-col md:flex-row items-start gap-4 w-full">
           <A
             href={`/users/${props.post.author.id}`}
-            class="w-10 h-10 flex bg-surface rounded-full hover:bg-surface-2 transition"
+            class="w-10 h-10 flex bg-surface rounded-full hover:brightness-90 transition"
           >
             <img
               class={`w-10 h-10 rounded-full object-cover border-2 border-border hover:brightness-95 transition flex-shrink-0 ${props.post.thingReturnedToOwner ? "grayscale" : ""}`}
@@ -218,7 +218,7 @@ const PostCardCompact = (props: Props) => {
                     onClick={openModal}
                     disabled={contactLoading()}
                     type="button"
-                    class="w-full sm:w-auto px-3 h-10 bg-blue-100 text-blue-700 text-sm rounded-lg hover:bg-blue-200 transition font-medium cursor-pointer"
+                    class="w-full sm:w-auto px-3 h-10 bg-accent hover:bg-accent-hover text-bg text-sm rounded-lg transition font-medium cursor-pointer"
                   >
                     Связаться с автором
                   </button>
@@ -239,7 +239,7 @@ const PostCardCompact = (props: Props) => {
                       }
                       disabled={loading()}
                       type="button"
-                      class="w-full sm:w-auto px-3 h-10 bg-green-100 text-green-700 text-sm rounded-lg hover:bg-green-200 transition font-medium cursor-pointer"
+                      class="w-full sm:w-auto px-3 h-10 bg-success hover:brightness-90 text-bg text-sm rounded-lg transition font-medium cursor-pointer"
                     >
                       Опубликовать
                     </button>
@@ -251,7 +251,7 @@ const PostCardCompact = (props: Props) => {
                       }
                       disabled={loading()}
                       type="button"
-                      class="w-full sm:w-auto px-3 h-10 bg-red-100 text-red-700 text-sm rounded-lg hover:bg-red-200 transition font-medium cursor-pointer"
+                      class="w-full sm:w-auto px-3 h-10 bg-urgent hover:brightness-90 text-bg text-sm rounded-lg transition font-medium cursor-pointer"
                     >
                       Отклонить
                     </button>
@@ -273,7 +273,7 @@ const PostCardCompact = (props: Props) => {
                     onClick={markReturned}
                     disabled={loading()}
                     type="button"
-                    class="w-full sm:w-auto px-3 h-10 bg-green-100 text-green-700 text-sm rounded-lg hover:bg-green-200 transition font-medium cursor-pointer"
+                    class="w-full sm:w-auto px-3 h-10 bg-success hover:brightness-90 text-bg text-sm rounded-lg transition font-medium cursor-pointer"
                   >
                     Отметить найденным
                   </button>
@@ -290,7 +290,7 @@ const PostCardCompact = (props: Props) => {
                     onClick={deletePost}
                     disabled={loading()}
                     type="button"
-                    class="w-full sm:w-auto px-3 h-10 bg-red-100 text-red-700 text-sm rounded-lg hover:bg-red-200 transition font-medium cursor-pointer"
+                    class="w-full sm:w-auto px-3 h-10 bg-urgent hover:brightness-90 text-bg text-sm rounded-lg transition font-medium cursor-pointer"
                   >
                     Удалить
                   </button>
@@ -302,7 +302,7 @@ const PostCardCompact = (props: Props) => {
                     (window.location.href = `/posts/${props.post.id}`)
                   }
                   type="button"
-                  class="w-full sm:w-auto px-3 h-10 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition font-medium cursor-pointer inline-flex items-center justify-center"
+                  class="w-full sm:w-auto px-3 h-10 bg-surface-2 hover:brightness-90 text-text text-sm rounded-lg transition font-medium cursor-pointer inline-flex items-center justify-center"
                 >
                   Подробнее <ChevronRight />
                 </button>
@@ -337,9 +337,7 @@ const PostCardCompact = (props: Props) => {
             >
               {/* Header */}
               <div class="sticky top-0 bg-surface border-b border-border px-6 py-4">
-                <h2 class="text-xl font-bold text-text">
-                  Связаться с автором
-                </h2>
+                <h2 class="text-xl font-bold text-text">Связаться с автором</h2>
                 <p class="text-sm text-text">
                   {props.post.author.firstName} {props.post.author.lastName} ·{" "}
                   {props.post.name}
@@ -371,7 +369,7 @@ const PostCardCompact = (props: Props) => {
                     }
                   }}
                   placeholder="Введите сообщение..."
-                  class="flex-1 px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition disabled:opacity-50 disabled:cursor-not-allowed text-text"
+                  class="flex-1 px-4 py-2 border border-border rounded-xl  transition disabled:opacity-50 disabled:cursor-not-allowed text-text"
                   required
                 />
               </div>
@@ -380,7 +378,7 @@ const PostCardCompact = (props: Props) => {
               <div class="sticky bottom-0 bg-surface border-t border-border px-6 py-4 flex justify-end gap-3">
                 <button
                   onClick={closeModal}
-                  class="px-4 py-2 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium cursor-pointer"
+                  class="px-4 py-2 bg-surface-2 text-text rounded-xl hover:brightness-90 transition font-medium cursor-pointer"
                 >
                   Отмена
                 </button>

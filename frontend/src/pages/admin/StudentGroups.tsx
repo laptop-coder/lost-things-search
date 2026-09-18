@@ -127,9 +127,7 @@ const StudentGroups = () => {
       {/* Form for student group creating */}
       <Show when={hasPermission(PERMISSIONS.STUDENT_GROUP_CREATE)}>
         <div class="bg-surface rounded-2xl shadow-lg p-6">
-          <h2 class="text-lg font-semibold text-text mb-4">
-            Добавить группу
-          </h2>
+          <h2 class="text-lg font-semibold text-text mb-4">Добавить группу</h2>
           <form onSubmit={createStudentGroup} class="flex gap-3">
             <input
               ref={inputRef}
@@ -137,7 +135,7 @@ const StudentGroups = () => {
               value={newStudentGroupName()}
               onInput={(e) => setNewStudentGroupName(e.currentTarget.value)}
               placeholder="Название группы (например, 11А)"
-              class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition disabled:opacity-50 text-text"
+              class="w-full px-4 py-2 border border-border rounded-xl  transition disabled:opacity-50 text-text"
               disabled={creating()}
             />
             <button
@@ -195,7 +193,7 @@ const StudentGroups = () => {
               <tbody class="divide-y divide-border">
                 <For each={studentGroups()}>
                   {(studentGroup) => (
-                    <tr class="hover:bg-surface transition">
+                    <tr class="bg-surface hover:brightness-90 transition">
                       <td class="px-6 py-4 text-sm text-text font-mono">
                         {studentGroup.id}
                       </td>

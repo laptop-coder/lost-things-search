@@ -97,9 +97,7 @@ const PostsToVerify = () => {
     hasPermission(PERMISSIONS.POST_READ_ANY) && (
       <div class="space-y-6 p-4 overflow-hidden">
         <div class="mb-6">
-          <h1 class="text-3xl font-bold text-text">
-            Верификация объявлений
-          </h1>
+          <h1 class="text-3xl font-bold text-text">Верификация объявлений</h1>
           <p class="text-text-muted mt-1">
             Проверьте и подтвердите объявления пользователей
           </p>

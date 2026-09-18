@@ -112,9 +112,7 @@ const Rooms = () => {
       {/* Form for rooms creating */}
       <Show when={hasPermission(PERMISSIONS.ROOM_CREATE)}>
         <div class="bg-surface rounded-2xl shadow-lg p-6">
-          <h2 class="text-lg font-semibold text-text mb-4">
-            Добавить кабинет
-          </h2>
+          <h2 class="text-lg font-semibold text-text mb-4">Добавить кабинет</h2>
           <form onSubmit={createRoom} class="flex gap-3">
             <input
               ref={inputRef}
@@ -122,7 +120,7 @@ const Rooms = () => {
               value={newRoomName()}
               onInput={(e) => setNewRoomName(e.currentTarget.value)}
               placeholder="Название кабинета"
-              class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition disabled:opacity-50 text-text"
+              class="w-full px-4 py-2 border border-border rounded-xl  transition disabled:opacity-50 text-text"
               disabled={creating()}
             />
             <button
@@ -180,7 +178,7 @@ const Rooms = () => {
               <tbody class="divide-y divide-border">
                 <For each={rooms()}>
                   {(room) => (
-                    <tr class="hover:bg-surface transition">
+                    <tr class="bg-surface hover:brightness-90 transition">
                       <td class="px-6 py-4 text-sm text-text font-mono">
                         {room.id}
                       </td>

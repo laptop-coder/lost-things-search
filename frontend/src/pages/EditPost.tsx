@@ -130,7 +130,7 @@ const EditPost = () => {
                   type="text"
                   value={name()}
                   onInput={(e) => setName(e.currentTarget.value)}
-                  class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition text-text"
+                  class="w-full px-4 py-2 border border-border rounded-xl  transition text-text"
                   required
                 />
               </div>
@@ -143,7 +143,7 @@ const EditPost = () => {
                   value={description()}
                   onInput={(e) => setDescription(e.currentTarget.value)}
                   rows={5}
-                  class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition min-h-[140px] max-h-[600px] text-text"
+                  class="w-full px-4 py-2 border border-border rounded-xl  transition min-h-[140px] max-h-[600px] text-text"
                 />
               </div>
 
@@ -158,7 +158,7 @@ const EditPost = () => {
                       postAuthorId() === auth.user()?.id)) && (
                     <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-focus transition">
                       <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                        <Image class="text-text-muted"/>
+                        <Image class="text-text-muted" />
                         <p class="text-sm text-text-muted">
                           Нажмите для загрузки фото
                         </p>
@@ -211,7 +211,7 @@ const EditPost = () => {
                 <button
                   type="button"
                   onClick={() => navigate("/")}
-                  class="flex-1 px-4 h-10 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium cursor-pointer"
+                  class="flex-1 px-4 h-10 bg-surface-2 text-text rounded-xl hover:brightness-90 transition font-medium cursor-pointer"
                 >
                   Отмена
                 </button>

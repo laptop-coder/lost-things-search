@@ -11,13 +11,12 @@
 
   --color-accent: var(--accent); /*buttons, links, active*/
   --color-accent-hover: var(--accent-hover);
-  --color-disabled: var(--disabled);
   --color-info: var(--info);
 
   --color-focus: var(--focus);
 
-  --color-lost: var(--lost);
-  --color-found: var(--found);
+  --color-warning: var(--warning);
+  --color-success: var(--success);
   --color-urgent: var(--urgent);
   --color-urgent-bg: var(--urgent-bg);
 }
@@ -33,13 +32,12 @@
 
   --accent: #ffc49b; /*buttons, links, active*/
   --accent-hover: #ffb37a;
-  --disabled: #4a4d6a;
   --info: #aaabb8;
 
   --focus: #9193a8;
 
-  --lost: #ffb37a;
-  --found: #8fd9a8;
+  --warning: #ffb37a;
+  --success: #8fd9a8;
   --urgent: #ff8a8a;
   --urgent-bg: #4a2b2b;
 }
@@ -55,18 +53,29 @@
 
   --accent: #e08a4a;
   --accent-hover: #c9743a;
-  --disabled: #b8b3a8;
   --info: #5c5f7a;
 
   --focus: #25274d;
 
-  --lost: #e08a4a;
-  --found: #3f9e6a;
+  --warning: #e08a4a;
+  --success: #3f9e6a;
   --urgent: #d9534f;
-  --urgent-bg: #fdecea;
+  --urgent-bg: #f9c8c2;
 }
 
 @layer base {
+  :where(*):focus {
+    @apply outline-none ring-2 ring-focus;
+  }
+  :where(button, a):focus:not(:focus-visible),
+  :where(input[type="checkbox"], input[type="radio"]):focus:not(
+      :focus-visible
+    ) {
+    @apply ring-0;
+  }
+  :where(input[type="checkbox"], input[type="radio"]) {
+    @apply accent-accent;
+  }
   body {
     @apply bg-surface;
   }

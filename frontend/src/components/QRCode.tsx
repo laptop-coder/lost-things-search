@@ -47,7 +47,7 @@ const QRCodeButton = (props: Props) => {
     <>
       <button
         onClick={generateQR}
-        class="aspect-square w-10 h-10 ml-2 text-sm bg-surface-2 text-text rounded-lg hover:bg-surface transition cursor-pointer flex items-center justify-center"
+        class="aspect-square w-10 h-10 ml-2 text-sm bg-surface-2 text-text rounded-lg hover:brightness-90 transition cursor-pointer flex items-center justify-center"
         title="Показать QR-код"
       >
         <QrCode />
@@ -75,7 +75,7 @@ const QRCodeButton = (props: Props) => {
               <div class="mt-2 text-center">
                 <button
                   onClick={closeQR}
-                  class="px-4 h-10 bg-surface-2 text-text rounded-lg hover:bg-surface transition cursor-pointer"
+                  class="px-4 h-10 bg-surface-2 text-text rounded-lg hover:brightness-90 transition cursor-pointer"
                 >
                   Закрыть
                 </button>

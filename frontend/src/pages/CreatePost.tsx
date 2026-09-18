@@ -207,7 +207,7 @@ const CreatePost = () => {
                   refreshSimilarPosts();
                 }}
                 placeholder="Например: синяя шапка"
-                class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition text-text-muted"
+                class="w-full px-4 py-2 border border-border rounded-xl  transition text-text-muted"
                 required
               />
               <p class="text-xs text-text-muted mt-1">
@@ -227,7 +227,7 @@ const CreatePost = () => {
                 }}
                 placeholder="Где и когда, особые приметы..."
                 rows={5}
-                class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition min-h-[140px] max-h-[600px] text-text-muted"
+                class="w-full px-4 py-2 border border-border rounded-xl  transition min-h-[140px] max-h-[600px] text-text-muted"
               />
               <p class="text-xs text-text-muted mt-1">
                 Чем подробнее, тем лучше
@@ -244,7 +244,7 @@ const CreatePost = () => {
               <button
                 type="button"
                 onClick={() => navigate("/")}
-                class="flex-1 px-4 py-2 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium cursor-pointer"
+                class="flex-1 px-4 py-2 bg-surface-2 text-text rounded-xl hover:brightness-90 transition font-medium cursor-pointer"
               >
                 Отмена
               </button>

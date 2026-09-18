@@ -77,7 +77,7 @@ export const PublicRoute: Component<Props> = (props) => {
                 {hasAnyRole(ROLES.ADMIN, ROLES.SUPERADMIN) && (
                   <A
                     href="/admin"
-                    class="bg-surface-2 text-text rounded-lg hover:bg-surface transition flex items-center justify-center w-10 h-10"
+                    class="bg-surface-2 text-text rounded-lg hover:brightness-90 transition flex items-center justify-center w-10 h-10"
                   >
                     <Settings2 />
                   </A>
@@ -86,7 +86,7 @@ export const PublicRoute: Component<Props> = (props) => {
                 {hasPermission(PERMISSIONS.POST_CREATE) && (
                   <A
                     href="/posts/new"
-                    class="bg-surface-2 text-text rounded-lg hover:bg-surface transition flex items-center justify-center w-10 h-10"
+                    class="bg-surface-2 text-text rounded-lg hover:brightness-90 transition flex items-center justify-center w-10 h-10"
                   >
                     <Plus />
                   </A>
@@ -95,7 +95,7 @@ export const PublicRoute: Component<Props> = (props) => {
                 <Show when={hasPermission(PERMISSIONS.CONVERSATION_READ_OWN)}>
                   <A
                     href="/conversations"
-                    class="bg-surface-2 text-text rounded-lg hover:bg-surface transition flex items-center justify-center w-10 h-10 relative"
+                    class="bg-surface-2 text-text rounded-lg hover:brightness-90 transition flex items-center justify-center w-10 h-10 relative"
                   >
                     <MessageSquareText />
                     <Show when={unreadMessagesCount() > 0}>
@@ -108,7 +108,7 @@ export const PublicRoute: Component<Props> = (props) => {
 
                 <A
                   href="/profile"
-                  class="w-10 h-10 flex bg-surface rounded-full hover:bg-surface-2 transition"
+                  class="w-10 h-10 flex bg-surface rounded-full hover:brightness-90 transition"
                 >
                   <img
                     class="w-10 h-10 rounded-full object-cover border-2 border-border hover:brightness-95 transition"

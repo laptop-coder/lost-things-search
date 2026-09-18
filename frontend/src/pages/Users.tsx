@@ -451,7 +451,7 @@ const Users = () => {
       {/* "Copied!" notification */}
       <Show when={showCopied()}>
         <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50">
-          <div class="bg-surface-2 text-text px-5 py-3 rounded-xl shadow-lg text-sm font-medium gap-2">
+          <div class="bg-surface-2 text-text px-5 py-3 rounded-xl shadow-lg text-sm font-medium gap-2 flex flex-row">
             <Check /> Скопировано!
           </div>
         </div>
@@ -522,12 +522,12 @@ const Users = () => {
                   )}
                 >
                   {(user) => (
-                    <tr class="hover:bg-surface-2 transition">
+                    <tr class="bg-surface hover:brightness-90 transition">
                       <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
                           <A
                             href={`/users/${user.id}`}
-                            class="w-8 h-8 bg-surface rounded-full hover:bg-surface-2 transition aspect-square"
+                            class="w-8 h-8 bg-surface rounded-full hover:brightness-90 transition aspect-square"
                           >
                             <img
                               class="w-8 h-8 rounded-full object-cover border-2 border-border hover:brightness-95 transition"
@@ -713,7 +713,7 @@ const Users = () => {
                       })}
                     >
                       {(role) => (
-                        <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-2 transition cursor-pointer">
+                        <label class="flex items-center gap-3 p-2 rounded-lg hover:brightness-90 transition cursor-pointer">
                           <input
                             type="checkbox"
                             checked={selectedRoles().includes(role.id)}
@@ -748,7 +748,7 @@ const Users = () => {
                           Number(e.currentTarget.value),
                         );
                       }}
-                      class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
+                      class="w-full px-4 py-2 border border-border rounded-xl  transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
                     >
                       <option value="">Выберите должность</option>
                       <For each={institutionAdministratorPositions()}>
@@ -774,7 +774,7 @@ const Users = () => {
                         setError("");
                         setStaffPositionId(Number(e.currentTarget.value));
                       }}
-                      class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
+                      class="w-full px-4 py-2 border border-border rounded-xl  transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
                     >
                       <option value="">Выберите должность</option>
                       <For each={staffPositions()}>
@@ -803,7 +803,7 @@ const Users = () => {
                           setError("");
                           setTeacherClassroomId(Number(e.currentTarget.value));
                         }}
-                        class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
+                        class="w-full px-4 py-2 border border-border rounded-xl  transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
                       >
                         <option value="">Выберите кабинет</option>
                         <For each={rooms()}>
@@ -821,7 +821,7 @@ const Users = () => {
                       <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border border-border rounded-xl p-2">
                         <For each={subjects()}>
                           {(subject) => (
-                            <label class="flex items-center gap-2 p-2 hover:bg-surface-2 rounded-lg cursor-pointer transition">
+                            <label class="flex items-center gap-2 p-2 hover:brightness-90 rounded-lg cursor-pointer transition">
                               <input
                                 disabled={saving()}
                                 type="checkbox"
@@ -871,7 +871,7 @@ const Users = () => {
                                   Number(e.target.value),
                                 )
                               }
-                              class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-text"
+                              class="w-full px-4 py-2 border border-border rounded-xl  transition bg-surface cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-text"
                             >
                               <option value="">Выберите группу</option>
                               <For
@@ -890,7 +890,7 @@ const Users = () => {
                             <button
                               type="button"
                               onClick={() => removeTeacherStudentGroupId(index)}
-                              class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-urgent-bg text-urgent rounded-xl hover:bg-urgent transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                              class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-urgent-bg text-urgent rounded-xl hover:brightness-90 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                             >
                               <span class="hidden md:flex">Удалить</span>
                               <Trash class="flex md:hidden" />
@@ -902,7 +902,7 @@ const Users = () => {
                       <button
                         type="button"
                         onClick={addTeacherStudentGroupId}
-                        class="w-full py-2 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
+                        class="w-full py-2 bg-surface-2 text-text rounded-xl hover:brightness-90 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
                       >
                         <Plus /> Добавить группу
                       </button>
@@ -928,13 +928,13 @@ const Users = () => {
                               updateStudentId(index, e.target.value);
                             }}
                             placeholder={`ID ученика ${index + 1}`}
-                            class="flex-1 px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition disabled:opacity-50 disabled:cursor-not-allowed text-text"
+                            class="flex-1 px-4 py-2 border border-border rounded-xl  transition disabled:opacity-50 disabled:cursor-not-allowed text-text"
                           />
                           <button
                             disabled={saving()}
                             type="button"
                             onClick={() => removeStudentId(index)}
-                            class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-urgent-bg text-urgent rounded-xl hover:bg-urgent transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                            class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-urgent-bg text-urgent rounded-xl hover:brightness-90 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                           >
                             <span class="hidden md:flex">Удалить</span>
                             <Trash class="flex md:hidden" />
@@ -947,7 +947,7 @@ const Users = () => {
                       disabled={saving()}
                       type="button"
                       onClick={addStudentId}
-                      class="w-full py-2 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
+                      class="w-full py-2 bg-surface-2 text-text rounded-xl hover:brightness-90 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
                     >
                       <Plus /> Добавить ученика
                     </button>
@@ -966,7 +966,7 @@ const Users = () => {
                       onChange={(e) =>
                         setStudentGroupId(Number(e.currentTarget.value))
                       }
-                      class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
+                      class="w-full px-4 py-2 border border-border rounded-xl  transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
                     >
                       <option value="">Выберите группу</option>
                       <For each={studentGroups()}>
@@ -983,7 +983,7 @@ const Users = () => {
               <div class="sticky bottom-0 bg-surface border-t border-border px-6 py-4 flex justify-end gap-3">
                 <button
                   onClick={closeModal}
-                  class="w-40 h-10 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium cursor-pointer"
+                  class="w-40 h-10 bg-surface-2 text-text rounded-xl hover:brightness-90 transition font-medium cursor-pointer"
                 >
                   Отмена
                 </button>

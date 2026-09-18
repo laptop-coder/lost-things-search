@@ -15,7 +15,7 @@ const Pagination = (props: PaginationProps) => {
         <button
           onClick={props.onPrev}
           disabled={props.page === 0}
-          class="px-4 py-2 bg-surface text-text rounded-xl hover:bg-surface-2 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          class="px-4 py-2 bg-surface text-text rounded-xl hover:brightness-90 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           <ChevronLeft /> Назад
         </button>
@@ -23,7 +23,7 @@ const Pagination = (props: PaginationProps) => {
         <button
           onClick={props.onNext}
           disabled={!props.hasMore}
-          class="px-4 py-2 bg-surface text-text rounded-xl hover:bg-surface-2 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          class="px-4 py-2 bg-surface text-text rounded-xl hover:brightness-90 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           Вперёд <ChevronRight />
         </button>

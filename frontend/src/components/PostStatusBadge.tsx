@@ -8,15 +8,14 @@ interface Props {
 
 const PostStatusBadge = (props: Props) => {
   // use map instead of dynamic classes, because otherwise Tailwind will not
-  // include colors in final CSS
-  const colorMap = {
-    gray: "bg-gray-100 text-gray-700",
-    green: "bg-green-100 text-green-700",
-    purple: "bg-purple-100 text-purple-700",
-    red: "bg-red-100 text-red-700",
-    yellow: "bg-yellow-100 text-yellow-700",
+  // include styles in final CSS
+  const styleMap = {
+    info: "bg-surface-2 text-text-muted",
+    success: "bg-success text-bg",
+    urgent: "bg-urgent text-bg",
+    warning: "bg-warning text-bg",
   };
-  const [colorClasses, setColorClasses] = createSignal(colorMap.gray);
+  const [styleClasses, setStyleClasses] = createSignal(styleMap.info);
   const messagesMap = {
     pending: "Ожидание модерации",
     inProgress: "На рассмотрении",
@@ -28,35 +27,35 @@ const PostStatusBadge = (props: Props) => {
   const [message, setMessage] = createSignal(messagesMap.pending);
   switch (props.moderationStatus) {
     case PostModerationStatus.Pending:
-      setColorClasses(colorMap.gray);
+      setStyleClasses(styleMap.info);
       setMessage(messagesMap.pending);
       break;
     case PostModerationStatus.InProgress:
-      setColorClasses(colorMap.yellow);
+      setStyleClasses(styleMap.info);
       setMessage(messagesMap.inProgress);
       break;
     case PostModerationStatus.AutoApproved:
     case PostModerationStatus.Approved:
       if (props.thingReturnedToOwner) {
-        setColorClasses(colorMap.purple);
+        setStyleClasses(styleMap.success);
         setMessage(messagesMap.found);
       } else {
-        setColorClasses(colorMap.green);
+        setStyleClasses(styleMap.success);
         setMessage(messagesMap.approved);
       }
       break;
     case PostModerationStatus.AutoRejected:
     case PostModerationStatus.Rejected:
-      setColorClasses(colorMap.red);
+      setStyleClasses(styleMap.urgent);
       setMessage(messagesMap.rejected);
       break;
     case PostModerationStatus.NeedsReview:
-      setColorClasses(colorMap.yellow);
+      setStyleClasses(styleMap.warning);
       setMessage(messagesMap.needsReview);
       break;
   }
   return (
-    <div class={`px-2 py-0.5 ${colorClasses()} text-xs rounded-full`}>
+    <div class={`px-2 py-0.5 ${styleClasses()} text-xs rounded-full`}>
       {message()}
     </div>
   );

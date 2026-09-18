@@ -168,7 +168,7 @@ const InviteTokens = () => {
       {/* "Copied!" notification */}
       <Show when={showTokenCopied()}>
         <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50">
-          <div class="bg-surface-2 text-text px-5 py-3 rounded-xl shadow-lg text-sm font-medium gap-2">
+          <div class="bg-surface-2 text-text px-5 py-3 rounded-xl shadow-lg text-sm font-medium gap-2 flex flex-row">
             <Check /> Скопировано!
           </div>
         </div>
@@ -210,7 +210,7 @@ const InviteTokens = () => {
                   ),
                 )
               }
-              class="w-32 px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition text-text"
+              class="w-32 px-4 py-2 border border-border rounded-xl  transition text-text"
             />
           </div>
 
@@ -221,7 +221,7 @@ const InviteTokens = () => {
               <For each={availableRoles}>
                 {(role) => (
                   <label
-                    class={`flex items-center gap-3 p-2 rounded-lg hover:bg-surface-2 transition cursor-pointer ${((hasRole(ROLES.SUPERADMIN) && role.id === 2) || creating()) && "cursor-not-allowed"}`}
+                    class={`flex items-center gap-3 p-2 rounded-lg bg-surface hover:brightness-90 transition cursor-pointer ${((hasRole(ROLES.SUPERADMIN) && role.id === 2) || creating()) && "cursor-not-allowed"}`}
                   >
                     <input
                       type="checkbox"
@@ -269,7 +269,7 @@ const InviteTokens = () => {
             </h2>
             <button
               onClick={downloadTokensFile}
-              class="px-4 h-10 bg-surface text-text rounded-xl hover:bg-surface-2 transition cursor-pointer font-medium flex flex-row flex-nowrap gap-2 items-center justify-center"
+              class="px-4 h-10 bg-surface text-text rounded-xl hover:brightness-90 transition cursor-pointer font-medium flex flex-row flex-nowrap gap-2 items-center justify-center"
             >
               <Download />{" "}
               <span class="hidden text-nowrap md:flex">Скачать Markdown</span>{" "}
@@ -281,7 +281,7 @@ const InviteTokens = () => {
             <div class="divide-y divide-gray-100">
               <For each={tokens()}>
                 {(item, index) => (
-                  <div class="p-4 hover:bg-surface-2 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div class="p-4 hover:brightness-90 transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <code
                       class={`text-sm font-mono break-all text-text px-3 leading-10 text-center rounded-lg truncate ${navigator.clipboard ? "cursor-copy" : ""}`}
                       onClick={() => copyTokenToClipboard(item.token)}
