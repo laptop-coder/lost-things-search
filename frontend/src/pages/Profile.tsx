@@ -427,7 +427,7 @@ const Profile = () => {
           {/* "Copied!" notification */}
           <Show when={showCopied()}>
             <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50">
-              <div class="bg-surface-2 text-text px-5 py-3 rounded-xl shadow-lg text-sm font-medium gap-2">
+              <div class="bg-surface-2 text-text px-5 py-3 rounded-xl shadow-lg text-sm font-medium gap-2 flex flex-row">
                 <Check /> Скопировано!
               </div>
             </div>
@@ -464,7 +464,7 @@ const Profile = () => {
             <div class="bg-surface rounded-2xl shadow-lg p-6 relative">
               <button
                 onClick={handleLogout}
-                class="aspect-square h-10 bg-urgent-bg text-urgent rounded-lg hover:bg-urgent-bg transition cursor-pointer absolute top-4 right-4 flex justify-center items-center"
+                class="aspect-square h-10 bg-urgent-bg text-text rounded-lg hover:brightness-90 transition cursor-pointer absolute top-4 right-4 flex justify-center items-center"
               >
                 <LogOut />
               </button>
@@ -534,13 +534,13 @@ const Profile = () => {
                     <Show when={!editMode()}>
                       <button
                         onClick={() => setEditMode(true)}
-                        class="w-55 h-10 bg-surface-2 text-text rounded-lg hover:bg-surface transition cursor-pointer"
+                        class="w-55 h-10 bg-surface-2 text-text rounded-lg hover:brightness-90 transition cursor-pointer"
                       >
                         Редактировать
                       </button>
                       <button
                         onClick={openDeleteAccountModal}
-                        class="w-55 h-10 bg-urgent-bg text-urgent rounded-lg hover:bg-urgent-bg transition cursor-pointer"
+                        class="w-55 h-10 bg-urgent-bg text-text rounded-lg hover:brightness-90 transition cursor-pointer"
                       >
                         Удалить учётную запись
                       </button>
@@ -548,7 +548,7 @@ const Profile = () => {
                     <Show when={editMode()}>
                       <button
                         onClick={cancelEdit}
-                        class="w-55 h-10 bg-urgent-bg text-urgent rounded-lg hover:bg-urgent-bg transition cursor-pointer"
+                        class="w-55 h-10 bg-urgent-bg text-text rounded-lg hover:brightness-90 transition cursor-pointer"
                       >
                         Отмена
                       </button>
@@ -585,13 +585,13 @@ const Profile = () => {
                                 updateStudentId(index, e.target.value);
                               }}
                               placeholder={`ID ученика ${index + 1}`}
-                              class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition disabled:opacity-50 disabled:cursor-not-allowed text-text"
+                              class="w-full px-4 py-2 border border-border rounded-xl  transition disabled:opacity-50 disabled:cursor-not-allowed text-text"
                             />
                             <button
                               disabled={saving()}
                               type="button"
                               onClick={() => removeStudentId(index)}
-                              class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-urgent-bg text-urgent rounded-xl hover:bg-urgent-bg transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                              class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-urgent-bg text-text rounded-xl hover:brightness-90 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                             >
                               <span class="hidden md:flex">Удалить</span>
                               <Trash class="flex md:hidden" />
@@ -604,7 +604,7 @@ const Profile = () => {
                         disabled={saving()}
                         type="button"
                         onClick={addStudentId}
-                        class="w-full py-2 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
+                        class="w-full py-2 bg-surface-2 text-text rounded-xl hover:brightness-90 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
                       >
                         <Plus /> Добавить ученика
                       </button>
@@ -614,7 +614,7 @@ const Profile = () => {
                     <For each={parentStudentsUsers()}>
                       {(user) => (
                         <div
-                          class={`border rounded-xl p-4 hover:shadow-md transition relative ${!parentStudentIds.includes(user.id) ? "opacity-50" : ""}`}
+                          class={`shadow-lg rounded-xl p-4 hover:shadow-md transition relative ${!parentStudentIds.includes(user.id) ? "opacity-50" : ""}`}
                         >
                           <div class="flex flex-col md:flex-row items-center gap-3">
                             <img
@@ -678,7 +678,7 @@ const Profile = () => {
                   <div>
                     <h4 class="text-sm font-medium text-text mb-2">Кабинет</h4>
                     <div class="flex items-center gap-3">
-                      <span class="w-2 h-2 bg-surface-2 rounded-full"></span>
+                      <span class="w-2 h-2 bg-text rounded-full"></span>
                       <span class="text-text">
                         {teacherClassroom()?.name || "Не указан"}
                       </span>
@@ -731,7 +731,7 @@ const Profile = () => {
                       onChange={(e) =>
                         setTeacherClassroomId(Number(e.currentTarget.value))
                       }
-                      class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-text"
+                      class="w-full px-4 py-2 border border-border rounded-xl  transition bg-surface cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-text"
                     >
                       <option value="">Выберите кабинет</option>
                       <For each={rooms()}>
@@ -747,7 +747,7 @@ const Profile = () => {
                     <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border border-border rounded-xl">
                       <For each={subjects()}>
                         {(subject) => (
-                          <label class="flex items-center gap-2 p-2 hover:bg-surface-2 rounded-lg cursor-pointer transition">
+                          <label class="flex items-center gap-2 p-2 hover:brightness-90 rounded-lg cursor-pointer transition">
                             <input
                               type="checkbox"
                               checked={teacherSubjectIds().includes(subject.id)}
@@ -789,7 +789,7 @@ const Profile = () => {
                                 Number(e.target.value),
                               )
                             }
-                            class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-text"
+                            class="w-full px-4 py-2 border border-border rounded-xl  transition bg-surface cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-text"
                           >
                             <option value="">Выберите группу</option>
                             <For
@@ -808,7 +808,7 @@ const Profile = () => {
                           <button
                             type="button"
                             onClick={() => removeTeacherStudentGroupId(index)}
-                            class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-urgent-bg text-urgent rounded-xl hover:bg-urgent-bg transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                            class="max-md:aspect-square flex items-center justify-center px-2 md:px-4 bg-urgent-bg text-text rounded-xl hover:brightness-90 transition disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                           >
                             <span class="hidden md:flex">Удалить</span>
                             <Trash class="flex md:hidden" />
@@ -820,7 +820,7 @@ const Profile = () => {
                     <button
                       type="button"
                       onClick={addTeacherStudentGroupId}
-                      class="w-full py-2 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
+                      class="w-full py-2 bg-surface-2 text-text rounded-xl hover:brightness-90 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex flex-row flex-nowrap items-center justify-center gap-2"
                     >
                       <Plus /> Добавить группу
                     </button>
@@ -833,7 +833,7 @@ const Profile = () => {
                 <h3 class="text-lg font-semibold text-text mb-4">Должность</h3>
                 <Show when={!editMode()}>
                   <div class="flex items-center gap-3">
-                    <span class="w-2 h-2 bg-surface-2 rounded-full"></span>
+                    <span class="w-2 h-2 bg-text rounded-full"></span>
                     <span class="text-text">
                       {institutionAdministratorPosition()?.name}
                     </span>
@@ -854,7 +854,7 @@ const Profile = () => {
                           Number(e.currentTarget.value),
                         );
                       }}
-                      class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
+                      class="w-full px-4 py-2 border border-border rounded-xl  transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
                     >
                       <option value="">Выберите должность</option>
                       <For each={institutionAdministratorPositions()}>
@@ -872,7 +872,7 @@ const Profile = () => {
                 <h3 class="text-lg font-semibold text-text mb-4">Должность</h3>
                 <Show when={!editMode()}>
                   <div class="flex items-center gap-3">
-                    <span class="w-2 h-2 bg-surface-2 rounded-full"></span>
+                    <span class="w-2 h-2 bg-text rounded-full"></span>
                     <span class="text-text">{staffPosition()?.name}</span>
                   </div>
                 </Show>
@@ -889,7 +889,7 @@ const Profile = () => {
                         setError("");
                         setStaffPositionId(Number(e.currentTarget.value));
                       }}
-                      class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
+                      class="w-full px-4 py-2 border border-border rounded-xl  transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
                     >
                       <option value="">Выберите должность</option>
                       <For each={staffPositions()}>
@@ -909,7 +909,7 @@ const Profile = () => {
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <For each={studentParentsUsers()}>
                       {(user) => (
-                        <div class="border rounded-xl p-4 hover:shadow-md transition">
+                        <div class="rounded-xl p-4 hover:shadow-md transition shadow-lg">
                           <div class="flex items-center gap-3">
                             <img
                               class="w-12 h-12 rounded-full object-cover border-2 border-border"
@@ -921,7 +921,7 @@ const Profile = () => {
                               alt="Фото профиля"
                             />
                             <div>
-                              <p class="font-semibold">
+                              <p class="font-semibold text-text">
                                 {user.lastName} {user.firstName}{" "}
                                 {user?.middleName}
                               </p>
@@ -956,7 +956,7 @@ const Profile = () => {
                 </h3>
                 <Show when={!editMode()}>
                   <div class="flex items-center gap-3">
-                    <span class="w-2 h-2 bg-surface-2 rounded-full"></span>
+                    <span class="w-2 h-2 bg-text rounded-full"></span>
                     <span class="text-text">{studentGroup()?.name}</span>
                   </div>
                 </Show>
@@ -971,7 +971,7 @@ const Profile = () => {
                       onChange={(e) =>
                         setStudentGroupId(Number(e.currentTarget.value))
                       }
-                      class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
+                      class="w-full px-4 py-2 border border-border rounded-xl  transition bg-surface disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer text-text"
                     >
                       <option value="">Выберите группу</option>
                       <For each={studentGroups()}>
@@ -1040,7 +1040,7 @@ const Profile = () => {
                         }
                       }}
                       placeholder={user() ? user()!.email : "email@example.ru"}
-                      class="flex-1 px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition disabled:opacity-50 disabled:cursor-not-allowed text-text"
+                      class="flex-1 px-4 py-2 border border-border rounded-xl  transition disabled:opacity-50 disabled:cursor-not-allowed text-text"
                       required
                     />
                   </div>
@@ -1049,14 +1049,14 @@ const Profile = () => {
                   <div class="sticky bottom-0 bg-surface border-t border-border px-6 py-4 flex justify-end gap-3">
                     <button
                       onClick={closeDeleteAccountModal}
-                      class="px-4 py-2 bg-surface-2 text-text rounded-xl hover:bg-surface transition font-medium cursor-pointer"
+                      class="px-4 py-2 bg-surface-2 text-text rounded-xl hover:brightness-90 transition font-medium cursor-pointer"
                     >
                       Отмена
                     </button>
                     <button
                       onClick={deleteAccount}
                       disabled={deleteAccountLoading()}
-                      class="px-4 py-2 bg-urgent-bg text-urgent rounded-xl hover:bg-urgent-bg transition font-medium disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
+                      class="px-4 py-2 bg-urgent-bg text-text rounded-xl hover:brightness-90 transition font-medium disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                     >
                       {deleteAccountLoading() ? "Удаление..." : "Удалить"}
                     </button>

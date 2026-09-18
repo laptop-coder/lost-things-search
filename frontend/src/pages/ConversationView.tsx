@@ -182,9 +182,7 @@ const ConversationView = () => {
                       <div class={`max-w-[70%] ${isOwn ? "order-2" : ""}`}>
                         <Motion.div
                           class={`rounded-2xl px-4 py-2 ${
-                            isOwn
-                              ? "bg-surface-2 text-text"
-                              : "bg-bg text-text"
+                            isOwn ? "bg-surface-2 text-text" : "bg-bg text-text"
                           }`}
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
@@ -221,7 +219,7 @@ const ConversationView = () => {
           onInput={(e) => setNewMessage(e.currentTarget.value)}
           placeholder="Сообщение..."
           disabled={sending()}
-          class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none disabled:opacity-50 text-text"
+          class="w-full px-4 py-2 border border-border rounded-xl  disabled:opacity-50 text-text"
         />
         <button
           type="submit"

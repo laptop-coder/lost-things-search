@@ -112,9 +112,7 @@ const Subjects = () => {
       {/* Form for subjects creating */}
       <Show when={hasPermission(PERMISSIONS.SUBJECT_CREATE)}>
         <div class="bg-surface rounded-2xl shadow-lg p-6">
-          <h2 class="text-lg font-semibold text-text mb-4">
-            Добавить предмет
-          </h2>
+          <h2 class="text-lg font-semibold text-text mb-4">Добавить предмет</h2>
           <form onSubmit={createSubject} class="flex gap-3">
             <input
               ref={inputRef}
@@ -122,7 +120,7 @@ const Subjects = () => {
               value={newSubjectName()}
               onInput={(e) => setNewSubjectName(e.currentTarget.value)}
               placeholder="Название предмета"
-              class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition disabled:opacity-50 text-text"
+              class="w-full px-4 py-2 border border-border rounded-xl  transition disabled:opacity-50 text-text"
               disabled={creating()}
             />
             <button
@@ -180,7 +178,7 @@ const Subjects = () => {
               <tbody class="divide-y divide-border">
                 <For each={subjects()}>
                   {(subject) => (
-                    <tr class="hover:bg-surface-2 transition">
+                    <tr class="bg-surface hover:brightness-90 transition">
                       <td class="px-6 py-4 text-sm text-text font-mono">
                         {subject.id}
                       </td>

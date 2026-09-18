@@ -55,8 +55,8 @@ const ListOfConversations = () => {
       </Show>
 
       <Show when={!loading() && conversations().length === 0}>
-        <div class="text-center py-16 bg-surface rounded-2xl shadow">
-          <div class="text-5xl mb-3"><MessageSquareText /></div>
+        <div class="text-center py-16 bg-surface rounded-2xl shadow flex items-center flex-col">
+          <MessageSquareText class="text-5xl mb-3 text-text" />
           <p class="text-text-muted">Нет сообщений</p>
         </div>
       </Show>

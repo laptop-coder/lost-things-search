@@ -44,9 +44,7 @@ const Login = () => {
     <div class="min-h-[80vh] flex items-center justify-center px-4">
       <div class="w-full max-w-md">
         <div class="text-center mb-8">
-          <h1 class="text-3xl font-bold text-text">
-            Вход в учётную запись
-          </h1>
+          <h1 class="text-3xl font-bold text-text">Вход в учётную запись</h1>
           <p class="text-text-muted mt-2">Добро пожаловать!</p>
         </div>
 
@@ -64,7 +62,7 @@ const Login = () => {
               value={email()}
               onInput={(e) => setEmail(e.currentTarget.value)}
               placeholder="email@example.ru"
-              class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition text-text"
+              class="w-full px-4 py-2 border border-border rounded-xl  transition text-text"
               required
             />
           </div>
@@ -78,7 +76,7 @@ const Login = () => {
               value={password()}
               onInput={(e) => setPassword(e.currentTarget.value)}
               placeholder="••••••••"
-              class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition text-text"
+              class="w-full px-4 py-2 border border-border rounded-xl  transition text-text"
               required
             />
           </div>
@@ -102,16 +100,16 @@ const Login = () => {
           <div class="flex flex-col">
             <a
               href="/forgot-password"
-              class="text-text-muted hover:text-text hover:underline"
+              class="text-text hover:text-text-muted hover:underline"
             >
               Забыли пароль?
             </a>
 
-            <p class="text-sm text-text-muted mt-4 flex flex-col">
+            <p class="text-sm text-text mt-4 flex flex-col">
               Ученик или родитель?
               <a
                 href="/register"
-                class="text-text-muted hover:text-text hover:underline"
+                class="text-text hover:text-text-muted hover:underline"
               >
                 Запросить пригласительную ссылку
               </a>

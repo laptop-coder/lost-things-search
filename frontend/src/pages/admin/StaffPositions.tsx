@@ -105,9 +105,7 @@ const StaffPositions = () => {
   return (
     <div class="space-y-6 p-4">
       <div class="mb-6">
-        <h1 class="text-3xl font-bold text-text">
-          Должности сотрудников ОУ
-        </h1>
+        <h1 class="text-3xl font-bold text-text">Должности сотрудников ОУ</h1>
         <p class="text-gray-500 mt-1">Управление должностями сотрудников</p>
       </div>
 
@@ -130,7 +128,7 @@ const StaffPositions = () => {
               value={newStaffPositionName()}
               onInput={(e) => setNewStaffPositionName(e.currentTarget.value)}
               placeholder="Название должности"
-              class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition disabled:opacity-50 text-text"
+              class="w-full px-4 py-2 border border-border rounded-xl  transition disabled:opacity-50 text-text"
               disabled={creating()}
             />
             <button
@@ -188,7 +186,7 @@ const StaffPositions = () => {
               <tbody class="divide-y divide-border">
                 <For each={staffPositions()}>
                   {(position) => (
-                    <tr class="hover:bg-surface transition">
+                    <tr class="bg-surface hover:brightness-90 transition">
                       <td class="px-6 py-4 text-sm text-text font-mono">
                         {position.id}
                       </td>

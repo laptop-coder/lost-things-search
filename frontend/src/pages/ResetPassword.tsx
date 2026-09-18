@@ -90,7 +90,7 @@ const ResetPassword = () => {
                 value={password()}
                 onInput={(e) => setPassword(e.currentTarget.value)}
                 placeholder="••••••••"
-                class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition"
+                class="w-full px-4 py-2 border border-border rounded-xl  transition"
                 required
               />
             </div>
@@ -104,7 +104,7 @@ const ResetPassword = () => {
                 value={confirmPassword()}
                 onInput={(e) => setConfirmPassword(e.currentTarget.value)}
                 placeholder="••••••••"
-                class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition"
+                class="w-full px-4 py-2 border border-border rounded-xl  transition"
                 required
               />
             </div>

@@ -68,7 +68,7 @@ const ForgotPassword = () => {
                 value={email()}
                 onInput={(e) => setEmail(e.currentTarget.value)}
                 placeholder="email@example.ru"
-                class="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-focus focus:border-focus outline-none transition"
+                class="w-full px-4 py-2 border border-border rounded-xl  transition"
                 required
               />
             </div>

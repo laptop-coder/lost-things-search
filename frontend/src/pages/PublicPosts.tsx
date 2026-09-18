@@ -170,7 +170,9 @@ const PublicPosts = () => {
       </div>
 
       <Show when={error()}>
-        <div class="bg-urgent-bg text-urgent p-4 rounded-lg border-urgent">{error()}</div>
+        <div class="bg-urgent-bg text-urgent p-4 rounded-lg border-urgent">
+          {error()}
+        </div>
       </Show>
 
       <Show when={refreshLoading()}>
@@ -213,7 +215,9 @@ const PublicPosts = () => {
       </Show>
       <div ref={observerRef} class="h-10">
         <Show when={posts().length === 0 && !refreshLoading() && !loading()}>
-          <div class="text-center text-text-muted py-8">Пока нет объявлений</div>
+          <div class="text-center text-text-muted py-8">
+            Пока нет объявлений
+          </div>
         </Show>
         <Show when={!hasMore() && posts().length > 0}>
           <div class="text-center text-text-muted py-8">

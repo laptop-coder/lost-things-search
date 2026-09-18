@@ -205,5 +205,9 @@ export const ROLES_TO_DISPLAY = [
   { id: 5, name: ROLES.TEACHER, displayName: "Преподаватель" },
   { id: 6, name: ROLES.PARENT, displayName: "Родитель" },
   { id: 7, name: ROLES.STUDENT, displayName: "Обучающийся" },
-  { id: 8, name: ROLES.BOT_MODERATOR_POSTS, displayName: "Бот (модератор объявлений)" },
+  {
+    id: 8,
+    name: ROLES.BOT_MODERATOR_POSTS,
+    displayName: "Бот (модератор объявлений)",
+  },
 ];

@@ -168,7 +168,7 @@ const PublicProfile = () => {
           {/* "Copied!" notification */}
           <Show when={showCopied()}>
             <div class="fixed top-5 left-1/2 -translate-x-1/2 z-50">
-              <div class="bg-surface-2 text-text px-5 py-3 rounded-xl shadow-lg text-sm font-medium gap-2">
+              <div class="bg-surface-2 text-text px-5 py-3 rounded-xl shadow-lg text-sm font-medium gap-2 flex flex-row">
                 <Check /> Скопировано!
               </div>
             </div>
@@ -280,7 +280,7 @@ const PublicProfile = () => {
                               alt="Фото профиля"
                             />
                             <div>
-                              <p class="font-semibold">
+                              <p class="font-semibold text-text">
                                 {user.lastName} {user.firstName}{" "}
                                 {user?.middleName}
                               </p>
@@ -346,7 +346,7 @@ const PublicProfile = () => {
                 <div>
                   <h4 class="text-sm font-medium text-text mb-2">Кабинет</h4>
                   <div class="flex items-center gap-3">
-                    <span class="w-2 h-2 bg-surface-2 rounded-full"></span>
+                    <span class="w-2 h-2 bg-text rounded-full"></span>
                     <span class="text-text">
                       {teacherClassroom()?.name || "Не указан"}
                     </span>
@@ -382,7 +382,7 @@ const PublicProfile = () => {
               <div class="bg-surface-2 rounded-2xl shadow-lg p-6">
                 <h3 class="text-lg font-semibold text-text mb-4">Должность</h3>
                 <div class="flex items-center gap-3">
-                  <span class="w-2 h-2 bg-surface-2 rounded-full"></span>
+                  <span class="w-2 h-2 bg-text rounded-full"></span>
                   <span class="text-text">
                     {institutionAdministratorPosition()?.name}
                   </span>
@@ -393,7 +393,7 @@ const PublicProfile = () => {
               <div class="bg-surface rounded-2xl shadow-lg p-6">
                 <h3 class="text-lg font-semibold text-text mb-4">Должность</h3>
                 <div class="flex items-center gap-3">
-                  <span class="w-2 h-2 bg-surface-2 rounded-full"></span>
+                  <span class="w-2 h-2 bg-text rounded-full"></span>
                   <span class="text-text">{staffPosition()?.name}</span>
                 </div>
               </div>
@@ -421,7 +421,7 @@ const PublicProfile = () => {
                               alt="Фото профиля"
                             />
                             <div>
-                              <p class="font-semibold">
+                              <p class="font-semibold text-text">
                                 {user.lastName} {user.firstName}{" "}
                                 {user?.middleName}
                               </p>
@@ -455,7 +455,7 @@ const PublicProfile = () => {
                   Класс/учебная группа
                 </h3>
                 <div class="flex items-center gap-3">
-                  <span class="w-2 h-2 bg-surface-2 rounded-full"></span>
+                  <span class="w-2 h-2 bg-text rounded-full"></span>
                   <span class="text-text">{studentGroup()?.name}</span>
                 </div>
               </div>

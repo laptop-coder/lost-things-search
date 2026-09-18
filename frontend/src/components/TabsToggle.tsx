@@ -69,7 +69,7 @@ const TabsToggle = (props: {
                 setActiveTab(index());
                 props.onChange(props.tabs[index()]);
               }}
-              class="border-none bg-none p-[20px] h-full text-sm cursor-pointer flex items-center rounded-lg text-text"
+              class="border-none bg-none p-[20px] h-full text-sm cursor-pointer flex items-center rounded-lg text-text focus:ring-0 focus-visible:ring-2 focus-visible:ring-focus"
             >
               <span class="relative z-2 select-none flex items-center justify-center">
                 {tab.label}

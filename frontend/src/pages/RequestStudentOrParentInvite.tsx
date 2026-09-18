@@ -139,7 +139,7 @@ const RequestStudentOrParentInvite = () => {
                   value={email()}
                   placeholder={`${role() === ROLES.STUDENT ? "student" : "parent"}@example.ru`}
                   onInput={(e) => setEmail(e.currentTarget.value)}
-                  class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition disabled:cursor-not-allowed"
+                  class="w-full px-4 py-2 border border-border rounded-xl  transition disabled:cursor-not-allowed"
                   required
                 />
               </div>

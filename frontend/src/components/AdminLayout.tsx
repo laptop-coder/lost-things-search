@@ -129,14 +129,14 @@ const AdminLayout = (props: Props) => {
                       navigate(tab.path!);
                       setMobileMenuOpen(false);
                     }}
-                    class={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer text-text ${isActive(tab.path) ? "bg-surface-2" : "hover:bg-surface-2"}`}
+                    class={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer text-text hover:bg-surface-2 ${isActive(tab.path) ? "bg-surface-2" : "hover:brightness-90"}`}
                   >
                     {tab.label}
                   </button>
                 ) : (
                   <button
                     onClick={() => toggleSubmenu(tab.key)}
-                    class={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex justify-between items-center cursor-pointer text-text ${isParentActive(tab) ? "bg-surface-2" : "hover:bg-surface-2"}`}
+                    class={`w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex justify-between items-center cursor-pointer text-text ${isParentActive(tab) ? "bg-surface-2" : "hover:brightness-90"}`}
                   >
                     <span>{tab.label}</span>
                     <span>{openSubmenu() === tab.key ? "▾" : "▸"}</span>
@@ -152,7 +152,7 @@ const AdminLayout = (props: Props) => {
                             navigate(sub.path);
                             setMobileMenuOpen(false);
                           }}
-                          class={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 cursor-pointer text-text ${isActive(sub.path) ? "bg-surface-2 font-medium" : "hover:bg-surface-2"}`}
+                          class={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 cursor-pointer text-text ${isActive(sub.path) ? "bg-surface-2 font-medium" : "hover:brightness-90"}`}
                         >
                           {sub.label}
                         </button>
