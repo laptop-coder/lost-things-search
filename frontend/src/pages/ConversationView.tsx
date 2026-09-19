@@ -95,7 +95,7 @@ const ConversationView = () => {
   const post = () => conversation()?.post;
 
   return (
-    <div class="max-w-4xl mx-auto h-full md:h-[calc(100vh-120px)] flex flex-col bg-surface rounded-2xl shadow-lg overflow-hidden">
+    <div class="max-w-4xl mx-auto h-full md:h-[calc(100vh-200px)] flex flex-col bg-surface rounded-2xl shadow-lg overflow-hidden">
       {/* Header */}
       <div class="border-b border-border p-4 flex items-center gap-3">
         <button

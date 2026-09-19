@@ -341,9 +341,9 @@ const Register = () => {
                     <button
                       type="button"
                       onClick={removeAvatar}
-                      class="absolute -top-2 -right-2 p-1 bg-urgent-bg text-urgent rounded-full hover:brightness-90 transition cursor-pointer"
+                      class="absolute -top-2 -right-2 p-1 bg-urgent-bg hover:brightness-90 rounded-full transition cursor-pointer"
                     >
-                      <X />
+                      <X class="text-text" />
                     </button>
                   </div>
                 </Show>

@@ -140,9 +140,9 @@ const CreatePost = () => {
                   <button
                     type="button"
                     onClick={removePhoto}
-                    class="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition cursor-pointer"
+                    class="absolute top-2 right-2 p-1 bg-urgent-bg hover:brightness-90 rounded-full transition cursor-pointer"
                   >
-                    <X class="text-urgent bg-urgent-bg" />
+                    <X class="text-text" />
                   </button>
                 </div>
               </Show>

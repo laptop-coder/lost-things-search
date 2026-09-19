@@ -189,9 +189,9 @@ const EditPost = () => {
                       <button
                         type="button"
                         onClick={removePhoto}
-                        class="absolute top-2 right-2 p-1 bg-urgent-bg text-urgent rounded-full hover:bg-red-600 transition cursor-pointer disabled:cursor-not-allowed"
+                        class="absolute top-2 right-2 p-1 bg-urgent-bg hover:brightness-90 rounded-full transition cursor-pointer disabled:cursor-not-allowed"
                       >
-                        <X />
+                        <X class="text-text" />
                       </button>
                     )}
                   </div>
