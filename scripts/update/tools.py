@@ -1,4 +1,6 @@
 import datetime
+import re
+from pathlib import Path
 import time
 import subprocess
 from .vk_api import send_alert, post_on_wall
@@ -198,6 +200,28 @@ def download_docker_images(latest_tag: str) -> list[int]:
         time.sleep(0.1)
 
     return processes_time
+
+
+def write_latest_tag_to_env(latest_tag: str, path_to_env: Path):
+    print_wait("Writing latest tag to env...")
+    try:
+        lines = path_to_env.read_text(encoding="utf-8").splitlines()
+        var_name = "DOCKER_COMPOSE_LATEST_TAG"
+        for i in range(len(lines)):
+            if lines[i].startswith(f"{var_name}="):
+                lines[i] = re.sub(
+                    rf"^{var_name}=.*#",
+                    f"{var_name}={latest_tag} #",
+                    lines[i],
+                )
+        path_to_env.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    except Exception as e:
+        print_err("ERROR")
+        msg = f"Failed to write latest tag to the env file! Error: {e}"
+        print_err(msg)
+        send_alert(msg)
+        return False
+    print_ok("OK")
 
 
 def stop_project():

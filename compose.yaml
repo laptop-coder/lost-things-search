@@ -51,7 +51,7 @@ services:
       retries: 5
 
   backend:
-    image: ghcr.io/laptop-coder/lost-things-search-backend:latest
+    image: ghcr.io/laptop-coder/lost-things-search-backend:${DOCKER_COMPOSE_LATEST_TAG}
     container_name: lts-backend
     restart: always
     volumes:
@@ -81,7 +81,7 @@ services:
       retries: 5
 
   ml:
-    image: ghcr.io/laptop-coder/lost-things-search-ml:latest
+    image: ghcr.io/laptop-coder/lost-things-search-ml:${DOCKER_COMPOSE_LATEST_TAG}
     container_name: lts-ml
     restart: always
     volumes:
@@ -103,7 +103,7 @@ services:
       retries: 5
 
   migrate:
-    image: ghcr.io/laptop-coder/lost-things-search-migrate:latest
+    image: ghcr.io/laptop-coder/lost-things-search-migrate:${DOCKER_COMPOSE_LATEST_TAG}
     container_name: lts-migrate
     volumes:
       - /etc/localtime:/etc/localtime
@@ -122,7 +122,7 @@ services:
       - lts_network
 
   frontend:
-    image: ghcr.io/laptop-coder/lost-things-search-frontend:latest
+    image: ghcr.io/laptop-coder/lost-things-search-frontend:${DOCKER_COMPOSE_LATEST_TAG}
     container_name: lts-frontend
     restart: always
     volumes:

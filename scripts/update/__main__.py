@@ -1,3 +1,4 @@
+from pathlib import Path
 from .utils import (
     graceful_shutdown,
     print_wait,
@@ -16,6 +17,7 @@ from .tools import (
     update_current_tag_in_file,
     publish_update_digest,
     get_changelog,
+    write_latest_tag_to_env,
 )
 from .config import PATH_TO_PROJECT, MAIN_SERVICE, TAG_FILE, DigestDTOBuilder
 import signal
@@ -64,6 +66,8 @@ def main(digest_dto_builder: DigestDTOBuilder) -> bool:
 
     if need_update:
         digest_dto_builder.downloading_time = download_docker_images(latest_tag)
+        PATH_TO_ENV = Path(__file__).resolve().parent.parent.parent / ".env"
+        write_latest_tag_to_env(latest_tag, PATH_TO_ENV)
 
         stop_project()
         pull_code_changes()
